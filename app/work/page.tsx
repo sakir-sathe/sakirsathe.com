@@ -23,6 +23,10 @@ export default function WorkPage() {
           <div className="border-t border-line">
             {caseStudies.map((c) => <CaseStudyRow key={c.slug} c={c} />)}
           </div>
+          <aside className="mt-12 grid gap-3 border-t border-line pt-6 md:grid-cols-[110px_1fr] md:gap-8">
+            <p className="meta">Earlier systems</p>
+            <p className="max-w-3xl text-[14px] leading-relaxed text-muted">Earlier enterprise work included workforce, attendance, leave and reimbursement workflows; employee administration; project and resource management; timesheets; work allocation; and audit/document systems. These applications brought together business workflows, role-based access, reporting and web functionality across the Microsoft stack.</p>
+          </aside>
         </Container>
       </section>
     </>

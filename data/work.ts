@@ -201,36 +201,112 @@ export const caseStudies: CaseStudy[] = [
     index: "W-06",
     title: "Complex Product Configuration Platform",
     systemType: "Rule-driven product configuration software",
-    domain: "Enterprise Product Engineering",
-    summary: "Enterprise engineering software for configuring complex physical products, validating rules and generating downstream order, pricing and reporting outputs.",
-    technologies: ["ASP.NET Core", "ASP.NET MVC", "React", "Redux / Saga", "Angular", "SQL Server", "REST APIs"],
-    themes: ["Rules engines", "Complex workflows", "Full-stack architecture", "Technical leadership", "Maintainability", "Product engineering"],
+    domain: "Manufacturing · Product Engineering",
+    summary: "Manufacturing workflows for configuring complex products, applying business rules, and producing pricing, order, document and reporting outputs across evolving web applications.",
+    technologies: ["ASP.NET MVC / Core", "React", "Redux / Saga", "Angular / AngularJS", "SQL Server", "REST APIs", "Selenium", "Report templating"],
+    themes: ["Product configuration", "Manufacturing workflows", "Desktop-to-web modernization", "Business rules", "Technical leadership", "Quality and maintainability"],
     narrativeStatus: "published",
     sections: [
       {
         heading: "System overview",
-        body: "The platform supported configuration of complex physical products, with validation and downstream order, pricing and reporting outputs. Its user workflows needed to make interdependent choices understandable without exposing the details of proprietary configuration rules.",
+        body: "Across a broader manufacturing and product-engineering chapter, I worked on complex configurators and enterprise workflows for defining products, validating interdependent choices, and producing pricing, order, document and reporting outputs. Some experiences also involved modernizing desktop-oriented capabilities into web applications.",
       },
       {
         heading: "My contribution",
-        body: "I worked across technical leadership, full-stack development, validation logic, UI workflows, APIs, reporting, code review, estimation and engineering quality.",
+        body: "My work spanned full-stack implementation, configuration-driven interfaces, validation and business rules, APIs, report generation, UI automation and technical leadership. I contributed to design decisions, estimation, code review, mentoring and iterative delivery with engineering teams.",
       },
       {
         heading: "Engineering challenge",
-        body: "Many interdependent options can determine whether a configuration is valid. A change in one part of the configuration may affect choices elsewhere. The software must make that complexity understandable to users while keeping validation logic reliable, maintainable and separate from presentation details.",
+        body: "Configuration choices often depend on rules elsewhere in a product or workflow. The interface must communicate valid options while authoritative rules remain consistent across APIs, persistence and downstream documents. Modernization adds another constraint: preserve essential business behavior while improving maintainability and delivery.",
       },
       {
         heading: "Architecture and approach",
-        body: "The generic flow begins with a web UI and application or API layer. Configuration logic and validation rules determine the valid state before persistence and downstream outputs. Reporting and integration boundaries consume the configuration without needing to reproduce the user interface. No proprietary rules or product details are included in this flow.",
-        flow: ["Web UI", "Application / API layer", "Configuration logic", "Validation rules", "Persistence", "Reporting / downstream outputs"],
+        body: "The general pattern combines a web interface with application and API layers, SQL-backed business data, reusable configuration rules, and downstream order or reporting workflows. Across different systems, the frontend approaches included ASP.NET MVC/Core, React with Redux/Saga, and Angular-family applications; Selenium supported UI automation. These technologies describe the broader body of work, not one application using every option.",
+        flow: ["Configuration-driven web UI", "Application / REST API", "Business rules + validation", "SQL Server / workflow data", "Order, pricing, document + report outputs"],
       },
       {
         heading: "Engineering priorities",
-        body: "Frontend state and authoritative validation serve different purposes. The interface needs to explain choices and constraints, while application logic needs to remain dependable regardless of the path a user takes. Clear boundaries support review, estimation and changes to complex workflows without spreading configuration rules across every layer.",
+        body: "The interface should make constraints understandable without becoming the source of truth for business rules. Stable API contracts, testable validation, report quality and UI automation all help protect complex workflows as they evolve. Technical guidance and code review support consistent delivery across teams.",
       },
       {
         heading: "Lessons and takeaways",
-        body: "A configuration system is as much a communication problem as a rules problem. Users need understandable feedback, and engineers need rules that can be reasoned about independently of the UI. Maintainability depends on preserving that separation as the application and its workflows evolve.",
+        body: "Product configurators are long-lived business applications: they must explain complex choices to users and preserve reliable downstream outcomes. Separating interface state from authoritative rules makes modernization safer, while iterative planning, mentoring and review help teams improve systems without losing the domain behavior they depend on.",
+      },
+    ],
+  },
+  {
+    slug: "cross-platform-product-ai-platform",
+    index: "W-07",
+    title: "Cross-Platform Product & AI Platform",
+    systemType: "Web, mobile and AI-enabled application platform",
+    domain: "Web · Mobile · AI-Enabled Applications",
+    summary: "Full-stack engineering across connected web and cross-platform mobile products, shared services, enterprise integrations and AI-assisted experiences.",
+    technologies: ["Blazor WebAssembly", ".NET MAUI", "Next.js", "TypeScript", "C# / .NET", "Python", "REST / GraphQL / gRPC", "Azure Functions"],
+    themes: ["Cross-platform product engineering", "Technical design ownership", "Enterprise integration", "AI-enabled experiences", "Observability", "Production reliability"],
+    narrativeStatus: "published",
+    sections: [
+      {
+        heading: "System overview",
+        body: "This work represents full-stack product engineering across web and cross-platform mobile experiences. Product capabilities connected user interfaces with shared services, enterprise data and external integrations, with location-aware and AI-assisted experiences where they fit the use case.",
+      },
+      {
+        heading: "My contribution",
+        body: "I owned technical design and implementation across frontend, mobile and backend concerns, integrating enterprise UI components and APIs while providing code review, technical guidance and hands-on production support.",
+      },
+      {
+        heading: "Engineering challenge",
+        body: "A product spanning browser and mobile clients must balance native interaction expectations with reusable services and dependable data contracts. Authentication, integration behavior, observability and release coordination all affect whether features remain reliable beyond the development environment.",
+      },
+      {
+        heading: "Architecture and approach",
+        body: "Different product needs called for different client and service patterns: Blazor WebAssembly and .NET MAUI, alongside Next.js and TypeScript, connected to C#/.NET or Python services. Integrations included REST, GraphQL and gRPC/Protobuf, OAuth 2.0 flows, Azure Functions, and SQL or NoSQL data stores. These describe the breadth of systems and choices, not a claim that every feature used every technology.",
+        flow: ["Web and cross-platform mobile clients", "Authentication + enterprise UI components", "REST / GraphQL / gRPC service boundaries", ".NET / Python services + SQL / NoSQL data", "Azure delivery + observability"],
+      },
+      {
+        heading: "Engineering priorities",
+        body: "Consistent contracts and authentication flows help client applications evolve without duplicating business behavior. CI/CD, Azure deployments and Application Insights support repeatable releases and production diagnosis; troubleshooting and reliability work remain part of implementation rather than a final handoff.",
+      },
+      {
+        heading: "Lessons and takeaways",
+        body: "Cross-platform product work is a coordination problem as much as a framework choice. Clear service boundaries, deliberate component integration and production feedback make it possible to deliver different client experiences while keeping the system maintainable.",
+      },
+    ],
+  },
+  {
+    slug: "enterprise-appraisal-workflow-platform",
+    index: "W-08",
+    title: "Enterprise Appraisal & Workflow Platform",
+    systemType: "Transactional workflow and business application",
+    domain: "Enterprise Application Engineering",
+    summary: "A transactional business application supporting appraisal, valuation and related workflows with complex rules, data and operational handoffs.",
+    technologies: ["ASP.NET Core", "Angular", "Redux-style state", "REST APIs", "SQL Server", "Kubernetes", "Azure DevOps"],
+    themes: ["Transactional workflows", "Feature delivery", "Performance and maintainability", "Production readiness", "Hands-on team leadership", "Engineering quality"],
+    narrativeStatus: "published",
+    sections: [
+      {
+        heading: "System overview",
+        body: "The platform supported enterprise appraisal and valuation workflows, coordinating detailed business information, review steps and transactional outcomes in a production business application.",
+      },
+      {
+        heading: "My contribution",
+        body: "I combined hands-on feature development across ASP.NET Core, Angular and APIs with technical leadership: estimating work, solving difficult engineering problems, reviewing code and mentoring engineers through delivery.",
+      },
+      {
+        heading: "Engineering challenge",
+        body: "Workflow-heavy applications need state to remain understandable across user interactions, APIs and persistence. Changes must preserve business rules while improving responsiveness and maintainability, and must be delivered in a form that can be operated reliably.",
+      },
+      {
+        heading: "Architecture and approach",
+        body: "A browser application used Angular and Redux-style state management over ASP.NET Core REST APIs, with SQL Server for transactional data. Kubernetes and Azure DevOps supported deployment and delivery practices. This is a high-level description of the engineering pattern, not an internal system design.",
+        flow: ["Angular workflow UI", "ASP.NET Core REST APIs", "Business validation + workflow state", "SQL Server", "Kubernetes deployment + Azure DevOps delivery"],
+      },
+      {
+        heading: "Engineering priorities",
+        body: "Feature work was balanced with performance, maintainability and production readiness. Estimation, focused technical problem solving, code review and mentoring helped the team deliver changes while keeping shared workflows understandable and supportable.",
+      },
+      {
+        heading: "Lessons and takeaways",
+        body: "Transactional enterprise applications benefit from clear state ownership and predictable API boundaries. Leadership is most effective when technical direction stays connected to implementation, delivery constraints and the realities of operating the application.",
       },
     ],
   },

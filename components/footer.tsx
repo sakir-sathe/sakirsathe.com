@@ -31,7 +31,7 @@ export function Footer() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 font-mono text-[11px] text-subtle sm:flex-row sm:justify-between sm:px-8">
           <span>{site.domain}</span>
-          <span>Static build · Next.js · Azure-ready</span>
+          <span>Static build · Next.js · Azure Static Web Apps</span>
         </div>
       </div>
     </footer>

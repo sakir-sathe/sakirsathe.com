@@ -16,8 +16,8 @@ export default function AboutPage() {
         <Container className="grid gap-14 lg:grid-cols-[1fr_300px] lg:gap-24">
           <div className="max-w-2xl space-y-6 text-[17px] leading-[1.75] text-muted text-pretty">
             <p className="text-[20px] leading-relaxed text-fg">I&rsquo;m {site.name}, a {site.roleSummary} based in {site.location}.</p>
-            <p>I&rsquo;ve spent more than fourteen years building software across the Microsoft ecosystem, from enterprise .NET applications and databases to cloud platforms, distributed integrations and AI-enabled systems.</p>
-            <p>My work often sits where multiple parts of a system meet: application architecture, backend engineering, cloud infrastructure, data, search, automation and production reliability.</p>
+            <p>I&rsquo;ve spent more than fourteen years building software across the Microsoft ecosystem, from enterprise applications and complex product engineering to Azure/cloud systems, data and geospatial platforms, and AI-enabled software.</p>
+            <p>That progression has included technical leadership and hands-on work across architecture, backend and frontend engineering, production reliability, AI/search, and more recently developer tooling and open-source work. I&rsquo;ve led substantial engineering teams while staying close to design decisions, implementation, review and delivery.</p>
             <p>I enjoy understanding how systems work beneath the abstractions, solving practical engineering problems and turning useful solutions into reusable tools.</p>
             <p>Much of my recent exploration has focused on AI-assisted software engineering, retrieval systems, coding agents and developer infrastructure.</p>
             <p>This site is where I document what I learn, publish engineering notes and share open-source work.</p>
