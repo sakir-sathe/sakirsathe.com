@@ -35,19 +35,15 @@ export const giscus: {
   categoryId: "",
 } as const;
 
-/**
- * Social profiles. Set `url` to the exact profile URL to configure.
- * PLACEHOLDERS: replace social.github.url and social.linkedin.url with exact
- * profile URLs. null renders non-interactive "Not configured" text, never search.
- */
+/** Public profile URLs used by the header, footer, and structured metadata. */
 export const social: { github: SocialLink; linkedin: SocialLink } = {
   github: {
     label: "GitHub",
-    url: null,
+    url: "https://github.com/sakir-sathe",
   },
   linkedin: {
     label: "LinkedIn",
-    url: null,
+    url: "https://www.linkedin.com/in/sakir-sathe-6777649a/",
   },
 };
 
