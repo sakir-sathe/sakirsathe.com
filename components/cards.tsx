@@ -53,10 +53,14 @@ export function ProjectCard({ p }: { p: Project }) {
 export function PostRow({ p }: { p: Post }) {
   return (
     <Link href={`/writing/${p.slug}`} className="group grid gap-2 border-b border-line py-6 md:grid-cols-[140px_1fr] md:gap-8">
-      <time dateTime={p.date} className="font-mono text-[12px] text-subtle">{formatDate(p.date)}</time>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[12px] text-subtle">
+        <time dateTime={p.date}>{formatDate(p.date)}</time>
+        <span>{p.readingTime} min read</span>
+      </div>
       <div>
         <h3 className="text-[18px] font-medium tracking-tight group-hover:text-accent">{p.title}</h3>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">{p.description}</p>
+        <div className="mt-3 flex flex-wrap gap-1.5">{p.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</div>
       </div>
     </Link>
   );

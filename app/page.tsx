@@ -4,7 +4,7 @@ import { capabilities, engineeringIntro, problemAreas } from "@/data/engineering
 import { caseStudies } from "@/data/work";
 import { getPublishedProjects } from "@/data/projects";
 import { labAreas, labsDescription } from "@/data/labs";
-import { social, socialHref, socialTitle } from "@/data/site";
+import { site, social, socialHref, socialTitle } from "@/data/site";
 import { SocialAnchor } from "@/components/social-anchor";
 import { getPublishedPosts } from "@/lib/writing";
 import { Container, EmptyState, SectionHeading } from "@/components/ui";
@@ -24,17 +24,17 @@ export default function HomePage() {
         <div className="bg-grid mask-fade-b absolute inset-0" aria-hidden="true" />
         <Container className="relative grid gap-14 pt-16 pb-20 md:pt-24 md:pb-28 lg:grid-cols-[1.25fr_1fr] lg:items-center lg:gap-10">
           <div>
-            <p className="meta rise">Software Engineer · Technical Lead · Builder</p>
+            <p className="meta rise">{site.headline}</p>
             <h1 className="rise mt-7 text-[15px] font-medium text-muted" style={{ ["--d" as string]: 1 }}>
-              <span className="text-fg">Sakir Sathe</span>
+              <span className="text-fg">{site.name}</span>
               <span className="mx-2 text-line-strong" aria-hidden="true">/</span>
-              <span className="font-mono text-[12.5px]">Costa Rica</span>
+              <span className="font-mono text-[12.5px]">{site.location}</span>
             </h1>
             <p className="rise mt-5 text-[clamp(2.3rem,5.8vw,4.1rem)] font-medium leading-[1.02] tracking-[-0.04em] text-balance" style={{ ["--d" as string]: 2 }}>
               Building reliable software across <span className="text-accent">.NET, cloud, data and&nbsp;AI.</span>
             </p>
             <div className="rise mt-8 max-w-xl space-y-4 text-[16.5px] leading-relaxed text-muted text-pretty" style={{ ["--d" as string]: 3 }}>
-              <p>I&rsquo;m a software engineer and technical lead with more than fourteen years of experience building, modernizing and operating complex software systems.</p>
+              <p>I&rsquo;m a {site.roleSummary} with more than fourteen years of experience building, modernizing and operating complex software systems.</p>
               <p>I remain hands-on across architecture, backend engineering, cloud, data and AI. Alongside that work, I develop reusable tools and write about what I learn while building systems.</p>
             </div>
             <div className="rise mt-10 flex flex-wrap items-center gap-3" style={{ ["--d" as string]: 4 }}>
@@ -62,7 +62,7 @@ export default function HomePage() {
               ["Experience", "14+ years"],
               ["Primary", "C# · .NET · Azure"],
               ["Current focus", "Retrieval · Agents"],
-              ["Based in", "Costa Rica"],
+              ["Based in", site.location],
             ].map(([k, v]) => (
               <div key={k} className="bg-bg py-4 pr-4 [&:nth-child(even)]:pl-4 md:[&:not(:first-child)]:pl-4">
                 <dt className="text-[10.5px] uppercase tracking-[0.08em] text-subtle">{k}</dt>

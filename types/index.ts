@@ -56,12 +56,15 @@ export interface PostFrontmatter {
   tags: string[];
   published: boolean;
   featured: boolean;
+  image?: string;
+  imageAlt?: string;
 }
 
 export interface Post extends PostFrontmatter {
   slug: string;
   content: string;
-  readingMinutes: number;
+  readingTime: number;
+  canonicalUrl: string;
 }
 
 export interface SocialLink {

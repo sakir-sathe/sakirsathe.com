@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t border-line">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <p className="text-[15px] font-medium tracking-tight">Sakir Sathe</p>
+          <p className="text-[15px] font-medium tracking-tight">{site.name}</p>
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">Software engineering across .NET, cloud, data and AI. Based in {site.location}.</p>
         </div>
         <nav aria-label="Footer">
@@ -30,7 +30,7 @@ export function Footer() {
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 font-mono text-[11px] text-subtle sm:flex-row sm:justify-between sm:px-8">
-          <span>sakirsathe.com</span>
+          <span>{site.domain}</span>
           <span>Static build · Next.js · Azure-ready</span>
         </div>
       </div>

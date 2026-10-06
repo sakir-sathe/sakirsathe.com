@@ -5,20 +5,22 @@
   "description": "sakirsathe.com — personal engineering site. Next.js App Router, static export.",
   "scripts": {
     "lint": "eslint . --max-warnings=0",
-    "dev": "next dev --hostname 0.0.0.0 --port ${PORT:-3000}",
+    "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "npx --yes serve out -l ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "postbuild": "node scripts/clean-sentinels.mjs"
   },
   "dependencies": {
+    "@giscus/react": "^3.1.0",
     "geist": "^1.7.2",
     "js-yaml": "4.3.2",
     "lucide-react": "^1.52.0",
     "next": "16.3.8",
     "next-mdx-remote": "^6.0.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

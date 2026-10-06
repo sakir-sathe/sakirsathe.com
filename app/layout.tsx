@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             url: site.url,
             email: `mailto:${site.email}`,
             jobTitle: site.jobTitle,
-            address: { "@type": "PostalAddress", addressCountry: "CR" },
+            address: { "@type": "PostalAddress", addressCountry: site.countryCode },
             knowsAbout: ["C#", ".NET", "ASP.NET Core", "Azure", "Software architecture", "RAG", "AI search"],
             ...(sameAs.length ? { sameAs } : {}),
           }}

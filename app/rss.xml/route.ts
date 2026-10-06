@@ -1,6 +1,5 @@
 import { site } from "@/data/site";
 import { getPublishedPosts } from "@/lib/writing";
-import { absoluteUrl } from "@/lib/utils";
 
 export const dynamic = "force-static";
 
@@ -10,8 +9,8 @@ export function GET() {
   const items = getPublishedPosts()
     .map((p) => `    <item>
       <title>${esc(p.title)}</title>
-      <link>${absoluteUrl(`/writing/${p.slug}`)}</link>
-      <guid isPermaLink="true">${absoluteUrl(`/writing/${p.slug}`)}</guid>
+      <link>${p.canonicalUrl}</link>
+      <guid isPermaLink="true">${p.canonicalUrl}</guid>
       <description>${esc(p.description)}</description>
       <pubDate>${new Date(`${p.date}T00:00:00Z`).toUTCString()}</pubDate>
 ${p.tags.map((t) => `      <category>${esc(t)}</category>`).join("\n")}

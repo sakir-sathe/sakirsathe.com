@@ -1,4 +1,5 @@
 import { load } from "js-yaml";
+import type { PostFrontmatter } from "@/types";
 
 const FRONTMATTER = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
 
@@ -24,4 +25,72 @@ export function parseMdxFrontmatter(source: string, filename: string) {
     data: data as Record<string, unknown>,
     content: source.slice(match[0].length),
   };
+}
+
+export function validatePostFrontmatter(data: Record<string, unknown>, filename: string): PostFrontmatter {
+  const allowed = new Set(["title", "description", "date", "updated", "tags", "published", "featured", "image", "imageAlt"]);
+  const unknown = Object.keys(data).filter((key) => !allowed.has(key));
+  if (unknown.length) throw new Error(`${filename}: unsupported frontmatter field(s): ${unknown.join(", ")}.`);
+
+  const requiredString = (field: "title" | "description"): string => {
+    const value = data[field];
+    if (typeof value !== "string" || !value.trim()) throw new Error(`${filename}: "${field}" must be a non-empty string.`);
+    return value.trim();
+  };
+
+  const validDate = (field: "date" | "updated"): string => {
+    const value = data[field];
+    let date: string;
+    if (value instanceof Date) {
+      if (Number.isNaN(value.getTime())) throw new Error(`${filename}: "${field}" must be a valid date in YYYY-MM-DD format.`);
+      date = value.toISOString().slice(0, 10);
+    } else if (typeof value === "string") {
+      date = value.trim();
+    } else {
+      throw new Error(`${filename}: "${field}" must be a valid date in YYYY-MM-DD format.`);
+    }
+    const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00.000Z`) : undefined;
+    if (!parsedDate || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== date) {
+      throw new Error(`${filename}: "${field}" must be a valid date in YYYY-MM-DD format.`);
+    }
+    return date;
+  };
+
+  if (!Array.isArray(data.tags) || data.tags.some((tag) => typeof tag !== "string" || !tag.trim())) {
+    throw new Error(`${filename}: "tags" must be an array of non-empty strings.`);
+  }
+  if (typeof data.published !== "boolean") throw new Error(`${filename}: "published" must be a boolean.`);
+  if (typeof data.featured !== "boolean") throw new Error(`${filename}: "featured" must be a boolean.`);
+
+  const frontmatter: PostFrontmatter = {
+    title: requiredString("title"),
+    description: requiredString("description"),
+    date: validDate("date"),
+    tags: data.tags.map((tag) => (tag as string).trim()),
+    published: data.published,
+    featured: data.featured,
+  };
+
+  if (data.updated !== undefined) frontmatter.updated = validDate("updated");
+  if (data.image !== undefined) {
+    if (typeof data.image !== "string" || !data.image.trim()) throw new Error(`${filename}: "image" must be a non-empty URL or site-relative path.`);
+    const image = data.image.trim();
+    if (image.startsWith("/")) {
+      if (image.startsWith("//")) throw new Error(`${filename}: "image" must be a secure URL or site-relative path.`);
+    } else {
+      try {
+        if (new URL(image).protocol !== "https:") throw new Error();
+      } catch {
+        throw new Error(`${filename}: "image" must be a secure URL or site-relative path.`);
+      }
+    }
+    frontmatter.image = image;
+  }
+  if (data.imageAlt !== undefined) {
+    if (typeof data.imageAlt !== "string" || !data.imageAlt.trim()) throw new Error(`${filename}: "imageAlt" must be a non-empty string.`);
+    frontmatter.imageAlt = data.imageAlt.trim();
+  }
+  if (frontmatter.image && !frontmatter.imageAlt) throw new Error(`${filename}: "imageAlt" is required when "image" is provided.`);
+
+  return frontmatter;
 }

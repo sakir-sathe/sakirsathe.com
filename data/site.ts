@@ -1,16 +1,38 @@
 import type { SocialLink } from "@/types";
 
+const siteName = "Sakir Sathe";
+const siteDomain = "sakirsathe.com";
+const siteJobTitle = "Lead Full Stack .NET Engineer";
+
 export const site = {
-  name: "Sakir Sathe",
-  url: "https://sakirsathe.com",
-  title: "Sakir Sathe — .NET, Azure & AI Engineering",
+  name: siteName,
+  domain: siteDomain,
+  url: `https://${siteDomain}`,
+  title: `${siteName} — .NET, Azure & AI Engineering`,
   description:
-    "Software engineering, .NET, Azure, AI, architecture, developer tooling and open-source projects by Sakir Sathe.",
+    `Software engineering, .NET, Azure, AI, architecture, developer tooling and open-source projects by ${siteName}.`,
   email: "sakirsathe@gmail.com",
   location: "Costa Rica",
-  jobTitle: "Lead Full Stack .NET Engineer",
-  roles: ["Lead Full Stack .NET Engineer", "Technical Lead", "Software Architect", "Open-Source Builder", "Technical Writer"],
+  countryCode: "CR",
+  headline: "Software Engineer · Technical Lead · Builder",
+  roleSummary: "software engineer and technical lead",
+  jobTitle: siteJobTitle,
+  roles: [siteJobTitle, "Technical Lead", "Software Architect", "Open-Source Builder", "Technical Writer"],
   locale: "en_US",
+} as const;
+
+export const giscus: {
+  enabled: boolean;
+  repo: string;
+  repoId: string;
+  category: string;
+  categoryId: string;
+} = {
+  enabled: false,
+  repo: "",
+  repoId: "",
+  category: "",
+  categoryId: "",
 } as const;
 
 /**

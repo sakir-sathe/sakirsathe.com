@@ -15,7 +15,6 @@ next-env.d.ts
 # Environment files
 .env
 .env.*
-!.env.example
 
 # Local logs
 npm-debug.log*

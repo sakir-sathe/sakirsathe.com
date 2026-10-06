@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { nav, social, socialHref, socialTitle } from "@/data/site";
+import { nav, site, social, socialHref, socialTitle } from "@/data/site";
 import { GitHubIcon, LinkedInIcon, Monogram } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -66,9 +66,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="group flex items-center gap-2.5 text-fg" aria-label="Sakir Sathe, home">
+        <Link href="/" className="group flex items-center gap-2.5 text-fg" aria-label={`${site.name}, home`}>
           <Monogram className="size-7 transition-transform duration-300 group-hover:-rotate-3" />
-          <span className="text-[15px] font-medium tracking-tight">Sakir Sathe</span>
+          <span className="text-[15px] font-medium tracking-tight">{site.name}</span>
         </Link>
 
         <nav aria-label="Primary" className="hidden md:block">
