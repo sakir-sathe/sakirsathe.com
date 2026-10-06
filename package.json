@@ -1,0 +1,35 @@
+{
+  "name": "sakir-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "sakirsathe.com — personal engineering site. Next.js App Router, static export.",
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "dev": "next dev --hostname 0.0.0.0 --port ${PORT:-3000}",
+    "build": "next build",
+    "start": "npx --yes serve out -l ${PORT:-3000}",
+    "typecheck": "tsc --noEmit",
+    "postbuild": "node scripts/clean-sentinels.mjs"
+  },
+  "dependencies": {
+    "geist": "^1.7.2",
+    "js-yaml": "4.3.2",
+    "lucide-react": "^1.52.0",
+    "next": "16.3.8",
+    "next-mdx-remote": "^6.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}

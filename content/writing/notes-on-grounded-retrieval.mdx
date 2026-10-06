@@ -1,0 +1,22 @@
+---
+title: "Notes on grounded retrieval in .NET"
+description: "What changes when retrieval, not the model, becomes the part of the system you spend most of your time on."
+date: "2025-01-15"
+tags: ["RAG", "Azure AI Search", ".NET"]
+published: false
+featured: true
+---
+
+Draft. Outline only.
+
+## Retrieval is the product
+
+- Chunking decisions are schema decisions.
+- Ranking deserves the same review rigour as business logic.
+
+## Evaluation before tuning
+
+```csharp
+// placeholder: evaluation harness sketch
+var results = await harness.RunAsync(queries, cancellationToken);
+```
