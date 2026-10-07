@@ -197,46 +197,8 @@ export const caseStudies: CaseStudy[] = [
     ],
   },
   {
-    slug: "complex-product-configuration-platform",
-    index: "W-06",
-    title: "Complex Product Configuration Platform",
-    systemType: "Rule-driven product configuration software",
-    domain: "Manufacturing · Product Engineering",
-    summary: "Manufacturing workflows for configuring complex products, applying business rules, and producing pricing, order, document and reporting outputs across evolving web applications.",
-    technologies: ["ASP.NET MVC / Core", "React", "Redux / Saga", "Angular / AngularJS", "SQL Server", "REST APIs", "Selenium", "Report templating"],
-    themes: ["Product configuration", "Manufacturing workflows", "Desktop-to-web modernization", "Business rules", "Technical leadership", "Quality and maintainability"],
-    narrativeStatus: "published",
-    sections: [
-      {
-        heading: "System overview",
-        body: "Across a broader manufacturing and product-engineering chapter, I worked on complex configurators and enterprise workflows for defining products, validating interdependent choices, and producing pricing, order, document and reporting outputs. Some experiences also involved modernizing desktop-oriented capabilities into web applications.",
-      },
-      {
-        heading: "My contribution",
-        body: "My work spanned full-stack implementation, configuration-driven interfaces, validation and business rules, APIs, report generation, UI automation and technical leadership. I contributed to design decisions, estimation, code review, mentoring and iterative delivery with engineering teams.",
-      },
-      {
-        heading: "Engineering challenge",
-        body: "Configuration choices often depend on rules elsewhere in a product or workflow. The interface must communicate valid options while authoritative rules remain consistent across APIs, persistence and downstream documents. Modernization adds another constraint: preserve essential business behavior while improving maintainability and delivery.",
-      },
-      {
-        heading: "Architecture and approach",
-        body: "The general pattern combines a web interface with application and API layers, SQL-backed business data, reusable configuration rules, and downstream order or reporting workflows. Across different systems, the frontend approaches included ASP.NET MVC/Core, React with Redux/Saga, and Angular-family applications; Selenium supported UI automation. These technologies describe the broader body of work, not one application using every option.",
-        flow: ["Configuration-driven web UI", "Application / REST API", "Business rules + validation", "SQL Server / workflow data", "Order, pricing, document + report outputs"],
-      },
-      {
-        heading: "Engineering priorities",
-        body: "The interface should make constraints understandable without becoming the source of truth for business rules. Stable API contracts, testable validation, report quality and UI automation all help protect complex workflows as they evolve. Technical guidance and code review support consistent delivery across teams.",
-      },
-      {
-        heading: "Lessons and takeaways",
-        body: "Product configurators are long-lived business applications: they must explain complex choices to users and preserve reliable downstream outcomes. Separating interface state from authoritative rules makes modernization safer, while iterative planning, mentoring and review help teams improve systems without losing the domain behavior they depend on.",
-      },
-    ],
-  },
-  {
     slug: "cross-platform-product-ai-platform",
-    index: "W-07",
+    index: "W-06",
     title: "Cross-Platform Product & AI Platform",
     systemType: "Web, mobile and AI-enabled application platform",
     domain: "Web · Mobile · AI-Enabled Applications",
@@ -274,7 +236,7 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "enterprise-appraisal-workflow-platform",
-    index: "W-08",
+    index: "W-07",
     title: "Enterprise Appraisal & Workflow Platform",
     systemType: "Transactional workflow and business application",
     domain: "Enterprise Application Engineering",
@@ -307,6 +269,44 @@ export const caseStudies: CaseStudy[] = [
       {
         heading: "Lessons and takeaways",
         body: "Transactional enterprise applications benefit from clear state ownership and predictable API boundaries. Leadership is most effective when technical direction stays connected to implementation, delivery constraints and the realities of operating the application.",
+      },
+    ],
+  },
+  {
+    slug: "complex-product-configuration-platform",
+    index: "W-08",
+    title: "Complex Product Configuration Platform",
+    systemType: "Rule-driven product configuration software",
+    domain: "Manufacturing · Product Engineering",
+    summary: "Manufacturing workflows for configuring complex products, applying business rules, and producing pricing, order, document and reporting outputs across evolving web applications.",
+    technologies: ["ASP.NET MVC / Core", "React", "Redux / Saga", "Angular / AngularJS", "SQL Server", "REST APIs", "Selenium", "Report templating"],
+    themes: ["Product configuration", "Manufacturing workflows", "Desktop-to-web modernization", "Business rules", "Technical leadership", "Quality and maintainability"],
+    narrativeStatus: "published",
+    sections: [
+      {
+        heading: "System overview",
+        body: "Across a broader manufacturing and product-engineering chapter, I worked on complex configurators and enterprise workflows for defining products, validating interdependent choices, and producing pricing, order, document and reporting outputs. Some experiences also involved modernizing desktop-oriented capabilities into web applications.",
+      },
+      {
+        heading: "My contribution",
+        body: "My work spanned full-stack implementation, configuration-driven interfaces, validation and business rules, APIs, report generation, UI automation and technical leadership. I contributed to design decisions, estimation, code review, mentoring and iterative delivery with engineering teams.",
+      },
+      {
+        heading: "Engineering challenge",
+        body: "Configuration choices often depend on rules elsewhere in a product or workflow. The interface must communicate valid options while authoritative rules remain consistent across APIs, persistence and downstream documents. Modernization adds another constraint: preserve essential business behavior while improving maintainability and delivery.",
+      },
+      {
+        heading: "Architecture and approach",
+        body: "The general pattern combines a web interface with application and API layers, SQL-backed business data, reusable configuration rules, and downstream order or reporting workflows. Across different systems, the frontend approaches included ASP.NET MVC/Core, React with Redux/Saga, and Angular-family applications; Selenium supported UI automation. These technologies describe the broader body of work, not one application using every option.",
+        flow: ["Configuration-driven web UI", "Application / REST API", "Business rules + validation", "SQL Server / workflow data", "Order, pricing, document + report outputs"],
+      },
+      {
+        heading: "Engineering priorities",
+        body: "The interface should make constraints understandable without becoming the source of truth for business rules. Stable API contracts, testable validation, report quality and UI automation all help protect complex workflows as they evolve. Technical guidance and code review support consistent delivery across teams.",
+      },
+      {
+        heading: "Lessons and takeaways",
+        body: "Product configurators are long-lived business applications: they must explain complex choices to users and preserve reliable downstream outcomes. Separating interface state from authoritative rules makes modernization safer, while iterative planning, mentoring and review help teams improve systems without losing the domain behavior they depend on.",
       },
     ],
   },
