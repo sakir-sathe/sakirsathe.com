@@ -4,7 +4,7 @@ A personal engineering website and reference implementation for a static, conten
 
 ## About
 
-This repository is the source for [sakirsathe.com](https://sakirsathe.com). It presents engineering work, technical writing, open-source projects, and experiments across .NET, Azure, AI, and software architecture.
+This repository is the source for [sakirsathe.com](https://sakirsathe.com), served at the canonical domain `https://sakirsathe.com`. It presents engineering work, technical writing, open-source projects, and experiments across .NET, Azure, AI, and software architecture.
 
 The repository is intentionally static. Content changes relatively infrequently, and a static site is a good fit for publishing articles and portfolio material without maintaining application infrastructure.
 
@@ -16,7 +16,7 @@ The publishing flow is:
 MDX → Git → static build → Azure Static Web Apps
 ```
 
-MDX keeps technical writing close to source control, and Git provides content version history. A CMS, application database, and persistent application server are not required. Static hosting keeps the runtime attack surface smaller, is inexpensive, and makes the site easy to move between hosts. Backend services can be added later if concrete requirements justify them.
+MDX keeps technical writing close to source control, and Git provides content version history. A CMS, application database, persistent application server, or custom application authentication system is not required. Static hosting keeps the runtime attack surface smaller, is inexpensive, and makes the site easy to move between hosts. Backend services can be added later if concrete requirements justify them.
 
 ## Technology
 
@@ -25,7 +25,9 @@ MDX keeps technical writing close to source control, and Git provides content ve
 - Tailwind CSS
 - MDX with validated YAML frontmatter
 - Azure Static Web Apps-compatible output
-- Giscus with GitHub Discussions for optional article comments
+- Giscus with GitHub Discussions for article comments
+- Cloudflare Web Analytics
+- Google Search Console, Bing Webmaster Tools, and IndexNow for search discovery
 
 ## Project Structure
 
@@ -88,10 +90,16 @@ featured: false
 
 `title`, `description`, `date`, `tags`, `published`, and `featured` are required. Dates must use `YYYY-MM-DD`. `updated` is optional. `image` and `imageAlt` are also optional; `imageAlt` is required whenever `image` is provided. Invalid or unknown fields fail the build with the article filename.
 
-Publishing is a manual source-control workflow:
+The normal article workflow is:
 
 ```text
-write locally → review → move into content/writing → commit manually → push manually → static site rebuild
+write and review locally in content/drafts
+→ move the approved article into content/writing and set published: true
+→ run the local checks
+→ commit and push manually
+→ GitHub Actions deploys to Azure Static Web Apps
+→ RSS and sitemap update; IndexNow notifies search engines of meaningful published-article changes
+→ Giscus provides discussion on the article page
 ```
 
 Articles are authored in MDX; no CMS is involved.
@@ -114,13 +122,21 @@ Update `data/labs.ts` with areas of exploration. Publish experiment results only
 
 ## Site Configuration
 
-The `site` object in `data/site.ts` is the central place to update the name, headline, role summary, job title, location and country code, email, and domain. The canonical URL is derived from the domain. Exact GitHub and LinkedIn profile URLs are configured in the `social` object; they are intentionally unset until known values are available. Giscus settings are in the same file and remain disabled by default.
+The `site` object in `data/site.ts` is the central place to update the name, headline, role summary, job title, location and country code, email, and domain. The canonical URL is derived from the domain. The public GitHub and LinkedIn profile URLs are configured in the `social` object.
 
 ## Comments
 
-Optional article comments use Giscus and GitHub Discussions. Comments remain disabled unless `giscus.enabled` is `true` and all four public values are configured in `data/site.ts`: `repo`, `repoId`, `category`, and `categoryId`.
+Article comments use Giscus and GitHub Discussions. The integration is configured in `data/site.ts`, uses the `Article Comments` category, and maps discussions by article pathname. It renders only on published article pages; there is no custom comments backend or database.
 
-The GitHub repository must be public for live Giscus comments to work normally, and GitHub Discussions must be enabled with an appropriate category. The Giscus GitHub App may need authorization. Never commit a GitHub token, OAuth credential, or other secret for comments; the Giscus repository and category identifiers are public configuration.
+The GitHub repository must be public and Discussions enabled for Giscus to work normally. The Giscus GitHub App may need authorization. Repository and category identifiers are public configuration; no GitHub token or OAuth credential is used by the site.
+
+## Search and Discovery
+
+Google Search Console and Bing Webmaster Tools are configured, and the canonical sitemap has been submitted to both. `robots.txt` points crawlers to `https://sakirsathe.com/sitemap.xml`. A public IndexNow verification file supports automatic notifications after successful production deployments when published Writing articles meaningfully change. Pull-request previews and private drafts are not submitted. The verification key is public configuration, not a secret.
+
+## Analytics
+
+Cloudflare Web Analytics is included as privacy-focused browser analytics. Its beacon token is public browser configuration, not a secret. The site does not currently use Google Analytics 4 or Application Insights analytics.
 
 ## Static Export
 
@@ -128,11 +144,11 @@ Next.js is configured with `output: "export"`. `npm run build` creates the deplo
 
 ## Azure Static Web Apps
 
-The project is compatible with Azure Static Web Apps. The existing static deployment settings use the repository root as the app location and `out` as the output location, with `npm run build` as the build command. The static web app configuration is in `public/staticwebapp.config.json`.
+The project is deployed to Azure Static Web Apps by GitHub Actions. The workflow uses the repository root as the app location and `out` as the output location, with `npm run build` as the build command. The Azure deployment credential is stored in GitHub Secrets; no credential is present in the repository. The static web app configuration is in `public/staticwebapp.config.json`.
 
 ## Using This Repository as a Reference
 
-This repository is the source for sakirsathe.com. Developers are welcome to fork or adapt its structure, but should replace personal content, identity, and configuration before publishing a fork. It is a personal website, not a general-purpose framework, and contributions may not be actively accepted.
+This repository is the source for sakirsathe.com. Developers are welcome to fork or adapt its structure, but should replace personal content, identity, and configuration before publishing a fork. It is a personal website, not a general-purpose framework, and contributions may not be actively accepted. The public Git history is intentionally preserved.
 
 ## License
 

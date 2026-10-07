@@ -38,6 +38,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="flex min-h-[100dvh] flex-col font-sans">
         <Script id="theme-initialization" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script
+          id="cloudflare-web-analytics"
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token":"91f13764172f47c8b3277a3c23e57e4c"}'
+          strategy="afterInteractive"
+        />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-raised focus:px-3 focus:py-2 focus:text-sm">Skip to content</a>
         <JsonLd
           data={{
