@@ -20,7 +20,7 @@ export default function WritingPage() {
             {posts.length > 0 ? (
               <div className="border-t border-line">{posts.map((p) => <PostRow key={p.slug} p={p} />)}</div>
             ) : (
-              <EmptyState code="Index · 0 published" title="The first notes are in draft" body="Articles are published when they are finished and reviewed. There is no fixed schedule. Subscribe to the RSS feed to be notified when the first one arrives.">
+              <EmptyState code="Index · 0 published" title="No articles published yet" body="Published engineering articles appear here when they are ready. Follow the RSS feed for new writing.">
                 <a href="/rss.xml" className="mt-5 inline-block font-mono text-[12px] text-accent link-underline">Subscribe via /rss.xml</a>
               </EmptyState>
             )}

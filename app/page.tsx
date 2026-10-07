@@ -34,7 +34,7 @@ export default function HomePage() {
               Building reliable software across <span className="text-accent">.NET, cloud, data and&nbsp;AI.</span>
             </p>
             <div className="rise mt-8 max-w-xl space-y-4 text-[16.5px] leading-relaxed text-muted text-pretty" style={{ ["--d" as string]: 3 }}>
-              <p>I&rsquo;m a {site.roleSummary} with more than fourteen years of experience building, modernizing and operating complex software systems.</p>
+              <p>I&rsquo;m a {site.roleSummary} who builds, modernizes and operates complex software systems.</p>
               <p>I remain hands-on across architecture, backend engineering, cloud, data and AI. Alongside that work, I develop reusable tools and write about what I learn while building systems.</p>
             </div>
             <div className="rise mt-10 flex flex-wrap items-center gap-3" style={{ ["--d" as string]: 4 }}>
@@ -59,7 +59,7 @@ export default function HomePage() {
         <Container className="relative">
           <dl className="grid grid-cols-2 gap-px border-t border-line bg-line font-mono text-[11.5px] md:grid-cols-4">
             {[
-              ["Experience", "14+ years"],
+              ["Experience", "10+ years"],
               ["Primary", "C# · .NET · Azure"],
               ["Current focus", "Retrieval · Agents"],
               ["Based in", site.location],
@@ -122,7 +122,7 @@ export default function HomePage() {
             <div className="mt-8">
               {posts.length > 0
                 ? <div className="border-t border-line">{posts.map((p) => <PostRow key={p.slug} p={p} />)}</div>
-                : <EmptyState code="Drafts · Unpublished" title="First notes are being written" body="Articles are published when they are finished, not on a schedule. An RSS feed is available for when they arrive." >
+                : <EmptyState code="Writing · 0 published" title="No articles published yet" body="Published engineering notes appear here when they are ready. Follow the RSS feed for new writing." >
                     <a href="/rss.xml" className="mt-5 inline-block font-mono text-[12px] text-accent link-underline">/rss.xml</a>
                   </EmptyState>}
             </div>
