@@ -11,6 +11,7 @@ export default function EngineeringPage() {
       <PageHeader index="01" label="Engineering" title="Engineering across the stack" intro={engineeringIntro} />
       <section className="py-20">
         <Container>
+          <h2 className="sr-only">Engineering capabilities</h2>
           <div className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
             {capabilities.map((c) => <CapabilityCard key={c.id} c={c} />)}
           </div>

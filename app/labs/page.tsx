@@ -17,6 +17,7 @@ export default function LabsPage() {
       <PageHeader index="05" label="Labs" title="Labs" intro={labsDescription} />
       <section className="py-16 md:py-20">
         <Container>
+          <h2 className="sr-only">Areas of exploration</h2>
           <p className="meta mb-5">Areas of exploration</p>
           <div className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
             {labAreas.map((l, i) => <LabCard key={l.id} l={l} i={i} />)}

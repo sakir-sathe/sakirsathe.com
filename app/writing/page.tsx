@@ -16,6 +16,7 @@ export default function WritingPage() {
       <section className="py-16 md:py-20">
         <Container className="grid gap-14 lg:grid-cols-[1fr_240px] lg:gap-20">
           <div>
+            <h2 className="sr-only">Published articles</h2>
             {posts.length > 0 ? (
               <div className="border-t border-line">{posts.map((p) => <PostRow key={p.slug} p={p} />)}</div>
             ) : (

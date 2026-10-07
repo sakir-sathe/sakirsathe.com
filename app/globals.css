@@ -138,3 +138,4 @@ dialog.mobile-menu::backdrop { background: rgb(0 0 0 / .45); }
   --tw-prose-quote-borders: hsl(var(--accent));
 }
 .prose-site pre { border: 1px solid hsl(var(--line)); }
+.prose-site table { display: block; max-width: 100%; overflow-x: auto; }

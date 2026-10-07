@@ -13,6 +13,7 @@ export default function OpenSourcePage() {
       <PageHeader index="03" label="Open Source" title="Open Source" intro={intro} />
       <section className="py-16 md:py-20">
         <Container>
+          <h2 className="sr-only">Published projects</h2>
           {projects.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">{projects.map((p) => <ProjectCard key={p.slug} p={p} />)}</div>
           ) : (

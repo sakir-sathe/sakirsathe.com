@@ -17,6 +17,7 @@ export default function WorkPage() {
       </PageHeader>
       <section className="py-16 md:py-20">
         <Container>
+          <h2 className="sr-only">Case studies</h2>
           <div className="hidden grid-cols-[110px_1fr_1fr_24px] gap-8 pb-3 md:grid">
             <span className="meta">Ref</span><span className="meta">System</span><span className="meta">Technology</span><span />
           </div>
