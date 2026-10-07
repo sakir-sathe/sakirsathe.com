@@ -28,7 +28,7 @@ export interface CaseStudy {
   sections: CaseStudySection[];
 }
 
-export type ProjectStatus = "planned" | "in-development" | "preview" | "released" | "archived";
+export type ProjectStatus = "planned" | "in-development" | "preview" | "released" | "archived" | "public";
 
 export interface Project {
   name: string;
@@ -36,6 +36,8 @@ export interface Project {
   description: string;
   status: ProjectStatus;
   githubUrl: string | null;
+  githubCtaLabel?: string;
+  hasDetailPage?: boolean;
   technologies: string[];
   featured: boolean;
   published: boolean;

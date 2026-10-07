@@ -15,7 +15,7 @@ export default function OpenSourcePage() {
         <Container>
           <h2 className="sr-only">Published projects</h2>
           {projects.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">{projects.map((p) => <ProjectCard key={p.slug} p={p} />)}</div>
+            <div className="grid gap-4 md:grid-cols-2">{projects.map((p) => <ProjectCard key={p.slug} p={p} externalGithub />)}</div>
           ) : (
             <EmptyState code="Registry · 0 published" title="Repositories are being prepared" body="Projects are listed here only once they have a public repository and a first usable release. Until then there is nothing to show, and nothing is presented as released.">
               <div className="mt-6 flex flex-wrap gap-6">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { getPublishedProject, getPublishedProjects } from "@/data/projects";
+import { getPublishedProject, getPublishedProjectsWithDetailPages } from "@/data/projects";
 import { Container, Tag } from "@/components/ui";
 import { EMPTY_PARAM, pageMetadata } from "@/lib/utils";
 
@@ -11,7 +11,7 @@ export const dynamicParams = false;
 
 /** Only published projects are exported. A sentinel keeps static export valid when none are. */
 export function generateStaticParams() {
-  const published = getPublishedProjects();
+  const published = getPublishedProjectsWithDetailPages();
   return published.length ? published.map((p) => ({ slug: p.slug })) : [{ slug: EMPTY_PARAM }];
 }
 

@@ -37,16 +37,26 @@ export function CaseStudyRow({ c }: { c: CaseStudy }) {
   );
 }
 
-export function ProjectCard({ p }: { p: Project }) {
-  return (
-    <Link href={`/open-source/${p.slug}`} className="ticks group block border border-line bg-raised p-6 transition-colors hover:border-line-strong">
+export function ProjectCard({ p, externalGithub = false }: { p: Project; externalGithub?: boolean }) {
+  const className = "ticks group block border border-line bg-raised p-6 transition-colors hover:border-line-strong";
+  const content = (
+    <>
       <div className="flex items-center justify-between">
         <h3 className="font-mono text-[15px] text-fg">{p.name}</h3>
         <span className="meta">{p.status.replace("-", " ")}</span>
       </div>
       <p className="mt-3 text-sm leading-relaxed text-muted">{p.description}</p>
       <div className="mt-5 flex flex-wrap gap-1.5">{p.technologies.map((t) => <Tag key={t}>{t}</Tag>)}</div>
-    </Link>
+      {externalGithub && p.githubUrl && p.githubCtaLabel && (
+        <p className="mt-5 text-sm font-medium text-accent">{p.githubCtaLabel} <span aria-hidden="true">→</span></p>
+      )}
+    </>
+  );
+
+  return externalGithub && p.githubUrl ? (
+    <a href={p.githubUrl} target="_blank" rel="noopener noreferrer" className={className}>{content}</a>
+  ) : (
+    <Link href={`/open-source/${p.slug}`} className={className}>{content}</Link>
   );
 }
 

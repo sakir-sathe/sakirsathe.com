@@ -7,6 +7,30 @@ import type { Project } from "@/types";
  */
 export const projects: Project[] = [
   {
+    name: "Cubiscan Serial Driver",
+    slug: "cubiscan-serial-driver",
+    description: "A lightweight .NET integration for reading dimensions and weight from Cubiscan devices over serial/RS-232 connections.",
+    status: "public",
+    githubUrl: "https://github.com/sakir-sathe/cubiscan-serial-driver",
+    githubCtaLabel: "View on GitHub",
+    hasDetailPage: false,
+    technologies: [".NET", "Hardware Integration", "Serial", "RS-232"],
+    featured: false,
+    published: true,
+  },
+  {
+    name: "sakirsathe.com",
+    slug: "sakirsathe-com",
+    description: "The open-source codebase behind this site, built as a statically exported Next.js application with MDX content and Azure Static Web Apps deployment.",
+    status: "public",
+    githubUrl: "https://github.com/sakir-sathe/sakirsathe.com",
+    githubCtaLabel: "View source",
+    hasDetailPage: false,
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "MDX", "Azure"],
+    featured: false,
+    published: true,
+  },
+  {
     name: "Cubiscan.Net",
     slug: "cubiscan-net",
     description: ".NET library for communicating with dimensioning devices.",
@@ -60,6 +84,10 @@ export const projects: Project[] = [
 
 export function getPublishedProjects(): Project[] {
   return projects.filter((p) => p.published);
+}
+
+export function getPublishedProjectsWithDetailPages(): Project[] {
+  return getPublishedProjects().filter((p) => p.hasDetailPage !== false);
 }
 
 export function getPublishedProject(slug: string): Project | undefined {
