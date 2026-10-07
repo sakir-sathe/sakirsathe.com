@@ -28,11 +28,11 @@ export const giscus: {
   category: string;
   categoryId: string;
 } = {
-  enabled: false,
-  repo: "",
-  repoId: "",
-  category: "",
-  categoryId: "",
+  enabled: true,
+  repo: "sakir-sathe/sakirsathe.com",
+  repoId: "R_kgDOU9ghcQ",
+  category: "Article Comments",
+  categoryId: "DIC_kwDOU9ghcc4DHN7k",
 } as const;
 
 /** Public profile URLs used by the header, footer, and structured metadata. */

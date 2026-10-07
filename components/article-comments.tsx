@@ -66,10 +66,10 @@ export function ArticleComments() {
               category={giscus.category}
               categoryId={giscus.categoryId}
               mapping="pathname"
-              strict="0"
+              strict="1"
               reactionsEnabled="1"
               emitMetadata="0"
-              inputPosition="top"
+              inputPosition="bottom"
               theme={theme}
               lang="en"
               loading="lazy"
