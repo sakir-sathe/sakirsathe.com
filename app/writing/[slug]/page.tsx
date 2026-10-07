@@ -9,6 +9,7 @@ import { site } from "@/data/site";
 import { Container, Tag } from "@/components/ui";
 import { CopyLink } from "@/components/copy-link";
 import { ArticleComments } from "@/components/article-comments";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 import { PostRow } from "@/components/cards";
 import { JsonLd } from "@/components/json-ld";
 import { EMPTY_PARAM, absoluteUrl, cn, formatDate, pageMetadata } from "@/lib/utils";
@@ -144,6 +145,12 @@ export default async function PostPage({ params }: Props) {
             <div className="mt-2 border-t border-line">{related.map((relatedPost) => <PostRow key={relatedPost.slug} p={relatedPost} />)}</div>
           </section>
         )}
+        <NewsletterSignup
+          compact
+          heading="Enjoyed this article?"
+          description="Subscribe to get new posts by email."
+          className="mt-16"
+        />
         <ArticleComments />
       </Container>
     </article>
