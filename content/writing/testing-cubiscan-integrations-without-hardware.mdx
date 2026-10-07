@@ -1,0 +1,119 @@
+---
+title: "Testing Cubiscan Integrations Without Physical Hardware"
+description: "A deterministic device-facing contract can make application integration tests useful before a physical dimensional scanner is available."
+date: "2026-10-06"
+tags:
+  - .NET
+  - Hardware Integration
+  - Testing
+  - Developer Tooling
+published: true
+featured: false
+---
+
+## The problem
+
+I like device integrations because they expose an interesting boundary: software has to interact with something that is not software. In enterprise applications, I have worked with systems that integrate with dimensional-scanning hardware. A measurement may begin at a physical device, but it eventually becomes application state: a result is parsed, associated with a workflow, shown to a user, and perhaps used elsewhere.
+
+That path is where much of the application logic lives. It is also where testing can become awkward. A developer may not have a scanner available, and a shared device can be difficult to reserve. Vendor tooling may help with setup or diagnosis without offering a test dependency that fits automated tests or continuous integration. The integration code matters, but ordinary development feedback can be hard to get without the equipment.
+
+The useful question is not whether software can replace the scanner. It is how much of the application-facing behavior can be exercised without one.
+
+## Why hardware integrations are awkward to test
+
+A unit test can exercise business logic with an in-memory value. A hardware integration adds a boundary before that value exists. The application may need to establish a connection, send a request, wait for a response, interpret what came back, and decide what the workflow should do next. Each step can fail in a way the application must handle.
+
+A test that depends on a physical device also depends on its surroundings: the device must be available, connected, and ready to produce a result. Those conditions matter for eventual hardware validation, but they are a poor prerequisite for every developer test run. A real-device test may also be slower and less repeatable than a test of a software boundary.
+
+There is no reason to assume a proprietary simulator exists, is licensed for automation, or behaves like an application needs. Access to physical devices and vendor tooling can make integration testing harder and more expensive than ordinary software testing. The goal is not to avoid real-device testing, but to separate what needs the scanner from what needs a predictable device-facing response.
+
+## What do we actually need to simulate?
+
+Most application tests do not need to reproduce the physical act of measuring an object. They need to exercise the software-visible contract around a measurement. At a high level, that path looks like this:
+
+```text
+application
+→ device/client abstraction
+→ transport and connection
+→ request and device response
+→ parsing and result handling
+→ business workflow
+```
+
+The application needs to know what it can request, how a response is represented at its boundary, and what outcomes it must handle. It may need to show a result, reject an unusable value, associate a measurement with an operation, or recover when the device is unavailable. These behaviors can be tested without modeling optics, sensors, calibration, or the geometry of a physical measurement.
+
+“Simulate the scanner” can mean reproducing the instrument or providing a controlled implementation of the contract the application depends on. For most application integration tests, the latter is the useful starting point.
+
+## Why not just mock the result?
+
+Suppose a test replaces a business service with a mock that immediately returns a measurement object containing width, height, and length. That can be a perfectly reasonable way to test downstream business behavior: the workflow receives a value and the test checks what happens next.
+
+But the mock starts after the device integration has already done its work. It skips connection handling, request/response flow, transport errors, parsing, malformed or incomplete responses, timeouts, and disconnects. If the real client or parser is responsible for turning device-facing data into that measurement object, the test has not exercised either one.
+
+The useful simulator boundary is below the business workflow but above the physical hardware. It supplies controlled transport behavior while leaving the application's actual device client and parser in the test. That lets an integration test cover the code between a device-facing response and the application result without pretending to perform a physical measurement.
+
+## Separate device behavior from physical hardware
+
+A maintainable design makes that boundary explicit. The application should not need to know whether a response came from a physical connection or a test implementation. A device client can own the operations the application understands. A transport can own the mechanics of sending and receiving data. A parser can turn a response into a typed result or a clear failure, and the business workflow can decide what to do with that result.
+
+The real-device transport remains the implementation used with hardware. A simulator transport is selected deliberately in a test or development context. It should not silently replace a real connection or make an unverified compatibility claim on the application's behalf.
+
+## A possible architecture
+
+A small design could look like this:
+
+```text
+Application
+  ↓
+Device client and parser
+  ↓
+Transport interface
+   ↙                 ↘
+Real device        Simulator
+```
+
+The client would express operations in terms the application understands. The transport would hide connection-specific details. Parsing would remain part of the production client path, so tests using the simulator could still verify how the application handles the received data.
+
+A test could construct the client with a simulator transport configured for a particular scenario. One test might return a predefined successful result; another might supply malformed or incomplete data. The application would use the same client-facing contract in both cases, while the test would not open a physical connection.
+
+Scenario configuration should be explicit and easy to inspect. It might select a predetermined response, a controlled delay, or a disconnect at a defined point. Recording and replaying exchanges could be useful later, but that capability should follow a verified understanding of the public contract rather than lead the design. For .NET teams, a small library could make this pattern easier to share without requiring a finalized public API up front.
+
+## What should be deterministic
+
+Given the same setup, a test should receive the same response, parse the same values, and observe the same state transition. Timing should be controlled well enough that a test does not wait an unpredictable amount of time.
+
+State should be resettable. One test should not inherit another test's connection state, queued response, or measurement. Scenario selection should be local to the test, and unexpected requests should fail clearly rather than return a plausible-looking default. The simulator should distinguish a valid result from a transport or parsing failure, so a passing happy-path test cannot hide an untested error path.
+
+These properties make failures easier to understand and help keep the simulator from masking mistakes in the application.
+
+## Failure scenarios worth testing
+
+The scenario set should reflect application responsibilities, not claim a list of confirmed Cubiscan behaviors. It could include a successful result, zero or empty values, an incomplete or malformed response, and an unexpected response. These cases exercise parsing and the decisions made after parsing.
+
+Connection behavior deserves similar attention. A test implementation could represent an unavailable device, a delayed response that reaches a timeout, or a disconnect during an operation. Repeating a measurement can reveal assumptions about stale state or response ordering. A deterministic predefined scenario lets the same condition be replayed after a change.
+
+The application may show an error, allow a retry, preserve the current workflow state, or ask for another measurement. Those paths can be tested without asserting that any one failure is a known characteristic of a particular device. The test is about what the application should do when its contract produces that condition.
+
+## Where a simulator stops being trustworthy
+
+A simulator can validate application integration logic, parsing, state transitions, error handling, retry and timeout behavior, and the workflow around a result. It can make those tests repeatable on a developer machine or in an automated build.
+
+It cannot validate physical measurement accuracy, calibration, sensor behavior, or electrical, serial, or network characteristics. It cannot prove undocumented hardware quirks or establish compatibility across physical models. A simulated response may be useful for software tests while still failing to reflect a device used in production.
+
+That distinction should be visible in both tests and documentation. Simulator-supported behavior must be identified as simulated; real-device validation remains a separate step before making hardware compatibility claims.
+
+## An open-source direction
+
+I am exploring whether this problem could become a small open-source .NET package: a device-facing API plus a deterministic simulator that lets application developers test integration flows before they have access to a physical scanner. The package does not exist as a released project, and its API is not finalized.
+
+A useful first version would be modest: a small core library, a simulator or test implementation, and an example application showing how an integration test can choose a scenario. It would need tests of its own and protocol documentation based only on publicly verifiable information. It should make clear which behavior is simulated and which has been validated against hardware.
+
+Cubiscan.Net is a possible name, not a release announcement. The value would come from a trustworthy test boundary, not from claiming device support before it has been demonstrated.
+
+## What I want to validate next
+
+Before choosing an API, I would want to understand the publicly documented device-facing contract well enough to separate stable application concerns from transport details. Any protocol assumptions should be checked against public documentation or a device that can be used with permission. I would also want to identify which responsibilities belong in a reusable client and which belong in an application's workflow.
+
+Then I would try the smallest useful test seam against an application integration: one successful result, one malformed or incomplete response, and one connection failure. The first milestone is not a complete Cubiscan SDK. It is one trustworthy device-facing boundary, a few deterministic scenarios, and evidence that an application's real client and parser can be exercised without the physical scanner attached.
+
+If that proves useful, there may be something worth turning into Cubiscan.Net. If it does not, the result is still a clearer understanding of which tests need software simulation and which need real hardware.
