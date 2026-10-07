@@ -3,10 +3,10 @@ import { PostRow } from "@/components/cards";
 import { Container, EmptyState, PageHeader } from "@/components/ui";
 import { pageMetadata } from "@/lib/utils";
 
-const intro = "Notes on software engineering, .NET, Azure, architecture, AI, developer tooling and lessons learned while building systems.";
+const intro = "Essays and notes on software engineering, AI, architecture, open source, career, building products, travel, and things I learn along the way.";
 export const metadata = pageMetadata({ title: "Writing", description: intro, path: "/writing" });
 
-const topics = [".NET", "ASP.NET Core", "Azure", "Architecture", "Retrieval", "AI agents", "Developer tooling", "Production"];
+const topics = ["Engineering", "AI", "Architecture", "Open Source", "Career", "Building", "Travel", "Personal"];
 
 export default function WritingPage() {
   const posts = getPublishedPosts();
