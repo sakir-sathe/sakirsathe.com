@@ -113,7 +113,7 @@ export default function HomePage() {
             <SectionHeadingCompact index="03" label="Open Source" title="Open Source" intro="Developer tools and experiments built around real engineering problems." href="/open-source" />
             <div className="mt-8 grid gap-4">
               {projects.length > 0
-                ? projects.map((p) => <ProjectCard key={p.slug} p={p} />)
+                ? projects.map((p) => <ProjectCard key={p.slug} p={p} externalGithub />)
                 : <EmptyState code="Status · In preparation" title="Nothing released yet" body="Projects appear here once they have a public repository and a first usable release. No placeholders, no inflated numbers." />}
             </div>
           </div>

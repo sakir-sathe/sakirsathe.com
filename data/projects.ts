@@ -15,7 +15,7 @@ export const projects: Project[] = [
     githubCtaLabel: "View on GitHub",
     hasDetailPage: false,
     technologies: [".NET", "Hardware Integration", "Serial", "RS-232"],
-    featured: false,
+    featured: true,
     published: true,
   },
   {
@@ -27,7 +27,7 @@ export const projects: Project[] = [
     githubCtaLabel: "View source",
     hasDetailPage: false,
     technologies: ["Next.js", "TypeScript", "Tailwind CSS", "MDX", "Azure"],
-    featured: false,
+    featured: true,
     published: true,
   },
   {
