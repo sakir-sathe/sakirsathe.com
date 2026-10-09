@@ -10,6 +10,15 @@ export const dictionary = {
     criteria: "Criteria", criteriaDescription: "Public repository, documented, usable.", metrics: "Metrics",
     metricsDescription: "No stars or downloads displayed unless real.", focus: "Focus", focusDescription: ".NET, devices, agents, retrieval.",
   },
+  newsletterForm: {
+    emailLabel: "Email address", placeholder: "email@example.com", subscribe: "Subscribe", submitting: "Subscribing…",
+    success: "Thanks for subscribing! You'll receive new articles and updates from Sakir Sathe Writing.",
+    invalidEmail: "Please enter a valid email address.", requiredEmail: "Please enter your email address.",
+    brevoRequired: "This field cannot be left blank.",
+    error: "Your subscription could not be saved. Please try again.",
+    brevoEmailInvalid: "The information provided is invalid. Please review the field format and try again.",
+    brevoGenericInvalid: "The information provided is invalid. Please review the field format and try again.",
+  },
   metadata: {
     home: { title: "Home", description: "Software engineering, .NET, Azure, AI, architecture, developer tooling and open-source projects by Sakir Sathe." },
     engineering: { title: "Engineering", description: "I enjoy engineering problems that cross boundaries — application architecture, backend systems, cloud infrastructure, data, search, AI and developer experience." },

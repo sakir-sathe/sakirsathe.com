@@ -180,7 +180,7 @@ export function WritingPage({ locale }: LocalizedPageProps) {
   return <>
     <PageHeader index="04" label={dictionary.nav.writing} title={dictionary.nav.writing} intro={copy.intro} />
     <section className="py-16 md:py-20"><Container className="grid gap-14 lg:grid-cols-[1fr_240px] lg:gap-20"><div>
-      {english && <NewsletterSignup heading={copy.newsletterHeading} description={copy.newsletterDescription} className="mb-12" />}
+      <NewsletterSignup locale={locale} heading={copy.newsletterHeading} description={copy.newsletterDescription} className="mb-12" />
       <h2 className="sr-only">{english ? "Published articles" : copy.emptyTitle}</h2>
       {posts.length > 0 ? <div className="border-t border-line">{posts.map((post) => <PostRow key={post.slug} p={post} locale={locale} />)}</div> : english ? <EmptyState code={copy.emptyCode} title={"No articles published yet"} body={"Published engineering articles appear here when they are ready. Follow the RSS feed for new writing."}><a href="/rss.xml" className="mt-5 inline-block font-mono text-[12px] text-accent link-underline">{copy.rssLink}</a></EmptyState> : <EmptyState code={copy.emptyCode} title={copy.emptyTitle} body={copy.emptyBody} />}
     </div><aside><p className="meta">{copy.topicsTitle}</p><ul className="mt-4 flex flex-wrap gap-1.5 lg:flex-col lg:gap-2.5">{copy.topics.map((topic) => <li key={topic} className="text-[14px] text-muted max-lg:rounded-full max-lg:border max-lg:border-line max-lg:px-3 max-lg:py-1">{topic}</li>)}</ul></aside></Container></section>

@@ -11,6 +11,13 @@ export const dictionary = {
     projectPublic: "público", note: "Nota", criteria: "Criterios", criteriaDescription: "Repositorio público, documentado y utilizable.", metrics: "Métricas",
     metricsDescription: "No se muestran estrellas ni descargas si no son reales.", focus: "Enfoque", focusDescription: ".NET, dispositivos, agentes y recuperación de información.",
   },
+  newsletterForm: {
+    emailLabel: "Correo electrónico", placeholder: "tu@correo.com", subscribe: "Suscribirme", submitting: "Suscribiendo…",
+    success: "¡Gracias por suscribirte!", invalidEmail: "Introduce un correo electrónico válido.",
+    requiredEmail: "Introduce tu correo electrónico.", brevoRequired: "Este campo es obligatorio.", error: "No pudimos completar tu suscripción. Inténtalo de nuevo.",
+    brevoEmailInvalid: "El correo electrónico no es válido. Revisa el formato e inténtalo de nuevo.",
+    brevoGenericInvalid: "La información proporcionada no es válida. Revisa el formato e inténtalo de nuevo.",
+  },
   metadata: {
     home: { title: "Inicio", description: "Ingeniería de software, .NET, Azure, IA, arquitectura, herramientas para desarrolladores y proyectos de código abierto de Sakir Sathe." },
     engineering: { title: "Ingeniería", description: "Me interesan los retos que conectan arquitectura de aplicaciones, sistemas backend, nube, datos, búsqueda, IA y experiencia de desarrollo." },
@@ -82,7 +89,7 @@ export const dictionary = {
     intro: "Ensayos y notas sobre ingeniería de software, IA, arquitectura, código abierto, carrera, productos, viajes y aprendizajes.", topicsTitle: "Temas",
     topics: ["Ingeniería", "IA", "Arquitectura", "Código abierto", "Carrera", "Productos", "Viajes", "Personal"],
     emptyCode: "Índice · 0 publicados", emptyTitle: "Aún no hay artículos traducidos", emptyBody: "Los artículos en español aparecerán aquí cuando se publiquen las traducciones.",
-    newsletterHeading: "Recibe nuevos artículos por correo", newsletterDescription: "Suscríbete para recibir nuevos ensayos y notas cuando los publique.", rssLink: "Suscribirse por /rss.xml",
+    newsletterHeading: "Recibe nuevos artículos", newsletterDescription: "Recibe nuevos artículos y notas de Sakir Sathe directamente en tu correo.", rssLink: "Suscribirse por /rss.xml",
   },
   feed: {
     title: "Sakir Sathe — Artículos",
@@ -92,7 +99,7 @@ export const dictionary = {
     backToWriting: "Artículos", updated: "Actualizado", minutesRead: "{count} min de lectura", onThisPage: "En este artículo",
     previousArticle: "Artículo anterior", nextArticle: "Artículo siguiente", articleNavigation: "Navegación del artículo", relatedArticles: "Artículos relacionados", discussion: "Comentarios",
     copyLink: "Copiar enlace", copyAriaLabel: "Copiar enlace del artículo", copied: "Copiado", articleLinkCopied: "Enlace del artículo copiado", unableToCopy: "No se pudo copiar el enlace del artículo",
-    newsletterHeading: "¿Te gustó este artículo?", newsletterDescription: "Suscríbete para recibir nuevos artículos por correo.",
+    newsletterHeading: "Recibe nuevos artículos", newsletterDescription: "Recibe nuevos artículos y notas de Sakir Sathe directamente en tu correo.",
   },
   labsPage: {
     intro: "Experimentos, benchmarks e ideas útiles, aunque no se conviertan en proyectos completos.", areasHeading: "Áreas de exploración",

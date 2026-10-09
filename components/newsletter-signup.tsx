@@ -1,15 +1,21 @@
 import { cn } from "@/lib/utils";
 import { LoaderCircle } from "lucide-react";
 import Script from "next/script";
+import { getDictionary } from "@/lib/i18n/dictionary";
+import type { Locale } from "@/lib/i18n/locales";
+import { getNewsletterConfig } from "@/lib/newsletter";
 
 type NewsletterSignupProps = {
+  locale: Locale;
   heading: string;
   description: string;
   compact?: boolean;
   className?: string;
 };
 
-export function NewsletterSignup({ heading, description, compact = false, className }: NewsletterSignupProps) {
+export function NewsletterSignup({ locale, heading, description, compact = false, className }: NewsletterSignupProps) {
+  const copy = getDictionary(locale).newsletterForm;
+  const config = getNewsletterConfig(locale);
   return (
     <section aria-labelledby="newsletter-signup-heading" className={cn("w-full min-w-0", compact ? "border-t border-line pt-6" : "border-y border-line bg-sunken/40 py-6", className)}>
       <div className={cn("grid min-w-0 gap-5", !compact && "md:grid-cols-[minmax(0,1fr)_minmax(0,540px)] md:items-center")}>
@@ -24,7 +30,7 @@ export function NewsletterSignup({ heading, description, compact = false, classN
             aria-live="assertive"
             className="sib-form-message-panel text-sm leading-relaxed text-red-700 dark:text-red-300 [&:not(.sib-form-message-panel--active)]:hidden"
           >
-            <p className="sib-form-message-panel__inner-text">Your subscription could not be saved. Please try again.</p>
+            <p className="sib-form-message-panel__inner-text">{copy.error}</p>
           </div>
           <div
             id="success-message"
@@ -32,27 +38,27 @@ export function NewsletterSignup({ heading, description, compact = false, classN
             aria-live="polite"
             className="sib-form-message-panel text-sm leading-relaxed text-muted [&:not(.sib-form-message-panel--active)]:hidden"
           >
-            <p className="sib-form-message-panel__inner-text">Thanks for subscribing! You&apos;ll receive new articles and updates from Sakir Sathe Writing.</p>
+            <p className="sib-form-message-panel__inner-text">{copy.success}</p>
           </div>
           <div id="sib-container" className="w-full min-w-0">
             <form
               id="sib-form"
               method="POST"
-              action="https://7d60b2a9.sibforms.com/serve/MUIFAElqzY43XvSm7ZLB9IwzzAiIwfes-oVJ3x8WYRbo9-Dr-1NpRRNCtzfYk7XgYwgrVC_lJXuEvjfuHypg2jaa29moLIimaaEaf0Cy9Jm5UARuASt1a4vl5_-gpNFvcHPvxQy34vXqm9sAeVAB0KOVXFBb3Hg3Oir_uA9-kNBlCz-TdXKx0ZXP0yAuaeOaqMCQUKPPv1zZ56Ki"
+              action={config.endpoint}
               data-type="subscription"
               className="w-full"
             >
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="sib-input min-w-0 flex-1">
                   <div className="form__entry">
-                    <label htmlFor="EMAIL" className="sr-only">Email address</label>
+                    <label htmlFor="EMAIL" className="sr-only">{copy.emailLabel}</label>
                     <input
                       className="input min-h-11 w-full min-w-0 rounded-sm border border-line bg-raised px-3.5 py-2.5 text-sm text-fg placeholder:text-subtle focus-visible:border-accent"
                       type="email"
                       id="EMAIL"
                       name="EMAIL"
                       autoComplete="email"
-                      placeholder="email@example.com"
+                      placeholder={copy.placeholder}
                       required
                       data-required="true"
                       aria-describedby="newsletter-email-error"
@@ -71,10 +77,11 @@ export function NewsletterSignup({ heading, description, compact = false, classN
                     type="submit"
                     className="inline-flex min-h-11 w-full items-center justify-center rounded-sm border border-fg bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors hover:border-accent hover:bg-accent hover:text-bg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-70"
                   >
-                    Subscribe
+                    {copy.subscribe}
                   </button>
-                  <span className="sib-loader absolute inset-0 flex items-center justify-center" style={{ display: "none" }} aria-hidden="true">
+                  <span className="sib-loader absolute inset-0 flex items-center justify-center" style={{ display: "none" }} role="status" aria-live="polite">
                     <LoaderCircle className="size-5 animate-spin text-accent" />
+                    <span className="sr-only">{copy.submitting}</span>
                   </span>
                 </div>
               </div>
@@ -89,18 +96,18 @@ export function NewsletterSignup({ heading, description, compact = false, classN
                 aria-hidden="true"
                 readOnly
               />
-              <input type="hidden" name="locale" value="en" />
+              <input type="hidden" name="locale" value={config.locale} />
             </form>
           </div>
         </div>
       </div>
       <Script id="brevo-form-config" strategy="afterInteractive">
         {`window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
-window.LOCALE = 'en';
-window.EMAIL_INVALID_MESSAGE = 'The information provided is invalid. Please review the field format and try again.';
+window.LOCALE = ${JSON.stringify(config.locale)};
+window.EMAIL_INVALID_MESSAGE = ${JSON.stringify(copy.brevoEmailInvalid)};
 window.SMS_INVALID_MESSAGE = 'The information provided is invalid. Please review the field format and try again.';
-window.REQUIRED_ERROR_MESSAGE = 'This field cannot be left blank.';
-window.GENERIC_INVALID_MESSAGE = 'The information provided is invalid. Please review the field format and try again.';
+window.REQUIRED_ERROR_MESSAGE = ${JSON.stringify(copy.brevoRequired)};
+window.GENERIC_INVALID_MESSAGE = ${JSON.stringify(copy.brevoGenericInvalid)};
 window.INVALID_NUMBER = 'The information provided is invalid. Please review the field format and try again.';
 window.INVALID_DATE = 'Please enter a valid date';
 window.REQUIRED_MULTISELECT_MESSAGE = 'Please select at least 1 option';
@@ -114,15 +121,17 @@ const successText = document.querySelector('#success-message .sib-form-message-p
 const errorText = document.querySelector('#error-message .sib-form-message-panel__inner-text');
 const successPanel = document.querySelector('#success-message');
 const errorPanel = document.querySelector('#error-message');
-const successMessage = "Thanks for subscribing! You'll receive new articles and updates from Sakir Sathe Writing.";
-const errorMessage = 'Your subscription could not be saved. Please try again.';
+const successMessage = ${JSON.stringify(copy.success)};
+const errorMessage = ${JSON.stringify(copy.error)};
+const requiredEmailMessage = ${JSON.stringify(copy.requiredEmail)};
+const invalidEmailMessage = ${JSON.stringify(copy.invalidEmail)};
 
 if (form && email && fieldError) {
   form.addEventListener('submit', (event) => {
     const message = !email.value.trim()
-      ? 'Please enter your email address.'
+      ? requiredEmailMessage
       : !email.validity.valid
-        ? 'Please enter a valid email address.'
+        ? invalidEmailMessage
         : '';
     if (!message) {
       fieldError.textContent = '';

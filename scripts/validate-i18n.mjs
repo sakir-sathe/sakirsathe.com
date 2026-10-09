@@ -8,6 +8,7 @@ import { dictionary as hi } from "../i18n/hi.ts";
 import { caseStudies, getPublishedWork } from "../data/work.ts";
 import { getPublishedProjects } from "../data/projects.ts";
 import { localeContentTargets } from "../lib/i18n/content-targets.ts";
+import { getNewsletterConfig, newsletterConfig } from "../lib/newsletter.ts";
 import { resolveLocaleTarget } from "../lib/i18n/resolve-locale-target.ts";
 import { localeSeoConfig } from "../lib/i18n/seo-config.ts";
 import { parseMdxFrontmatter, validatePostFrontmatter } from "../lib/mdx-frontmatter.ts";
@@ -29,6 +30,16 @@ import {
 assert.deepEqual(supportedLocales, ["en", "es", "hi"]);
 assert.equal(defaultLocale, "en");
 assert.deepEqual(translatedLocales, ["es", "hi"]);
+assert.deepEqual(Object.keys(newsletterConfig).sort(), [...supportedLocales].sort());
+assert.deepEqual(supportedLocales.map((locale) => getNewsletterConfig(locale).locale), supportedLocales);
+assert.equal(new Set(Object.values(newsletterConfig).map((config) => config.endpoint)).size, supportedLocales.length);
+assert.throws(() => getNewsletterConfig("fr"), RangeError);
+for (const locale of supportedLocales) {
+  for (const field of ["emailLabel", "placeholder", "subscribe", "submitting", "success", "invalidEmail", "requiredEmail", "error"]) {
+    assert.equal(typeof (locale === "en" ? en : locale === "es" ? es : hi).newsletterForm[field], "string");
+    assert.ok((locale === "en" ? en : locale === "es" ? es : hi).newsletterForm[field].trim(), `${locale} newsletter ${field} is empty`);
+  }
+}
 assert.deepEqual(supportedLocales.map(isLocale), [true, true, true]);
 assert.deepEqual(translatedLocales.map(isTranslatedLocale), [true, true]);
 assert.equal(isLocale("fr"), false);

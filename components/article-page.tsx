@@ -141,7 +141,7 @@ export async function ArticlePage({ post, locale }: { post: Post; locale: Locale
             <div className="mt-2 border-t border-line">{related.map((relatedPost) => <PostRow key={relatedPost.slug} p={relatedPost} locale={locale} />)}</div>
           </section>
         )}
-        <NewsletterSignup compact heading={labels.newsletterHeading} description={labels.newsletterDescription} className="mt-16" />
+        <NewsletterSignup locale={locale} compact heading={labels.newsletterHeading} description={labels.newsletterDescription} className="mt-16" />
         <ArticleComments locale={locale} heading={labels.discussion} />
       </Container>
     </article>

@@ -11,6 +11,13 @@ export const dictionary = {
     projectPublic: "सार्वजनिक", note: "नोट", criteria: "मानदंड", criteriaDescription: "सार्वजनिक, दस्तावेज़ित और उपयोग योग्य रिपॉज़िटरी।", metrics: "मेट्रिक्स",
     metricsDescription: "वास्तविक न होने पर स्टार या डाउनलोड नहीं दिखाए जाते।", focus: "मुख्य क्षेत्र", focusDescription: ".NET, डिवाइस, एजेंट और जानकारी पुनर्प्राप्ति।",
   },
+  newsletterForm: {
+    emailLabel: "ईमेल पता", placeholder: "aap@email.com", subscribe: "सदस्यता लें", submitting: "सदस्यता ली जा रही है…",
+    success: "सदस्यता के लिए धन्यवाद!", invalidEmail: "कृपया एक मान्य ईमेल पता दर्ज करें।",
+    requiredEmail: "कृपया अपना ईमेल पता दर्ज करें।", brevoRequired: "यह फ़ील्ड खाली नहीं छोड़ा जा सकता।", error: "आपकी सदस्यता पूरी नहीं हो सकी। कृपया फिर से प्रयास करें।",
+    brevoEmailInvalid: "दी गई जानकारी मान्य नहीं है। कृपया ईमेल का प्रारूप जाँचें।",
+    brevoGenericInvalid: "दी गई जानकारी मान्य नहीं है। कृपया प्रारूप जाँचकर फिर से प्रयास करें।",
+  },
   metadata: {
     home: { title: "होम", description: "Sakir Sathe द्वारा सॉफ़्टवेयर इंजीनियरिंग, .NET, Azure, AI, आर्किटेक्चर, डेवलपर टूलिंग और ओपन-सोर्स प्रोजेक्ट।" },
     engineering: { title: "इंजीनियरिंग", description: "मुझे ऐसे इंजीनियरिंग सवाल पसंद हैं जो एप्लिकेशन आर्किटेक्चर, backend सिस्टम, क्लाउड इंफ्रास्ट्रक्चर, डेटा, सर्च, AI और डेवलपर अनुभव को जोड़ते हैं।" },
@@ -82,7 +89,7 @@ export const dictionary = {
     intro: "सॉफ़्टवेयर इंजीनियरिंग, AI, आर्किटेक्चर, ओपन सोर्स, करियर, उत्पादों, यात्रा और सीख के बारे में लेख और नोट्स।", topicsTitle: "विषय",
     topics: ["इंजीनियरिंग", "AI", "आर्किटेक्चर", "ओपन सोर्स", "करियर", "निर्माण", "यात्रा", "व्यक्तिगत"],
     emptyCode: "सूची · 0 प्रकाशित", emptyTitle: "अभी अनूदित लेख नहीं हैं", emptyBody: "हिंदी लेखों के अनुवाद प्रकाशित होने पर वे यहाँ दिखाई देंगे।",
-    newsletterHeading: "नए लेख ईमेल से पाएँ", newsletterDescription: "नए निबंध और नोट्स प्रकाशित होने पर पाने के लिए सदस्यता लें।", rssLink: "/rss.xml से सदस्यता लें",
+    newsletterHeading: "नए लेख पाएँ", newsletterDescription: "Sakir Sathe के नए लेख और नोट्स सीधे अपने ईमेल पर पाएँ।", rssLink: "/rss.xml से सदस्यता लें",
   },
   feed: {
     title: "Sakir Sathe — लेख",
@@ -92,7 +99,7 @@ export const dictionary = {
     backToWriting: "लेख", updated: "अपडेट किया गया", minutesRead: "{count} मिनट पढ़ने का समय", onThisPage: "इस लेख में",
     previousArticle: "पिछला लेख", nextArticle: "अगला लेख", articleNavigation: "लेख नेविगेशन", relatedArticles: "संबंधित लेख", discussion: "चर्चा",
     copyLink: "लिंक कॉपी करें", copyAriaLabel: "लेख का लिंक कॉपी करें", copied: "कॉपी हो गया", articleLinkCopied: "लेख का लिंक कॉपी हो गया", unableToCopy: "लेख का लिंक कॉपी नहीं हो सका",
-    newsletterHeading: "लेख पसंद आया?", newsletterDescription: "नए लेख ईमेल से पाने के लिए सदस्यता लें।",
+    newsletterHeading: "नए लेख पाएँ", newsletterDescription: "Sakir Sathe के नए लेख और नोट्स सीधे अपने ईमेल पर पाएँ।",
   },
   labsPage: {
     intro: "प्रयोग, benchmarks और ऐसे विचार जो पूरे प्रोजेक्ट न बनें, तब भी उपयोगी हैं।", areasHeading: "खोज के क्षेत्र",
