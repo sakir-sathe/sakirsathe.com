@@ -1,0 +1,122 @@
+---
+title: "भौतिक हार्डवेयर के बिना Cubiscan इंटीग्रेशन की जाँच"
+description: "डिवाइस के सामने एक नियत contract होने से, भौतिक dimensional scanner उपलब्ध होने से पहले भी application integration tests उपयोगी बन सकते हैं।"
+date: "2026-10-06"
+locale: hi
+translationKey: testing-cubiscan-integrations-without-hardware
+translationSourceHash: 70be855e6739a07f382f6ea51aa4c48313d317c92d6048cf693db1cd46163b67
+tags:
+  - .NET
+  - Hardware Integration
+  - Testing
+  - Developer Tooling
+published: true
+featured: false
+---
+
+## समस्या
+
+मुझे device integrations पसंद हैं, क्योंकि वे एक दिलचस्प boundary दिखाते हैं: software को ऐसी चीज़ से interact करना पड़ता है जो खुद software नहीं है। Enterprise applications में मैंने ऐसे systems पर काम किया है जो dimensional-scanning hardware से integrate होते हैं। Measurement किसी physical device से शुरू हो सकता है, लेकिन अंततः वह application state बन जाता है: result parse होता है, workflow से जुड़ता है, user को दिखता है और शायद कहीं और भी इस्तेमाल होता है।
+
+Application logic का बड़ा हिस्सा इसी रास्ते में होता है। यहीं testing भी मुश्किल हो सकती है। किसी developer के पास scanner उपलब्ध न हो, और shared device reserve करना कठिन हो सकता है। Vendor tools setup या diagnosis में मदद कर सकते हैं, लेकिन automated tests या continuous integration के लिए उपयुक्त test dependency देना ज़रूरी नहीं। Integration code महत्वपूर्ण है, पर equipment के बिना सामान्य development feedback पाना कठिन हो सकता है।
+
+उपयोगी सवाल यह नहीं है कि software scanner की जगह ले सकता है या नहीं। सवाल यह है कि application को दिखाई देने वाले व्यवहार का कितना हिस्सा scanner के बिना exercise किया जा सकता है।
+
+## Hardware integrations की जाँच कठिन क्यों होती है
+
+एक unit test in-memory value के साथ business logic चला सकता है। Hardware integration उस value के बनने से पहले एक boundary जोड़ता है। Application को connection बनाना, request भेजना, response की प्रतीक्षा करना, मिले हुए data को समझना और workflow का अगला कदम तय करना पड़ सकता है। हर कदम इस तरह विफल हो सकता है जिसे application को संभालना होगा।
+
+Physical device पर निर्भर test अपने आसपास की स्थितियों पर भी निर्भर होता है: device उपलब्ध और connected हो, और result देने के लिए तैयार हो। अंतिम hardware validation में ये स्थितियाँ महत्वपूर्ण हैं, लेकिन हर developer test run के लिए इन्हें prerequisite बनाना व्यावहारिक नहीं। Real-device test software boundary की जाँच से धीमा और कम repeatable भी हो सकता है।
+
+यह मानकर नहीं चलना चाहिए कि कोई proprietary simulator मौजूद है, उसकी license automation की अनुमति देती है, या वह application की ज़रूरत के मुताबिक व्यवहार करता है। Physical devices और vendor tools तक पहुँच integration testing को सामान्य software testing से अधिक कठिन और महँगा बना सकती है। उद्देश्य real-device testing से बचना नहीं, बल्कि यह अलग करना है कि किसे scanner चाहिए और किसे device से मिलने वाला predictable response।
+
+## हमें वास्तव में क्या simulate करना है?
+
+अधिकतर application tests को किसी वस्तु को भौतिक रूप से मापने की प्रक्रिया दोहराने की ज़रूरत नहीं होती। उन्हें measurement के आसपास software को दिखने वाले contract को exercise करना होता है। मोटे तौर पर रास्ता ऐसा है:
+
+```text
+application
+→ device/client abstraction
+→ transport and connection
+→ request and device response
+→ parsing and result handling
+→ business workflow
+```
+
+Application को यह जानना होता है कि वह क्या request कर सकती है, उसकी boundary पर response किस रूप में आता है और उसे किन परिणामों को संभालना है। उसे result दिखाना, अनुपयोगी value अस्वीकार करना, measurement को operation से जोड़ना या device अनुपलब्ध होने पर recover करना पड़ सकता है। ये व्यवहार optics, sensors, calibration या physical measurement की geometry model किए बिना जाँचे जा सकते हैं।
+
+“Scanner simulate करना” instrument को दोहराने का अर्थ हो सकता है, या application जिस contract पर निर्भर है उसका controlled implementation देने का। अधिकतर application integration tests के लिए दूसरा विकल्प उपयोगी शुरुआत है।
+
+## Result को ही mock क्यों न करें?
+
+मान लें कोई test business service को ऐसे mock से बदलता है जो width, height और length वाला measurement object तुरंत लौटा देता है। Downstream business behavior जाँचने के लिए यह बिल्कुल उचित तरीका हो सकता है: workflow को value मिलती है और test देखता है कि उसके बाद क्या होता है।
+
+लेकिन mock उस बिंदु के बाद से शुरू होता है जहाँ device integration अपना काम कर चुका है। वह connection handling, request/response flow, transport errors, parsing, malformed या अधूरे responses, timeouts और disconnections को छोड़ देता है। यदि real client या parser device-facing data को measurement object में बदलता है, तो test ने उनमें से किसी को exercise नहीं किया।
+
+उपयोगी simulator boundary business workflow के नीचे, लेकिन physical hardware के ऊपर होती है। वह controlled transport behavior देती है, जबकि application का असली device client और parser test में बने रहते हैं। इससे integration test device-facing response और application result के बीच के code को जाँच सकता है, बिना physical measurement का दिखावा किए।
+
+## Device behavior और physical hardware को अलग रखें
+
+Maintainable design इस boundary को स्पष्ट करता है। Application को यह जानने की ज़रूरत नहीं होनी चाहिए कि response physical connection से आया या test implementation से। Device client उन operations को संभाल सकता है जिन्हें application समझती है। Transport data भेजने और पाने की mechanics संभाल सकता है। Parser response को typed result या स्पष्ट failure में बदल सकता है, और business workflow तय कर सकता है कि result के साथ क्या करना है।
+
+Real-device transport hardware के साथ उपयोग होने वाला implementation बना रहता है। Simulator transport को test या development context में स्पष्ट रूप से चुना जाता है। उसे चुपचाप real connection की जगह नहीं लेनी चाहिए या बिना जाँच के application की compatibility का दावा नहीं करना चाहिए।
+
+## एक संभावित architecture
+
+छोटा design कुछ ऐसा दिख सकता है:
+
+```text
+Application
+  ↓
+Device client and parser
+  ↓
+Transport interface
+   ↙                 ↘
+Real device        Simulator
+```
+
+Client उन operations को व्यक्त करेगा जिन्हें application समझती है। Transport connection-specific details छिपाएगा। Parsing production client path का हिस्सा रहेगा, ताकि simulator इस्तेमाल करने वाले tests यह भी जाँच सकें कि application मिले हुए data को कैसे संभालती है।
+
+कोई test client को किसी चुने हुए scenario के लिए configured simulator transport के साथ बना सकता है। एक test predetermined successful result लौटा सकता है; दूसरा malformed या अधूरा data दे सकता है। दोनों मामलों में application वही client-facing contract इस्तेमाल करेगी और test physical connection नहीं खोलेगा।
+
+Scenario configuration स्पष्ट और आसानी से समझ आने वाली होनी चाहिए। उसमें predetermined response, controlled delay या किसी तय बिंदु पर disconnect चुना जा सकता है। Exchanges को record और replay करना बाद में उपयोगी हो सकता है, लेकिन उस capability का design सार्वजनिक contract की verified समझ पर आधारित होना चाहिए, उससे पहले नहीं। .NET teams के लिए एक छोटी library इस pattern को साझा करना आसान बना सकती है, बिना अभी से final public API तय किए।
+
+## क्या deterministic होना चाहिए
+
+एक जैसी setup से test को वही response, वही parsed values और वही state transition दिखनी चाहिए। Timing पर्याप्त रूप से नियंत्रित हो, ताकि test को अनिश्चित समय तक प्रतीक्षा न करनी पड़े।
+
+State reset किया जा सके। एक test दूसरे test का connection state, queued response या measurement विरासत में न ले। Scenario का चुनाव उसी test तक सीमित हो, और अप्रत्याशित requests plausible-looking default लौटाने के बजाय स्पष्ट रूप से fail हों। Simulator को valid result और transport या parsing failure में अंतर करना चाहिए, ताकि happy-path test किसी अनजाँचे error path को न छिपाए।
+
+इन गुणों से failures समझना आसान होता है और simulator application की गलतियों को छिपाने से बचता है।
+
+## जाँचने योग्य failure scenarios
+
+Scenario set को application की जिम्मेदारियाँ दिखानी चाहिए, न कि Cubiscan के पुष्ट व्यवहारों की सूची होने का दावा करना चाहिए। इसमें successful result, zero या empty values, incomplete या malformed response और unexpected response शामिल हो सकते हैं। ये parsing और उसके बाद लिए जाने वाले निर्णयों को exercise करते हैं।
+
+Connection behavior पर भी ध्यान देना चाहिए। Test implementation unavailable device, timeout तक पहुँचने वाला delayed response या operation के बीच disconnect दिखा सकता है। Measurement दोहराने से stale state या response ordering की धारणाएँ सामने आ सकती हैं। Predetermined deterministic scenario उसी condition को बदलाव के बाद फिर चलाने देता है।
+
+Application error दिखा सकती है, retry की अनुमति दे सकती है, मौजूदा workflow state बचा सकती है या दूसरी measurement माँग सकती है। इन paths को यह दावा किए बिना जाँचा जा सकता है कि कोई खास failure किसी विशेष device का ज्ञात behavior है। Test इस बात पर है कि contract ऐसी स्थिति दे तो application को क्या करना चाहिए।
+
+## Simulator कब भरोसेमंद नहीं रहता
+
+Simulator application integration logic, parsing, state transitions, error handling, retry और timeout behavior, तथा result के आसपास के workflow को validate कर सकता है। इससे developer machine या automated build में tests repeatable हो सकते हैं।
+
+यह physical measurement accuracy, calibration, sensor behavior या electrical, serial और network characteristics validate नहीं कर सकता। यह undocumented hardware quirks साबित नहीं कर सकता और न ही physical models के बीच compatibility स्थापित कर सकता है। Simulated response software tests के लिए उपयोगी हो सकता है, फिर भी production में इस्तेमाल होने वाले device को प्रतिबिंबित न करे।
+
+यह अंतर tests और documentation दोनों में स्पष्ट होना चाहिए। Simulator से समर्थित behavior को simulated बताना चाहिए; hardware compatibility का दावा करने से पहले real-device validation एक अलग कदम है।
+
+## Open source की एक संभावित दिशा
+
+मैं सोच रहा हूँ कि क्या यह समस्या एक छोटे open-source .NET package में बदल सकती है: device-facing API और deterministic simulator, जिससे application developers physical scanner मिलने से पहले integration flows test कर सकें। Package अभी released project के रूप में मौजूद नहीं है और इसकी API तय नहीं है।
+
+एक उपयोगी पहला version सीमित होगा: छोटी core library, simulator या test implementation, और एक example application जो दिखाए कि integration test scenario कैसे चुन सकता है। Package को अपने tests और केवल publicly verifiable जानकारी पर आधारित protocol documentation की भी आवश्यकता होगी। इसमें साफ़ होना चाहिए कि कौन-सा behavior simulated है और किसे hardware के साथ validate किया गया है।
+
+Cubiscan.Net एक संभावित नाम है, release announcement नहीं। इसका मूल्य भरोसेमंद test boundary में होगा, hardware support का ऐसा दावा करने में नहीं जिसे अभी साबित न किया गया हो।
+
+## आगे मैं क्या validate करना चाहता हूँ
+
+API चुनने से पहले, मैं publicly documented device-facing contract को इतना समझना चाहूँगा कि application की स्थिर ज़रूरतों को transport details से अलग कर सकूँ। Protocol से जुड़ी हर धारणा को public documentation या अनुमति से इस्तेमाल किए जा सकने वाले device के साथ जाँचना चाहिए। मैं यह भी पहचानना चाहूँगा कि कौन-सी जिम्मेदारियाँ reusable client में होनी चाहिए और कौन-सी application workflow में।
+
+फिर मैं application integration पर सबसे छोटा उपयोगी test seam आज़माऊँगा: एक successful result, एक malformed या incomplete response और एक connection failure। पहला milestone पूरा Cubiscan SDK नहीं है। वह एक भरोसेमंद device-facing boundary, कुछ deterministic scenarios और यह प्रमाण है कि physical scanner जुड़े बिना application के real client और parser को exercise किया जा सकता है।
+
+अगर यह उपयोगी साबित हुआ, तो शायद Cubiscan.Net बनाने लायक कुछ हो। अगर नहीं, तब भी यह अधिक स्पष्ट समझ होगी कि किन tests को software simulation चाहिए और किन्हें real hardware।

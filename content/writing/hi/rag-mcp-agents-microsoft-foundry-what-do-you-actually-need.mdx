@@ -1,0 +1,825 @@
+---
+title: "RAG, MCP, Agents और Microsoft Foundry: आपको वास्तव में क्या चाहिए?"
+description: "यह तय करने के लिए एक व्यावहारिक mental model कि किसी AI system को retrieval, MCP, agents या Microsoft Foundry कब चाहिए—और कब इनमें से कुछ भी नहीं।"
+date: "2026-10-06"
+locale: hi
+translationKey: rag-mcp-agents-microsoft-foundry-what-do-you-actually-need
+translationSourceHash: bde1c5250bd4356e0ae78fc100441d8a552fe8c669eb55cca7a98795f2d51e65
+tags:
+  - AI
+  - RAG
+  - MCP
+  - Agents
+  - Microsoft Foundry
+published: true
+featured: false
+---
+
+आज AI applications बना रहे हों, तो ऐसा लग सकता है कि हर architecture diagram में boxes का वही समूह चाहिए:
+
+RAG.
+
+MCP.
+
+Agents.
+
+Microsoft Foundry.
+
+Vector databases.
+
+Tools.
+
+Evaluation.
+
+Orchestration.
+
+और पर्याप्त diagrams देखने के बाद एक बहुत उचित सवाल उठता है:
+
+**क्या मुझे सच में यह सब चाहिए?**
+
+मैं बार-बार कुछ सरल सवालों पर लौटता था।
+
+अगर मेरे पास पहले से APIs हैं, तो MCP क्यों चाहिए?
+
+अगर RAG model को मेरी company knowledge तक पहुँच देता है, तो agent की ज़रूरत कब पड़ती है?
+
+अगर Microsoft Foundry मुझे agent platform देता है, तो क्या मुझे फिर भी MCP चाहिए?
+
+और अगर मेरी application को केवल कुछ documents पर सवालों के जवाब देने हैं, तो मैं शुरू से autonomous system क्यों डिज़ाइन कर रहा हूँ?
+
+समस्या यह नहीं है कि इन technologies को समझना असंभव है।
+
+समस्या यह है कि अक्सर हम उनका नाम पहले सीखते हैं और यह बाद में कि हर technology कौन-सी समस्या हल करती है।
+
+इसलिए products और frameworks से शुरुआत करने के बजाय, आइए architecture को एक-एक capability जोड़कर बनाते हैं।
+
+---
+
+## सबसे सरल चीज़ से शुरुआत करें: एक LLM
+
+मान लें मेरे पास support application है।
+
+एक user पूछता है:
+
+> “मेरा VPN connection बार-बार fail हो रहा है। मुझे क्या आज़माना चाहिए?”
+
+अगर मैं यह सवाल सीधे language model को भेजूँ, तो वह शायद उपयोगी सामान्य जवाब दे सके।
+
+शायद वह सुझाव दे:
+
+- internet connection जाँचें
+- VPN client restart करें
+- credentials verify करें
+- firewall settings जाँचें
+
+सामान्य सवाल के लिए इतना पर्याप्त हो सकता है।
+
+Architecture लगभग इतनी ही है:
+
+```text
+User
+  ↓
+LLM
+  ↓
+Answer
+```
+
+कोई vector database नहीं।
+
+कोई MCP नहीं।
+
+कोई agent नहीं।
+
+कोई Foundry Agent Service नहीं।
+
+यह एक महत्वपूर्ण शुरुआती बिंदु है, क्योंकि AI architecture की शुरुआत सामान्यतः इस सवाल से होनी चाहिए:
+
+**ऐसा सबसे छोटा system कौन-सा है जो समस्या हल करता है?**
+
+यह नहीं:
+
+**मैं diagram में कितनी AI technologies रख सकता हूँ?**
+
+लेकिन हमारे support उदाहरण में एक समस्या है।
+
+Model को हमारी company की वास्तविक VPN policy पता नहीं है।
+
+उसे नहीं पता कि employees किस client version का उपयोग करते हैं।
+
+उसे internal troubleshooting procedures नहीं पता।
+
+उसे यह नहीं पता कि अभी कोई known incident चल रहा है या नहीं।
+
+अब हमें पहली missing capability मिल गई है।
+
+Model को knowledge चाहिए।
+
+---
+
+## RAG: जब model को ऐसा knowledge चाहिए जो उसके पास नहीं है
+
+यहीं Retrieval-Augmented Generation—RAG—काम आता है।
+
+इसका मूल विचार इसके नाम से लगने जितना जटिल नहीं है।
+
+Model से जवाब माँगने से पहले प्रासंगिक जानकारी retrieve करें और उसे context के रूप में दें।
+
+अब flow ऐसा होगा:
+
+```text
+User question
+  ↓
+Search relevant company knowledge
+  ↓
+Retrieve useful content
+  ↓
+Give that content to the LLM
+  ↓
+Generate a grounded answer
+```
+
+अब जब कोई पूछे:
+
+> “मेरा VPN connection बार-बार fail हो रहा है।”
+
+तो application शायद यह retrieve करे:
+
+- company की VPN troubleshooting guide
+- approved VPN client configuration
+- security policy
+- known issues वाला document
+
+Model training के दौरान सीखी बातों पर ही निर्भर रहने के बजाय इस जानकारी के आधार पर जवाब देता है।
+
+RAG जिस समस्या को हल करता है, वह यह है:
+
+**जवाब देते समय model को प्रासंगिक, निजी, domain-specific या वर्तमान knowledge चाहिए।**
+
+RAG model नहीं है।
+
+RAG vector database नहीं है।
+
+RAG agent नहीं है।
+
+यह retrieval और generation के आसपास का architectural pattern है।
+
+Vector index इस architecture का हिस्सा हो सकता है।
+
+Azure AI Search इसका हिस्सा हो सकता है।
+
+इसके पीछे SQL, documents, SharePoint, Blob Storage या कोई दूसरा knowledge source हो सकता है।
+
+लेकिन मुख्य विचार यह है:
+
+**जवाब generate करने से पहले उपयोगी context retrieve करें।**
+
+---
+
+## Classic RAG अब भी उपयोगी है
+
+AI में यह मान लेने की प्रवृत्ति है कि नया pattern आते ही पुराना बेकार हो जाता है।
+
+अक्सर यह गलती होती है।
+
+कई applications के लिए सीधी-सादी retrieval pipeline पूरी तरह उचित है:
+
+```text
+Question → Search → Retrieve top results → Generate answer
+```
+
+अगर मेरा knowledge base अपेक्षाकृत स्पष्ट है और user questions अनुमानित हैं, तो शायद मुझे इससे अधिक जटिल चीज़ की ज़रूरत न हो।
+
+लेकिन retrieval कठिन हो सकता है।
+
+मान लें सवाल है:
+
+> “हमारी remote-access policy की तुलना मौजूदा VPN troubleshooting process से करो और बताओ कि इस employee की समस्या को security team तक escalate करना चाहिए या नहीं।”
+
+एक search query शायद पर्याप्त न हो।
+
+System को शायद:
+
+- सवाल को छोटी searches में बाँटना पड़े
+- अलग-अलग knowledge sources खोजना पड़े
+- मिले हुए results evaluate करने पड़ें
+- एक और query करनी पड़े
+- results को जोड़ना पड़े
+
+यहीं **agentic retrieval** जैसे विचार दिलचस्प होने लगते हैं।
+
+एक fixed search operation मानने के बजाय, system यह plan कर सकता है कि आवश्यक जानकारी कैसे retrieve करनी है।
+
+लेकिन एक महत्वपूर्ण बात पर ध्यान दें।
+
+हम अब भी **knowledge problem** हल कर रहे हैं।
+
+हमने retrieval को बस अधिक सक्षम बनाया है।
+
+हमने अपने आप कोई business-process agent नहीं बना दिया।
+
+---
+
+## तो MCP क्या है?
+
+अब मान लें कि हमारी AI application को documents से अधिक चाहिए।
+
+शायद उसे:
+
+- incident lookup करना हो
+- ticket query करना हो
+- किसी employee के device status को retrieve करना हो
+- किसी service की जाँच करनी हो
+- support ticket बनाना हो
+
+शायद तुम्हारे पास पहले से APIs या services हैं जो ये काम कर सकती हैं।
+
+तो स्वाभाविक सवाल है:
+
+**API को सीधे call क्यों न करें?**
+
+कभी-कभी यही बिल्कुल सही तरीका है।
+
+MCP, REST का replacement नहीं है।
+
+यह तुम्हारी ASP.NET Core APIs का replacement नहीं है।
+
+यह वह जगह नहीं है जहाँ business logic को अचानक ले जाना पड़े।
+
+तुम्हारी मौजूदा services वहीं रह सकती हैं जहाँ उन्हें होना चाहिए।
+
+अंतर उस integration contract में है जो AI applications के सामने रखा जाता है।
+
+Model Context Protocol, AI hosts और clients को external capabilities खोजने और उनसे interact करने का standardized तरीका देता है।
+
+MCP server ऐसी चीज़ें expose कर सकता है:
+
+- **Tools** — operations जिन्हें model invoke कर सकता है
+- **Resources** — contextual information जो application दे सकती है
+- **Prompts** — reusable interaction templates
+
+उदाहरण के लिए, तुम्हारा मौजूदा system शायद पहले से यह expose करता हो:
+
+```text
+POST /tickets
+```
+
+MCP के इर्द-गिर्द ticketing system को फिर से लिखने के लिए उस API को हटाना ज़रूरी नहीं है।
+
+इसके बजाय, तुम MCP tool expose कर सकते हो, जैसे:
+
+```text
+create_support_ticket
+```
+
+उस tool के पीछे, असली काम तुम्हारी सामान्य application या API ही करती है।
+
+एक उपयोगी mental model ऐसा है:
+
+```text
+Existing application/API
+  ↓
+MCP server exposes selected capabilities
+  ↓
+AI client discovers those capabilities
+```
+
+इसलिए जब लोग कहते हैं कि MCP tool integration को standardize करता है, तो यही मुख्य बात है।
+
+MCP जैसी चीज़ न हो, तो हर AI host को अपना custom integration चाहिए हो सकता है।
+
+MCP के साथ एक ही capability को कई compatible AI clients के सामने common protocol से expose करना संभव हो सकता है।
+
+---
+
+## MCP किसी चीज़ को अपने आप agent नहीं बनाता
+
+यह अंतर महत्वपूर्ण है।
+
+मान लें model के पास एक tool है:
+
+```text
+get_ticket_status
+```
+
+User पूछता है:
+
+> “Ticket 123 का status क्या है?”
+
+Model एक बार tool call करता है और result लौटा देता है।
+
+Application ने एक tool का उपयोग किया।
+
+शायद MCP का भी।
+
+लेकिन मैं पूरे system को अपने आप autonomous agent नहीं कहूँगा।
+
+**Agent** शब्द तब उपयोगी होता है जब model यह तय करने में भूमिका निभाता है कि आगे क्या करना है।
+
+उदाहरण के लिए:
+
+```text
+User
+  ↓
+Understand goal
+  ↓
+Decide which information is required
+  ↓
+Retrieve knowledge
+  ↓
+Call a diagnostic tool
+  ↓
+Inspect result
+  ↓
+Decide next action
+  ↓
+Maybe call another tool
+  ↓
+Produce answer or perform an action
+```
+
+अब model multi-step workflow में भाग ले रहा है।
+
+वह केवल text generate नहीं कर रहा।
+
+वह goal की दिशा में आगे बढ़ने का तरीका तय कर रहा है।
+
+अलग-अलग frameworks agents को अलग तरह से परिभाषित करते हैं, इसलिए tool calls की कोई जादुई संख्या नहीं है जिसके बाद application अचानक agent बन जाए।
+
+मेरा व्यावहारिक अंतर इससे सरल है:
+
+**अगर workflow मेरे code से पहले से तय है, तो मेरे पास मुख्यतः AI वाला एक workflow है।**
+
+**अगर model अगले step के महत्वपूर्ण हिस्से तय कर रहा है, तो मैं agentic behavior की ओर बढ़ रहा हूँ।**
+
+यह अंतर मुझे वहाँ agent architecture जोड़ने से बचाता है जहाँ सामान्य application code अधिक स्पष्ट और सुरक्षित होगा।
+
+---
+
+## एक पूरा उदाहरण
+
+आइए support scenario को फिर से शुरुआत से बनाते हैं।
+
+### स्तर 1: केवल LLM
+
+User:
+
+> “मेरा VPN काम नहीं कर रहा।”
+
+Model सामान्य troubleshooting सलाह देता है।
+
+सामान्य सवालों के लिए उपयोगी।
+
+लेकिन उसे company-specific जानकारी नहीं है।
+
+### स्तर 2: RAG जोड़ें
+
+अब application internal VPN troubleshooting guide retrieve करती है।
+
+Model जवाब दे सकता है:
+
+> “मौजूदा remote-access guide के अनुसार, पहले ये तीन settings जाँचें...”
+
+अब जवाब company knowledge पर grounded है।
+
+लेकिन application अभी कुछ inspect नहीं कर सकती।
+
+### स्तर 3: Tools जोड़ें
+
+मान लें हम expose करते हैं:
+
+- get_device_status
+- get_incident_status
+- get_ticket
+- create_ticket
+
+ये सामान्य function tools हो सकते हैं या MCP से expose की गई capabilities।
+
+अब AI केवल documents पढ़ने के बजाय systems से interact कर सकती है।
+
+### स्तर 4: Agentic behavior जोड़ें
+
+User कहता है:
+
+> “मेरा VPN पूरी सुबह fail रहा है। क्या पता लगा सकते हो कि क्या गड़बड़ है?”
+
+अब system यह तय कर सकता है:
+
+1. VPN troubleshooting policy retrieve करना
+2. जाँचना कि कोई known outage है या नहीं
+3. Device का प्रासंगिक status inspect करना
+4. Result की तुलना troubleshooting guidance से करना
+5. तय करना कि एक और diagnostic step उपयोगी होगा या नहीं
+6. समस्या हल न होने पर support ticket बनाना
+7. User को समझाना कि क्या हुआ
+
+यह agent के काफी करीब है।
+
+System किसी outcome की दिशा में काम कर रहा है, केवल एक अलग-थलग सवाल का जवाब नहीं दे रहा।
+
+---
+
+## तो Microsoft Foundry कहाँ आता है?
+
+यह एक और जगह है जहाँ terminology अनावश्यक भ्रम पैदा करती है।
+
+तुम्हारी application LLM call करती है, सिर्फ इसलिए Microsoft Foundry ज़रूरी नहीं हो जाता।
+
+और यह RAG, MCP या agents का replacement नहीं है।
+
+Foundry को एक अलग स्तर पर देखो।
+
+यह models, tools, evaluation, observability, identity, governance और संबंधित platform capabilities के साथ AI applications तथा agents बनाने और चलाने के लिए managed environment देता है।
+
+Foundry Agent Service agents को host और operate कर सकता है।
+
+वे agents tools इस्तेमाल कर सकते हैं।
+
+उन tools में MCP servers भी हो सकते हैं।
+
+वे agents retrieval भी इस्तेमाल कर सकते हैं।
+
+इसलिए ये concepts एक-दूसरे के competitors नहीं हैं।
+
+वे एक ही architecture में साथ रह सकते हैं।
+
+एक simplified view ऐसा हो सकता है:
+
+```text
+Microsoft Foundry
+  ↓
+Agent
+  ├── Retrieval / knowledge
+  ├── MCP tools
+  ├── Other function tools
+  └── Model
+```
+
+Foundry system को operate करने में मदद करता है।
+
+MCP external capabilities को standardize करने में मदद करता है।
+
+RAG knowledge उपलब्ध कराने में मदद करता है।
+
+Agent goal तक पहुँचने के लिए capabilities का उपयोग करने का तरीका तय करता है।
+
+Model language और reasoning का काम करता है।
+
+जब मैं इन responsibilities को अलग करता हूँ, तो architecture समझना काफी आसान हो जाता है।
+
+---
+
+## क्या RAG के लिए Foundry चाहिए?
+
+नहीं।
+
+तुम इन चीज़ों से एक अच्छी RAG application बना सकते हो:
+
+- ASP.NET Core
+- LLM endpoint
+- Azure AI Search या कोई अन्य retrieval system
+- तुम्हारा अपना application code
+
+यही बिल्कुल सही architecture हो सकता है।
+
+इसी तरह, managed agent platform के बिना भी tool-calling applications बनाई जा सकती हैं।
+
+जब operational problem बढ़ती है, तब Foundry अधिक आकर्षक होने लगता है।
+
+उदाहरण के लिए:
+
+- कई agents
+- कई tools
+- managed identities
+- tracing
+- evaluation
+- monitoring
+- governance
+- deployment lifecycle
+- security controls
+- model management
+
+तब कठिन समस्या यह नहीं रहती:
+
+> “क्या मैं model call कर सकता हूँ?”
+
+कठिन सवाल बन जाता है:
+
+> “मैं इस AI system को विश्वसनीय ढंग से कैसे operate करूँ?”
+
+यह बिल्कुल अलग सवाल है।
+
+---
+
+## अगर Foundry है, तो क्या MCP चाहिए?
+
+फिर से, दोनों अलग समस्याएँ हल करते हैं।
+
+Foundry agents MCP server endpoints से connect कर सकते हैं।
+
+इसलिए Foundry इस्तेमाल करने से MCP खत्म नहीं होता।
+
+और MCP के लिए Foundry आवश्यक नहीं है।
+
+तुम्हारे पास यह हो सकता है:
+
+```text
+ASP.NET Core services
+  ↓
+MCP server
+  ↓
+Foundry agent
+```
+
+या:
+
+```text
+ASP.NET Core services
+  ↓
+MCP server
+  ↓
+another MCP-compatible AI client
+```
+
+दूसरी संभावना उन कारणों में से है जिनसे MCP दिलचस्प लगता है।
+
+Integration contract आवश्यक नहीं कि किसी एक agent framework या model provider से बँधा हो।
+
+लेकिन मैं हर internal API को MCP tool के रूप में expose नहीं करूँगा।
+
+यह पुराने integration mistakes में से एक को नई technology के साथ दोहराना होगा।
+
+AI के उपयोग के लिए उपयुक्त capabilities expose करो।
+
+Domain rules को वहीं रखो जहाँ वे belong करती हैं।
+
+जो APIs पहले से अच्छी हैं, उन्हें APIs ही रहने दो।
+
+MCP एक integration boundary होना चाहिए, सब कुछ redesign करने का बहाना नहीं।
+
+---
+
+## क्या RAG खुद एक tool बन सकता है?
+
+हाँ।
+
+और यहीं architecture diagrams के boxes एक-दूसरे से overlap करने लगते हैं।
+
+Agent के पास ऐसे tools हो सकते हैं:
+
+- search_knowledge
+- get_customer
+- check_service_status
+- create_ticket
+
+ऐसे architecture में retrieval agent के लिए उपलब्ध एक capability है।
+
+Agent तय करता है कि knowledge retrieval कब ज़रूरी है।
+
+Agentic RAG को समझने का यह एक तरीका है:
+
+**retrieval, हमेशा बिल्कुल एक ही तरह से होने वाला fixed step होने के बजाय, agent की decision process का हिस्सा बन जाता है।**
+
+Complex questions के लिए यह शक्तिशाली हो सकता है।
+
+सरल सवालों के लिए यह अनावश्यक भी हो सकता है।
+
+Complexity को अपनी जगह सही साबित करनी चाहिए।
+
+---
+
+## वह decision table जिसका मैं उपयोग करता हूँ
+
+| अगर मेरे system को यह करना हो... | मैं शुरुआत करूँगा... |
+| --- | --- |
+| Text generate, summarize, classify या transform करना | LLM |
+| Private या current knowledge के आधार पर जवाब देना | RAG |
+| AI applications को external capabilities तक standardized access देना | MCP |
+| कई actions में से चुनना या multi-step work करना | Agent |
+| Managed deployment, evaluation, observability, identity और governance के साथ models और agents operate करना | Microsoft Foundry |
+
+इस table में महत्वपूर्ण शब्द है **शुरुआत**।
+
+ये एक-दूसरे के विकल्प नहीं हैं।
+
+Production system अंततः इन सभी का उपयोग कर सकता है।
+
+लेकिन इसका अर्थ यह नहीं कि हर system को इन सब से शुरुआत करनी चाहिए।
+
+---
+
+## केवल AI शामिल होने से .NET architecture को अजीब बनाने की ज़रूरत नहीं
+
+Traditional enterprise systems से आने वाले .NET developers के लिए यह विशेष रूप से महत्वपूर्ण है।
+
+तुम पहले से जानते हो कि कैसे बनाते हैं:
+
+- domain services
+- APIs
+- authorization
+- background processing
+- data access
+- telemetry
+- integration boundaries
+
+इन विचारों को छोड़ो मत।
+
+अगर तुम्हारे पास पहले से अच्छी तरह design की गई service है, जैसे:
+
+```text
+TicketService
+```
+
+तो उसे बनाए रखो।
+
+तुम्हारी सामान्य API उसे call कर सकती है।
+
+Background worker उसे call कर सकता है।
+
+MCP tool उसे call कर सकता है।
+
+AI integration को अच्छी application architecture के ऊपर बैठना चाहिए, उसकी जगह नहीं लेनी चाहिए।
+
+मैं यह रखना पसंद करूँगा:
+
+```text
+Agent
+  ↓
+small, well-defined tool
+  ↓
+existing application service
+  ↓
+domain/data layer
+```
+
+महत्वपूर्ण business logic को tool description या prompt में रखने के बजाय।
+
+Model तय करे कि कोई capability **कब** मददगार हो सकती है।
+
+Application का नियंत्रण बना रहे कि वह capability **क्या कर सकती है**।
+
+---
+
+## जब model कार्रवाई कर सकता है, तो security अधिक महत्वपूर्ण हो जाती है
+
+इन दोनों में बड़ा अंतर है:
+
+> “हमारी VPN documentation खोजो।”
+
+और:
+
+> “इस employee का account disable करो।”
+
+जैसे ही tools वास्तविक systems बदल सकते हैं, authorization, validation, auditability और human approval architecture की चिंताएँ बन जाती हैं।
+
+Model का tool call करने का निर्णय authorization decision नहीं है।
+
+Underlying application को अब भी permissions लागू करनी होंगी।
+
+अधिक प्रभाव वाली operations के लिए execution से पहले human confirmation उचित हो सकती है।
+
+मुझे tools को मानसिक रूप से इन categories में अलग रखना पसंद है:
+
+- Read — जानकारी retrieve करना
+- Recommend — कोई action सुझाना
+- Write — system state बदलना
+- High impact — security-sensitive या destructive action करना
+
+जैसे-जैसे मैं इस list में आगे जाता हूँ, केवल model पर निर्भर रहने को लेकर मेरी सहजता कम होती है।
+
+Agents engineering controls को हटाते नहीं हैं।
+
+वे controls को और महत्वपूर्ण बनाते हैं।
+
+---
+
+## चार गलतियाँ जिनसे मैं बचूँगा
+
+### 1. जब सामान्य workflow काफी हो, तब agent से शुरुआत करना
+
+अगर sequence हमेशा यह हो:
+
+```text
+Search → Summarize → Save
+```
+
+तो शायद मुझे हर बार उन्हीं तीन steps का निर्णय लेने के लिए autonomous planner नहीं चाहिए।
+
+Code deterministic होता है।
+
+कभी-कभी मुझे ठीक यही चाहिए।
+
+### 2. MCP को API replacement समझना
+
+तुम्हारी domain APIs अब भी महत्वपूर्ण हैं।
+
+MCP, AI systems को चुनी हुई capabilities देने के लिए standardized interface देता है।
+
+ये अलग responsibilities हैं।
+
+### 3. सिर्फ इसलिए RAG जोड़ना क्योंकि हर AI diagram में vector database है
+
+अगर application को external knowledge की ज़रूरत नहीं है, तो retrieval बिना कुछ हल किए cost और complexity बढ़ाता है।
+
+### 4. समस्या समझने से पहले platform चुनना
+
+Foundry, production और operations की महत्वपूर्ण समस्याएँ हल कर सकता है।
+
+लेकिन solution लाने से पहले वे समस्याएँ मौजूद होनी चाहिए।
+
+---
+
+## समस्या के साथ architecture भी बढ़ना चाहिए
+
+यही वह mental model है जिससे मैं चाहता हूँ कि अधिक AI architecture discussions शुरू हों।
+
+यहाँ से शुरू करें:
+
+```text
+User
+  ↓
+LLM
+```
+
+फिर पूछें:
+
+**क्या model के पास आवश्यक knowledge नहीं है?**
+
+Retrieval जोड़ें।
+
+```text
+User
+  ↓
+RAG
+  ↓
+LLM
+```
+
+फिर पूछें:
+
+**क्या उसे external systems तक पहुँच चाहिए?**
+
+Tools जोड़ें—शायद MCP के माध्यम से।
+
+```text
+User
+  ↓
+Agent or AI application
+  ├── Retrieval
+  └── Tools / MCP
+```
+
+फिर पूछें:
+
+**क्या उसे goal की दिशा में कई steps तय करके execute करने हैं?**
+
+Agentic behavior शामिल करें।
+
+फिर पूछें:
+
+**क्या इस system को operate करना कठिन हिस्सा बन गया है?**
+
+अब Microsoft Foundry जैसा managed platform कहीं अधिक उचित लगने लगता है।
+
+हर layer इसलिए होनी चाहिए क्योंकि पिछला architecture किसी वास्तविक requirement को साफ़ तरीके से हल नहीं कर सका।
+
+---
+
+## एक आखिरी सवाल
+
+Architecture में कोई AI technology जोड़ने से पहले, मुझे लगता है कि यह सवाल पूछना उपयोगी है:
+
+**मेरा system आज क्या नहीं कर सकता?**
+
+अगर वह जवाब नहीं दे सकता क्योंकि उसके पास प्रासंगिक knowledge नहीं है:
+
+Retrieval जोड़ें।
+
+अगर वह आवश्यक systems से interact नहीं कर सकता:
+
+Tools expose करें।
+
+अगर कई AI clients को उन capabilities खोजने के लिए standardized तरीका चाहिए:
+
+MCP पर विचार करें।
+
+अगर system को goal की दिशा में कई actions चुनकर execute करने हैं:
+
+Agent पर विचार करें।
+
+अगर इसे deploy, evaluate, monitor, secure और govern करना कठिन हिस्सा बन जाए:
+
+Microsoft Foundry जैसे platform पर विचार करें।
+
+क्रम महत्वपूर्ण है।
+
+क्योंकि उद्देश्य कभी RAG system बनाना नहीं था।
+
+या MCP server।
+
+या agent।
+
+या Foundry architecture।
+
+उद्देश्य समस्या हल करना है।
+
+बाकी सब tools हैं।

@@ -1,3 +1,5 @@
+import type { Locale } from "@/lib/i18n/locales";
+
 export interface Capability {
   id: string;
   index: string;
@@ -6,27 +8,33 @@ export interface Capability {
   technologies: string[];
 }
 
-export interface CaseStudySection {
+export interface WorkSection {
   heading: string;
   body: string;
   /** Sanitized conceptual flow, never an internal system diagram. */
-  flow?: string[];
+  flow?: readonly string[];
 }
 
-export interface CaseStudy {
-  slug: string;
-  index: string;
+export interface WorkContent {
   title: string;
   systemType: string;
   domain: string;
   summary: string;
-  technologies: string[];
-  /** Neutral, category-level themes. Never personal outcomes or metrics. */
-  themes: string[];
+  themes: readonly string[];
+  sections: readonly WorkSection[];
+}
+
+export interface WorkRecord {
+  id: string;
+  slug: string;
+  index: string;
+  technologies: readonly string[];
   /** Whether the long-form narrative has been editorially approved. */
   narrativeStatus: "pending" | "published";
-  sections: CaseStudySection[];
+  content: Record<Locale, WorkContent>;
 }
+
+export type CaseStudy = WorkRecord;
 
 export type ProjectStatus = "planned" | "in-development" | "preview" | "released" | "archived" | "public";
 
@@ -54,6 +62,9 @@ export interface PostFrontmatter {
   title: string;
   description: string;
   date: string;
+  locale: Locale;
+  translationKey: string;
+  translationSourceHash?: string;
   updated?: string;
   tags: string[];
   published: boolean;
@@ -67,6 +78,7 @@ export interface Post extends PostFrontmatter {
   content: string;
   readingTime: number;
   canonicalUrl: string;
+  sourceHash: string;
 }
 
 export interface SocialLink {

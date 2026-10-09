@@ -8,7 +8,8 @@ const ORIGIN = `https://${HOST}`;
 const ENDPOINT = "https://api.indexnow.org/IndexNow";
 const KEY = "b818cf36f2594f22b16957d801faa9b2";
 const KEY_LOCATION = `${ORIGIN}/${KEY}.txt`;
-const ARTICLE_PATH = /^content\/writing\/[^/]+\.mdx$/;
+const ARTICLE_PATH = /^content\/writing\/(en|es|hi)\/([^/]+)\.mdx$/;
+const LEGACY_ROOT_ARTICLE_PATH = /^content\/writing\/([^/]+)\.mdx$/;
 const MAX_ATTEMPTS = 3;
 const MAX_RETRY_WAIT_MS = 15_000;
 
@@ -33,13 +34,24 @@ function verifyCommit(sha, name) {
   runGit(["cat-file", "-e", `${sha}^{commit}`]);
 }
 
+export function parseWritingArticlePath(value, { allowLegacyRoot = false } = {}) {
+  if (typeof value !== "string") return undefined;
+  const match = ARTICLE_PATH.exec(value);
+  if (match && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(match[2] ?? "")) return { locale: match[1], slug: match[2], legacyRoot: false };
+  if (allowLegacyRoot) {
+    const legacyMatch = LEGACY_ROOT_ARTICLE_PATH.exec(value);
+    if (legacyMatch && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(legacyMatch[1] ?? "")) return { locale: "en", slug: legacyMatch[1], legacyRoot: true };
+  }
+  return undefined;
+}
+
 export function isWritingArticlePath(value) {
-  return typeof value === "string" && ARTICLE_PATH.test(value);
+  return parseWritingArticlePath(value) !== undefined;
 }
 
 export function parseNameStatus(output) {
   const fields = output.split("\0");
-  const changes = [];
+  const rawChanges = [];
   let cursor = 0;
 
   while (cursor < fields.length - 1) {
@@ -57,15 +69,48 @@ export function parseNameStatus(output) {
       newPath = status.startsWith("D") ? null : filePath;
     }
 
-    if (isWritingArticlePath(oldPath) || isWritingArticlePath(newPath)) {
-      changes.push({ oldPath, newPath });
-    }
+    rawChanges.push({ oldPath, newPath });
   }
 
+  const enAdds = new Map();
+  for (const [index, change] of rawChanges.entries()) {
+    const identity = parseWritingArticlePath(change.newPath);
+    if (change.oldPath === null && identity?.locale === "en") enAdds.set(identity.slug, index);
+  }
+
+  const changes = [];
+  const consumedAdds = new Set();
+  for (const change of rawChanges) {
+    const oldIdentity = parseWritingArticlePath(change.oldPath, { allowLegacyRoot: true });
+    const newIdentity = parseWritingArticlePath(change.newPath);
+
+    if (oldIdentity?.legacyRoot) {
+      if (newIdentity?.locale === "en" && newIdentity.slug === oldIdentity.slug) {
+        changes.push({ oldPath: change.oldPath, newPath: change.newPath });
+        continue;
+      }
+      if (change.newPath === null) {
+        const addIndex = enAdds.get(oldIdentity.slug);
+        if (addIndex !== undefined) {
+          consumedAdds.add(addIndex);
+          changes.push({ oldPath: change.oldPath, newPath: rawChanges[addIndex]?.newPath ?? null });
+        }
+      }
+      continue;
+    }
+
+    const awaitingLegacyPair = change.oldPath === null && newIdentity?.locale === "en";
+    if (oldIdentity || (newIdentity && !awaitingLegacyPair)) changes.push(change);
+  }
+
+  for (const [index, change] of rawChanges.entries()) {
+    const newIdentity = parseWritingArticlePath(change.newPath);
+    if (change.oldPath === null && newIdentity?.locale === "en" && !consumedAdds.has(index)) changes.push(change);
+  }
   return changes;
 }
 
-function parseArticleSource(source) {
+function parseArticleSource(source, identity) {
   const match = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(source);
   if (!match) throw new Error("Changed Writing article has invalid frontmatter");
 
@@ -73,11 +118,20 @@ function parseArticleSource(source) {
   const publishedLines = frontmatterLines.filter((line) => /^\s*published\s*:/i.test(line));
   if (publishedLines.length !== 1) throw new Error("Changed Writing article has ambiguous published state");
 
+  const localeLines = frontmatterLines.filter((line) => /^\s*locale\s*:/i.test(line));
+  if (identity.legacyRoot) {
+    if (localeLines.length > 1 || (localeLines.length === 1 && !/^\s*locale\s*:\s*en\s*(?:#.*)?$/i.test(localeLines[0] ?? ""))) {
+      throw new Error("Legacy root Writing source has an invalid locale");
+    }
+  } else if (localeLines.length !== 1 || !new RegExp(`^\\s*locale\\s*:\\s*${identity.locale}\\s*(?:#.*)?$`, "i").test(localeLines[0] ?? "")) {
+    throw new Error("Writing source locale does not match its folder");
+  }
+
   const publishedMatch = /^\s*published\s*:\s*(true|false)\s*(?:#.*)?$/i.exec(publishedLines[0] ?? "");
   if (!publishedMatch) throw new Error("Changed Writing article has invalid published state");
 
   const publicFrontmatter = frontmatterLines
-    .filter((line) => line.trim() && !/^\s*#/.test(line) && !/^\s*(published|featured)\s*:/i.test(line))
+    .filter((line) => line.trim() && !/^\s*#/.test(line) && !/^\s*(published|featured|locale|translationKey|translationSourceHash)\s*:/i.test(line))
     .map((line) => line.trimEnd())
     .join("\n");
   const body = source.slice(match[0].length).replace(/\r\n/g, "\n").trim();
@@ -88,33 +142,38 @@ function parseArticleSource(source) {
   };
 }
 
-function articleUrl(filePath) {
-  const slug = filePath.slice("content/writing/".length, -".mdx".length);
-  return `${ORIGIN}/writing/${encodeURIComponent(slug)}`;
+export function articleUrl(identity) {
+  if (!identity || !["en", "es", "hi"].includes(identity.locale) || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(identity.slug)) {
+    throw new Error("Cannot derive a public URL from an invalid Writing identity");
+  }
+  const prefix = identity.locale === "en" ? "" : `/${identity.locale}`;
+  return `${ORIGIN}${prefix}/writing/${encodeURIComponent(identity.slug)}`;
 }
 
 export function articleUrlsForChange({ oldPath, newPath, oldSource, newSource }) {
-  const hasOld = isWritingArticlePath(oldPath);
-  const hasNew = isWritingArticlePath(newPath);
+  const oldIdentity = parseWritingArticlePath(oldPath, { allowLegacyRoot: true });
+  const newIdentity = parseWritingArticlePath(newPath);
+  const hasOld = Boolean(oldIdentity);
+  const hasNew = Boolean(newIdentity);
   if (!hasOld && !hasNew) return [];
 
-  const oldArticle = hasOld ? parseArticleSource(oldSource ?? "") : null;
-  const newArticle = hasNew ? parseArticleSource(newSource ?? "") : null;
+  const oldArticle = hasOld ? parseArticleSource(oldSource ?? "", oldIdentity) : null;
+  const newArticle = hasNew ? parseArticleSource(newSource ?? "", newIdentity) : null;
   const urls = new Set();
 
   if (hasOld && hasNew && oldPath !== newPath) {
-    if (oldArticle?.published) urls.add(articleUrl(oldPath));
-    if (newArticle?.published) urls.add(articleUrl(newPath));
+    if (oldArticle?.published) urls.add(articleUrl(oldIdentity));
+    if (newArticle?.published) urls.add(articleUrl(newIdentity));
   } else if (!oldArticle?.published && newArticle?.published) {
-    urls.add(articleUrl(newPath));
+    urls.add(articleUrl(newIdentity));
   } else if (oldArticle?.published && !newArticle?.published) {
-    urls.add(articleUrl(oldPath));
+    urls.add(articleUrl(oldIdentity));
   } else if (
     oldArticle?.published &&
     newArticle?.published &&
     oldArticle.fingerprint !== newArticle.fingerprint
   ) {
-    urls.add(articleUrl(newPath));
+    urls.add(articleUrl(newIdentity));
   }
 
   return [...urls];
@@ -126,8 +185,9 @@ export function buildUrlList(changes) {
     for (const url of articleUrlsForChange(change)) articleUrls.add(url);
   }
   if (articleUrls.size === 0) return [];
-  articleUrls.add(`${ORIGIN}/writing`);
-  articleUrls.add(ORIGIN);
+  const locales = new Set([...articleUrls].map((url) => url.startsWith(`${ORIGIN}/es/`) ? "es" : url.startsWith(`${ORIGIN}/hi/`) ? "hi" : "en"));
+  for (const locale of locales) articleUrls.add(`${ORIGIN}${locale === "en" ? "" : `/${locale}`}/writing`);
+  if (locales.has("en")) articleUrls.add(ORIGIN);
   return [...articleUrls];
 }
 
@@ -135,7 +195,7 @@ function changedPaths(beforeSha, afterSha) {
   if (isZeroSha(beforeSha)) {
     return runGit(["ls-tree", "-r", "--name-only", "-z", afterSha, "--", "content/writing"])
       .split("\0")
-      .filter(isWritingArticlePath)
+      .filter((path) => isWritingArticlePath(path))
       .map((newPath) => ({ oldPath: null, newPath }));
   }
 
@@ -153,7 +213,7 @@ function changedPaths(beforeSha, afterSha) {
 }
 
 function readArticleAt(sha, filePath) {
-  if (!isWritingArticlePath(filePath)) throw new Error("Refusing to read a non-Writing path");
+  if (!parseWritingArticlePath(filePath, { allowLegacyRoot: true })) throw new Error("Refusing to read a non-Writing path");
   return runGit(["show", `${sha}:${filePath}`]);
 }
 

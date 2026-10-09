@@ -2,14 +2,14 @@
  * Abstract, decorative "system" figure. Purely illustrative — not a
  * representation of any real or private architecture.
  */
-export function SystemFigure() {
+export function SystemFigure({ labels = { nodes: ["client", "api", "worker", "index", "store", "model"], caption: "FIG. 0 — ABSTRACT SYSTEM", scale: "NOT TO SCALE" } }: { labels?: { nodes: readonly string[]; caption: string; scale: string } }) {
   const nodes = [
-    { x: 40, y: 60, w: 92, label: "client" },
-    { x: 196, y: 30, w: 92, label: "api" },
-    { x: 196, y: 120, w: 92, label: "worker" },
-    { x: 352, y: 30, w: 92, label: "index" },
-    { x: 352, y: 120, w: 92, label: "store" },
-    { x: 196, y: 220, w: 92, label: "model" },
+    { x: 40, y: 60, w: 92, label: labels.nodes[0] ?? "client" },
+    { x: 196, y: 30, w: 92, label: labels.nodes[1] ?? "api" },
+    { x: 196, y: 120, w: 92, label: labels.nodes[2] ?? "worker" },
+    { x: 352, y: 30, w: 92, label: labels.nodes[3] ?? "index" },
+    { x: 352, y: 120, w: 92, label: labels.nodes[4] ?? "store" },
+    { x: 196, y: 220, w: 92, label: labels.nodes[5] ?? "model" },
   ];
   const paths = [
     "M132 76 H164 V46 H196",
@@ -37,8 +37,8 @@ export function SystemFigure() {
           </g>
         ))}
         <g className="fill-subtle font-mono" fontSize="8.5" letterSpacing="0.1em">
-          <text x="40" y="272">FIG. 0 — ABSTRACT SYSTEM</text>
-          <text x="384" y="272">NOT TO SCALE</text>
+          <text x="40" y="272">{labels.caption}</text>
+          <text x="384" y="272">{labels.scale}</text>
         </g>
       </svg>
     </figure>

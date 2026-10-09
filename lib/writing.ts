@@ -1,45 +1,67 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Post } from "@/types";
+import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/locales";
 import { parseMdxFrontmatter, validatePostFrontmatter } from "@/lib/mdx-frontmatter";
 import { absoluteUrl } from "@/lib/utils";
+import { calculateArticleSourceHash, getTranslationStatus, type TranslationStatus } from "@/lib/writing-source";
 
-const DIR = path.join(process.cwd(), "content", "writing");
+const ROOT = path.join(process.cwd(), "content", "writing");
+const allPostsByLocale = new Map<Locale, Post[]>();
+const publishedPostsByLocale = new Map<Locale, Post[]>();
 
-function readAll(): Post[] {
-  if (!fs.existsSync(DIR)) return [];
-  return fs
-    .readdirSync(DIR)
+export function getAllPosts(locale: Locale = defaultLocale): Post[] {
+  if (!isLocale(locale)) throw new RangeError(`Unsupported Writing locale: ${String(locale)}`);
+  const cached = allPostsByLocale.get(locale);
+  if (cached) return cached;
+  const directory = path.join(ROOT, locale);
+  if (!fs.existsSync(directory)) {
+    allPostsByLocale.set(locale, []);
+    return [];
+  }
+  const posts = fs
+    .readdirSync(directory)
     .filter((f) => f.endsWith(".mdx"))
     .map((file) => {
       const slug = file.replace(/\.mdx$/, "");
-      const raw = fs.readFileSync(path.join(DIR, file), "utf8");
-      const { data, content } = parseMdxFrontmatter(raw, `content/writing/${file}`);
-      const frontmatter = validatePostFrontmatter(data, `content/writing/${file}`);
+      const filename = `content/writing/${locale}/${file}`;
+      const raw = fs.readFileSync(path.join(directory, file), "utf8");
+      const { data, content } = parseMdxFrontmatter(raw, filename);
+      const frontmatter = validatePostFrontmatter(data, filename, locale);
       const words = content.split(/\s+/).filter(Boolean).length;
       return {
         ...frontmatter,
         slug,
         content,
         readingTime: Math.max(1, Math.round(words / 230)),
-        canonicalUrl: absoluteUrl(`/writing/${slug}`),
+        canonicalUrl: absoluteUrl(locale === "en" ? `/writing/${slug}` : `/${locale}/writing/${slug}`),
+        sourceHash: calculateArticleSourceHash(raw),
       };
     });
+  allPostsByLocale.set(locale, posts);
+  return posts;
 }
 
-/** Only published posts. Drafts are never listed, rendered or exported. */
-export function getPublishedPosts(): Post[] {
-  return readAll()
+/** Only published sources in the requested locale; translations never fall back to English. */
+export function getPublishedPosts(locale: Locale = defaultLocale): Post[] {
+  if (!isLocale(locale)) throw new RangeError(`Unsupported Writing locale: ${String(locale)}`);
+  const cached = publishedPostsByLocale.get(locale);
+  if (cached) return cached;
+  const posts = getAllPosts(locale)
     .filter((p) => p.published)
     .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+  publishedPostsByLocale.set(locale, posts);
+  return posts;
 }
 
-export function getPublishedPost(slug: string): Post | undefined {
-  return getPublishedPosts().find((p) => p.slug === slug);
+export function getPost(slug: string, locale: Locale = defaultLocale): Post | undefined {
+  return getPublishedPosts(locale).find((p) => p.slug === slug);
 }
 
-export function getAdjacentPosts(slug: string): { previous?: Post; next?: Post } {
-  const posts = getPublishedPosts();
+export const getPublishedPost = getPost;
+
+export function getAdjacentPosts(slug: string, locale: Locale = defaultLocale): { previous?: Post; next?: Post } {
+  const posts = getPublishedPosts(locale);
   const index = posts.findIndex((post) => post.slug === slug);
   if (index < 0) return {};
   return {
@@ -48,8 +70,8 @@ export function getAdjacentPosts(slug: string): { previous?: Post; next?: Post }
   };
 }
 
-export function getRelatedPosts(slug: string, limit = 3): Post[] {
-  const posts = getPublishedPosts();
+export function getRelatedPosts(slug: string, locale: Locale = defaultLocale, limit = 3): Post[] {
+  const posts = getPublishedPosts(locale);
   const current = posts.find((post) => post.slug === slug);
   if (!current || current.tags.length === 0) return [];
   const tags = new Set(current.tags.map((tag) => tag.toLocaleLowerCase()));
@@ -62,6 +84,9 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
     })
     .slice(0, limit);
 }
+
+export { calculateArticleSourceHash, getTranslationStatus };
+export type { TranslationStatus };
 
 export interface ArticleHeading {
   depth: 2 | 3;
@@ -84,7 +109,7 @@ function headingId(text: string): string {
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLocaleLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[^\p{L}\p{M}\p{N}\s-]/gu, "")
     .trim()
     .replace(/[\s-]+/g, "-");
 }

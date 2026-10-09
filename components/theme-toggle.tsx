@@ -28,7 +28,7 @@ function subscribe(callback: () => void) {
 const getSnapshot = (): Theme => document.documentElement.classList.contains("dark") ? "dark" : "light";
 const getServerSnapshot = (): Theme => "light";
 
-export function ThemeToggle() {
+export function ThemeToggle({ labels = { dark: "Switch to dark theme", light: "Switch to light theme" } }: { labels?: { dark: string; light: string } }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const toggle = () => {
@@ -37,7 +37,7 @@ export function ThemeToggle() {
     try { localStorage.setItem("theme", next); } catch { /* storage unavailable */ }
   };
 
-  const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  const label = theme === "dark" ? labels.light : labels.dark;
 
   return (
     <button

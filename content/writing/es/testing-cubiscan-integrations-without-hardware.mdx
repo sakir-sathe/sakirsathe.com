@@ -1,0 +1,122 @@
+---
+title: "Probar integraciones con Cubiscan sin hardware físico"
+description: "Un contrato determinista frente al dispositivo permite que las pruebas de integración de una aplicación sean útiles antes de tener acceso a un escáner dimensional físico."
+date: "2026-10-06"
+locale: es
+translationKey: testing-cubiscan-integrations-without-hardware
+translationSourceHash: 70be855e6739a07f382f6ea51aa4c48313d317c92d6048cf693db1cd46163b67
+tags:
+  - .NET
+  - Hardware Integration
+  - Testing
+  - Developer Tooling
+published: true
+featured: false
+---
+
+## El problema
+
+Me gustan las integraciones con dispositivos porque muestran un límite interesante: el software tiene que interactuar con algo que no es software. En aplicaciones empresariales he trabajado con sistemas que se integran con hardware de medición dimensional. Una medición puede empezar en un dispositivo físico, pero termina como estado de la aplicación: se interpreta un resultado, se asocia con un flujo de trabajo, se muestra al usuario y quizá se utiliza en otro lugar.
+
+Ahí es donde vive buena parte de la lógica de la aplicación. También es donde las pruebas pueden volverse complicadas. Puede que un desarrollador no tenga un escáner disponible, y reservar un dispositivo compartido puede ser difícil. Las herramientas del proveedor pueden ayudar con la configuración o el diagnóstico sin ofrecer una dependencia de pruebas adecuada para pruebas automatizadas o integración continua. El código de integración importa, pero sin el equipo puede ser difícil obtener retroalimentación habitual durante el desarrollo.
+
+La pregunta útil no es si el software puede reemplazar al escáner. Es cuánto del comportamiento que ve la aplicación se puede probar sin uno.
+
+## Por qué las integraciones de hardware son difíciles de probar
+
+Una prueba unitaria puede ejecutar la lógica de negocio con un valor en memoria. Una integración de hardware agrega un límite antes de que ese valor exista. La aplicación quizá tenga que establecer una conexión, enviar una solicitud, esperar una respuesta, interpretar lo recibido y decidir qué debe hacer después el flujo de trabajo. Cada paso puede fallar de una forma que la aplicación debe manejar.
+
+Una prueba que depende de un dispositivo físico también depende de su entorno: el dispositivo debe estar disponible, conectado y listo para producir un resultado. Esas condiciones importan para la validación final con hardware, pero son un requisito poco práctico para cada ejecución de pruebas de un desarrollador. Una prueba con el dispositivo real también puede ser más lenta y menos repetible que una prueba de un límite de software.
+
+No hay que dar por hecho que existe un simulador propietario, que su licencia permite automatizarlo o que se comporta como necesita la aplicación. El acceso a dispositivos físicos y herramientas del proveedor puede hacer que las pruebas de integración sean más difíciles y costosas que las pruebas de software habituales. El objetivo no es evitar las pruebas con el dispositivo real, sino separar lo que necesita el escáner de lo que necesita una respuesta predecible frente al dispositivo.
+
+## ¿Qué necesitamos simular realmente?
+
+La mayoría de las pruebas de aplicación no necesitan reproducir el acto físico de medir un objeto. Necesitan probar el contrato visible para el software alrededor de una medición. A grandes rasgos, el recorrido es así:
+
+```text
+application
+→ device/client abstraction
+→ transport and connection
+→ request and device response
+→ parsing and result handling
+→ business workflow
+```
+
+La aplicación necesita saber qué puede solicitar, cómo se representa una respuesta en su límite y qué resultados debe manejar. Puede que tenga que mostrar un resultado, rechazar un valor no utilizable, asociar una medición con una operación o recuperarse cuando el dispositivo no está disponible. Estas conductas se pueden probar sin modelar la óptica, los sensores, la calibración ni la geometría de una medición física.
+
+“Simular el escáner” puede significar reproducir el instrumento o proporcionar una implementación controlada del contrato del que depende la aplicación. Para la mayoría de las pruebas de integración de una aplicación, lo más útil es empezar por lo segundo.
+
+## ¿Por qué no simplemente simular el resultado?
+
+Supongamos que una prueba sustituye un servicio de negocio por un mock que devuelve inmediatamente un objeto de medición con ancho, alto y largo. Puede ser una forma perfectamente razonable de probar el comportamiento posterior del negocio: el flujo recibe un valor y la prueba comprueba qué ocurre después.
+
+Pero ese mock empieza después de que la integración con el dispositivo ya haya hecho su trabajo. Omite la gestión de la conexión, el flujo de solicitud y respuesta, los errores de transporte, el análisis, las respuestas malformadas o incompletas, los tiempos de espera y las desconexiones. Si el cliente real o el parser se encargan de convertir los datos del dispositivo en ese objeto de medición, la prueba no ha ejercitado ninguno de los dos.
+
+El límite útil para un simulador está por debajo del flujo de negocio y por encima del hardware físico. Proporciona un comportamiento de transporte controlado y deja en la prueba el cliente y el parser reales de la aplicación. Así, una prueba de integración puede cubrir el código entre una respuesta del dispositivo y el resultado de la aplicación sin fingir que se realizó una medición física.
+
+## Separar el comportamiento del dispositivo del hardware físico
+
+Un diseño mantenible hace explícito ese límite. La aplicación no debería necesitar saber si una respuesta provino de una conexión física o de una implementación de prueba. Un cliente del dispositivo puede encargarse de las operaciones que entiende la aplicación. Un transporte puede ocuparse de los mecanismos de envío y recepción de datos. Un parser puede convertir una respuesta en un resultado tipado o en un error claro, y el flujo de negocio puede decidir qué hacer con ese resultado.
+
+El transporte del dispositivo real sigue siendo la implementación que se usa con el hardware. Un transporte simulado se selecciona deliberadamente en un contexto de pruebas o desarrollo. No debería reemplazar silenciosamente una conexión real ni afirmar, sin verificarlo, que la aplicación es compatible.
+
+## Una posible arquitectura
+
+Un diseño pequeño podría verse así:
+
+```text
+Application
+  ↓
+Device client and parser
+  ↓
+Transport interface
+   ↙                 ↘
+Real device        Simulator
+```
+
+El cliente expresaría las operaciones en términos que la aplicación entiende. El transporte ocultaría los detalles específicos de la conexión. El análisis seguiría formando parte de la ruta del cliente de producción, para que las pruebas con el simulador también puedan verificar cómo la aplicación maneja los datos recibidos.
+
+Una prueba podría crear el cliente con un transporte simulado configurado para un escenario concreto. Una prueba podría devolver un resultado exitoso predeterminado; otra podría proporcionar datos malformados o incompletos. La aplicación usaría el mismo contrato visible para el cliente en ambos casos, sin que la prueba abriera una conexión física.
+
+La configuración de escenarios debería ser explícita y fácil de revisar. Podría seleccionar una respuesta predeterminada, una demora controlada o una desconexión en un punto definido. Grabar y reproducir intercambios podría resultar útil más adelante, pero esa capacidad debería basarse en una comprensión verificada del contrato público, no dirigir su diseño. Para equipos .NET, una biblioteca pequeña podría facilitar compartir este patrón sin exigir de antemano una API pública definitiva.
+
+## Qué debería ser determinista
+
+Con la misma configuración, una prueba debería recibir la misma respuesta, analizar los mismos valores y observar la misma transición de estado. El tiempo debe controlarse lo suficiente para que una prueba no espere una cantidad impredecible.
+
+El estado debe poder restablecerse. Una prueba no debería heredar el estado de conexión, las respuestas en cola ni la medición de otra. La selección del escenario debería ser local a la prueba, y las solicitudes inesperadas deberían fallar con claridad en vez de devolver un valor predeterminado que parezca válido. El simulador debería distinguir un resultado válido de un error de transporte o análisis, para que una prueba exitosa no oculte una ruta de error que no se ha probado.
+
+Estas propiedades facilitan entender los fallos y ayudan a evitar que el simulador oculte errores de la aplicación.
+
+## Escenarios de fallo que vale la pena probar
+
+El conjunto de escenarios debería reflejar las responsabilidades de la aplicación, no afirmar una lista de comportamientos confirmados de Cubiscan. Podría incluir un resultado exitoso, valores cero o vacíos, una respuesta incompleta o malformada y una respuesta inesperada. Estos casos ejercitan el análisis y las decisiones posteriores.
+
+El comportamiento de la conexión también merece atención. Una implementación de prueba podría representar un dispositivo no disponible, una respuesta demorada que supera el tiempo de espera o una desconexión durante una operación. Repetir una medición puede revelar suposiciones sobre estado obsoleto o el orden de las respuestas. Un escenario predeterminado y determinista permite repetir la misma condición después de un cambio.
+
+La aplicación podría mostrar un error, permitir un reintento, conservar el estado actual del flujo o pedir otra medición. Esos recorridos se pueden probar sin afirmar que un fallo concreto sea una característica conocida de un dispositivo determinado. La prueba trata de lo que debería hacer la aplicación cuando su contrato produce esa condición.
+
+## Cuándo deja de ser confiable un simulador
+
+Un simulador puede validar la lógica de integración de la aplicación, el análisis, las transiciones de estado, el manejo de errores, los reintentos y tiempos de espera, y el flujo alrededor de un resultado. Puede hacer que esas pruebas sean repetibles en la máquina de un desarrollador o en una compilación automatizada.
+
+No puede validar la precisión de una medición física, la calibración, el comportamiento de los sensores ni las características eléctricas, seriales o de red. No puede demostrar particularidades de hardware no documentadas ni establecer compatibilidad entre modelos físicos. Una respuesta simulada puede ser útil para pruebas de software y, aun así, no reflejar un dispositivo de producción.
+
+Esa distinción debe quedar clara tanto en las pruebas como en la documentación. El comportamiento respaldado por el simulador debe identificarse como simulado; la validación con hardware real sigue siendo un paso separado antes de afirmar compatibilidad con dispositivos.
+
+## Una posible dirección de código abierto
+
+Estoy explorando si este problema podría convertirse en un pequeño paquete .NET de código abierto: una API frente al dispositivo y un simulador determinista que permita a quienes desarrollan aplicaciones probar flujos de integración antes de tener acceso a un escáner físico. El paquete todavía no existe como proyecto publicado y su API no está definida.
+
+Una primera versión útil sería modesta: una biblioteca base pequeña, un simulador o una implementación para pruebas, y una aplicación de ejemplo que muestre cómo una prueba de integración elige un escenario. También necesitaría sus propias pruebas y documentación del protocolo basada únicamente en información que se pueda verificar públicamente. Debería dejar claro qué comportamiento se simula y cuál se ha validado con hardware.
+
+Cubiscan.Net es un nombre posible, no un anuncio de lanzamiento. El valor vendría de un límite de prueba confiable, no de afirmar compatibilidad con dispositivos antes de demostrarla.
+
+## Qué quiero validar después
+
+Antes de elegir una API, querría entender el contrato frente al dispositivo que está documentado públicamente lo suficiente como para separar las responsabilidades estables de la aplicación de los detalles del transporte. Cualquier suposición sobre el protocolo debería comprobarse con documentación pública o con un dispositivo que pueda usarse con permiso. También querría identificar qué responsabilidades corresponden a un cliente reutilizable y cuáles al flujo de una aplicación.
+
+Después probaría el límite de prueba más pequeño que resulte útil en una integración de aplicación: un resultado exitoso, una respuesta malformada o incompleta y un fallo de conexión. El primer hito no es un SDK completo para Cubiscan. Es un límite confiable frente al dispositivo, algunos escenarios deterministas y evidencia de que se pueden probar el cliente y el parser reales de una aplicación sin tener el escáner físico conectado.
+
+Si resulta útil, quizá haya algo que valga la pena convertir en Cubiscan.Net. Si no, el resultado seguirá siendo una comprensión más clara de qué pruebas necesitan simulación de software y cuáles necesitan hardware real.

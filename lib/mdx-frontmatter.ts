@@ -1,4 +1,5 @@
 import { load } from "js-yaml";
+import type { Locale } from "@/lib/i18n/locales";
 import type { PostFrontmatter } from "@/types";
 
 const FRONTMATTER = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
@@ -27,8 +28,8 @@ export function parseMdxFrontmatter(source: string, filename: string) {
   };
 }
 
-export function validatePostFrontmatter(data: Record<string, unknown>, filename: string): PostFrontmatter {
-  const allowed = new Set(["title", "description", "date", "updated", "tags", "published", "featured", "image", "imageAlt"]);
+export function validatePostFrontmatter(data: Record<string, unknown>, filename: string, expectedLocale: Locale): PostFrontmatter {
+  const allowed = new Set(["title", "description", "date", "locale", "translationKey", "translationSourceHash", "updated", "tags", "published", "featured", "image", "imageAlt"]);
   const unknown = Object.keys(data).filter((key) => !allowed.has(key));
   if (unknown.length) throw new Error(`${filename}: unsupported frontmatter field(s): ${unknown.join(", ")}.`);
 
@@ -37,6 +38,20 @@ export function validatePostFrontmatter(data: Record<string, unknown>, filename:
     if (typeof value !== "string" || !value.trim()) throw new Error(`${filename}: "${field}" must be a non-empty string.`);
     return value.trim();
   };
+
+  if (typeof data.locale !== "string" || !["en", "es", "hi"].includes(data.locale)) {
+    throw new Error(`${filename}: "locale" must be one of en, es, or hi.`);
+  }
+  if (data.locale !== expectedLocale) throw new Error(`${filename}: frontmatter locale "${data.locale}" does not match folder locale "${expectedLocale}".`);
+  if (typeof data.translationKey !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.translationKey)) {
+    throw new Error(`${filename}: "translationKey" must be a non-empty lowercase slug.`);
+  }
+  if (expectedLocale === "en" && data.translationSourceHash !== undefined) {
+    throw new Error(`${filename}: English source articles must not define "translationSourceHash".`);
+  }
+  if (expectedLocale !== "en" && (typeof data.translationSourceHash !== "string" || !/^[a-f0-9]{64}$/.test(data.translationSourceHash))) {
+    throw new Error(`${filename}: translated articles require a SHA-256 "translationSourceHash".`);
+  }
 
   const validDate = (field: "date" | "updated"): string => {
     const value = data[field];
@@ -66,10 +81,14 @@ export function validatePostFrontmatter(data: Record<string, unknown>, filename:
     title: requiredString("title"),
     description: requiredString("description"),
     date: validDate("date"),
+    locale: data.locale as Locale,
+    translationKey: data.translationKey,
     tags: data.tags.map((tag) => (tag as string).trim()),
     published: data.published,
     featured: data.featured,
   };
+
+  if (data.translationSourceHash !== undefined) frontmatter.translationSourceHash = data.translationSourceHash as string;
 
   if (data.updated !== undefined) frontmatter.updated = validDate("updated");
   if (data.image !== undefined) {

@@ -2,8 +2,16 @@
 
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { giscus } from "@/data/site";
+import type { Locale } from "@/lib/i18n/locales";
 
 const GiscusWidget = lazy(() => import("@giscus/react"));
+type GiscusLanguage = "en" | "es";
+
+const giscusLanguageByLocale: Record<Locale, GiscusLanguage> = {
+  en: "en",
+  es: "es",
+  hi: "en",
+};
 
 const [repoOwner, repoName, ...extraRepoParts] = giscus.repo.split("/");
 const configured = giscus.enabled && Boolean(
@@ -15,7 +23,7 @@ const configured = giscus.enabled && Boolean(
   giscus.categoryId.trim(),
 );
 
-export function ArticleComments() {
+export function ArticleComments({ locale = "en", heading = "Discussion" }: { locale?: Locale; heading?: string }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [nearViewport, setNearViewport] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -56,7 +64,7 @@ export function ArticleComments() {
 
   return (
     <section ref={sectionRef} aria-labelledby="article-comments-heading" className="mt-16 border-t border-line pt-8">
-      <h2 id="article-comments-heading" className="text-[17px] font-medium tracking-tight">Discussion</h2>
+      <h2 id="article-comments-heading" className="text-[17px] font-medium tracking-tight">{heading}</h2>
       <div className="mt-5 min-h-36">
         {nearViewport && (
           <Suspense fallback={<div aria-hidden="true" className="min-h-36" />}>
@@ -71,7 +79,7 @@ export function ArticleComments() {
               emitMetadata="0"
               inputPosition="bottom"
               theme={theme}
-              lang="en"
+              lang={giscusLanguageByLocale[locale]}
               loading="lazy"
             />
           </Suspense>

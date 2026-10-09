@@ -1,0 +1,825 @@
+---
+title: "RAG, MCP, agentes y Microsoft Foundry: ¿qué necesitas realmente?"
+description: "Un modelo mental práctico para decidir cuándo un sistema de IA necesita recuperación, MCP, agentes o Microsoft Foundry, y cuándo no necesita nada de eso."
+date: "2026-10-06"
+locale: es
+translationKey: rag-mcp-agents-microsoft-foundry-what-do-you-actually-need
+translationSourceHash: bde1c5250bd4356e0ae78fc100441d8a552fe8c669eb55cca7a98795f2d51e65
+tags:
+  - AI
+  - RAG
+  - MCP
+  - Agents
+  - Microsoft Foundry
+published: true
+featured: false
+---
+
+Si hoy construyes aplicaciones de IA, puede parecer que todos los diagramas de arquitectura necesitan la misma colección de cajas:
+
+RAG.
+
+MCP.
+
+Agentes.
+
+Microsoft Foundry.
+
+Bases de datos vectoriales.
+
+Herramientas.
+
+Evaluación.
+
+Orquestación.
+
+Y, después de ver suficientes diagramas, aparece una pregunta muy razonable:
+
+**¿De verdad necesito todo esto?**
+
+Yo volvía una y otra vez a unas preguntas más sencillas.
+
+Si ya tengo APIs, ¿para qué necesito MCP?
+
+Si RAG le da al modelo acceso al conocimiento de mi empresa, ¿cuándo necesito un agente?
+
+Si Microsoft Foundry me da una plataforma de agentes, ¿sigo necesitando MCP?
+
+Y si mi aplicación solo necesita responder preguntas sobre unos pocos documentos, ¿por qué estoy diseñando un sistema autónomo desde el principio?
+
+El problema no es que estas tecnologías sean imposibles de entender.
+
+El problema es que a menudo aprendemos sus nombres antes de entender qué problema resuelve cada una.
+
+Así que, en vez de empezar por productos y frameworks, construyamos la arquitectura una capacidad a la vez.
+
+---
+
+## Empecemos por lo más sencillo: un LLM
+
+Imagina que tengo una aplicación de soporte.
+
+Un usuario pregunta:
+
+> “Mi conexión VPN no deja de fallar. ¿Qué debería probar?”
+
+Si envío esa pregunta directamente a un modelo de lenguaje, probablemente pueda producir una respuesta genérica útil.
+
+Quizá sugiera:
+
+- comprobar la conexión a internet
+- reiniciar el cliente VPN
+- verificar las credenciales
+- revisar la configuración del firewall
+
+Para una pregunta general, quizá sea suficiente.
+
+La arquitectura es básicamente:
+
+```text
+User
+  ↓
+LLM
+  ↓
+Answer
+```
+
+Sin base de datos vectorial.
+
+Sin MCP.
+
+Sin agente.
+
+Sin Foundry Agent Service.
+
+Este es un punto de partida importante porque la arquitectura de IA normalmente debería comenzar con:
+
+**¿Cuál es el sistema más pequeño que resuelve el problema?**
+
+No con:
+
+**¿Cuántas tecnologías de IA puedo poner en el diagrama?**
+
+Pero nuestro ejemplo de soporte tiene un problema.
+
+El modelo no conoce la política real de VPN de nuestra empresa.
+
+No sabe qué versión del cliente usan los empleados.
+
+No conoce los procedimientos internos de resolución de problemas.
+
+No sabe si hay un incidente conocido ocurriendo ahora mismo.
+
+Acabamos de identificar nuestra primera capacidad faltante.
+
+El modelo necesita conocimiento.
+
+---
+
+## RAG: cuando el modelo necesita conocimiento que no tiene
+
+Aquí es donde Retrieval-Augmented Generation, o RAG, resulta útil.
+
+La idea central es mucho más sencilla de lo que su nombre parece.
+
+Antes de pedirle una respuesta al modelo, recupera información pertinente y dásela como contexto.
+
+El flujo ahora es:
+
+```text
+User question
+  ↓
+Search relevant company knowledge
+  ↓
+Retrieve useful content
+  ↓
+Give that content to the LLM
+  ↓
+Generate a grounded answer
+```
+
+Ahora, cuando alguien pregunta:
+
+> “Mi conexión VPN no deja de fallar.”
+
+la aplicación podría recuperar:
+
+- la guía de resolución de problemas de VPN de la empresa
+- la configuración aprobada del cliente VPN
+- una política de seguridad
+- un documento sobre problemas conocidos
+
+El modelo responde usando esa información en vez de depender únicamente de lo que aprendió durante el entrenamiento.
+
+Ese es el problema que resuelve RAG:
+
+**El modelo necesita conocimiento pertinente, privado, específico del dominio o actualizado al momento de responder.**
+
+RAG no es el modelo.
+
+RAG no es una base de datos vectorial.
+
+RAG no es un agente.
+
+Es un patrón de arquitectura que combina recuperación y generación.
+
+Un índice vectorial podría formar parte de esa arquitectura.
+
+Azure AI Search podría formar parte.
+
+SQL, documentos, SharePoint, Blob Storage u otra fuente de conocimiento podrían estar detrás.
+
+Pero la idea importante es:
+
+**Recupera contexto útil antes de generar la respuesta.**
+
+---
+
+## El RAG clásico sigue siendo útil
+
+En IA existe la tendencia a asumir que, cuando aparece un patrón nuevo, el anterior queda obsoleto.
+
+Normalmente es un error.
+
+Para muchas aplicaciones, un pipeline de recuperación sencillo es perfectamente razonable:
+
+```text
+Question → Search → Retrieve top results → Generate answer
+```
+
+Si tengo una base de conocimiento relativamente clara y preguntas previsibles, quizá no necesite nada más complicado.
+
+Pero la recuperación puede volverse más difícil.
+
+Imagina esta pregunta:
+
+> “Compara nuestra política de acceso remoto con el proceso actual de resolución de problemas de VPN y dime si el problema de este empleado requiere escalarse a seguridad.”
+
+Una sola búsqueda quizá no sea suficiente.
+
+El sistema podría necesitar:
+
+- dividir la pregunta en búsquedas más pequeñas
+- buscar en distintas fuentes de conocimiento
+- evaluar lo que recuperó
+- hacer otra consulta
+- combinar los resultados
+
+Aquí empiezan a ser interesantes ideas como la **recuperación agéntica**.
+
+En vez de tratar la recuperación como una sola operación de búsqueda fija, el sistema puede planificar cómo obtener la información que necesita.
+
+Pero observa algo importante.
+
+Seguimos resolviendo un **problema de conocimiento**.
+
+Simplemente hemos hecho más capaz la recuperación.
+
+No hemos creado automáticamente un agente para procesos de negocio.
+
+---
+
+## Entonces, ¿qué es MCP?
+
+Supongamos que nuestra aplicación de IA necesita algo más que documentos.
+
+Quizá deba:
+
+- consultar un incidente
+- consultar un ticket
+- recuperar el estado del dispositivo de un empleado
+- revisar un servicio
+- crear un ticket de soporte
+
+Probablemente ya tienes APIs o servicios capaces de hacer esas cosas.
+
+Así que la pregunta natural es:
+
+**¿Por qué no llamar directamente a la API?**
+
+A veces, sin duda, deberías hacerlo.
+
+MCP no reemplaza REST.
+
+No reemplaza tus APIs de ASP.NET Core.
+
+No es el lugar al que de repente tiene que trasladarse la lógica de negocio.
+
+Tus servicios existentes pueden quedarse exactamente donde deben estar.
+
+La diferencia está en el contrato de integración que se presenta a las aplicaciones de IA.
+
+Model Context Protocol ofrece una forma estandarizada para que los hosts y clientes de IA descubran e interactúen con capacidades externas.
+
+Un servidor MCP puede exponer cosas como:
+
+- **Tools**: operaciones que puede invocar el modelo
+- **Resources**: información contextual que puede proporcionar una aplicación
+- **Prompts**: plantillas reutilizables de interacción
+
+Por ejemplo, quizá tu sistema existente ya exponga:
+
+```text
+POST /tickets
+```
+
+No tienes que borrar esa API y reescribir el sistema de tickets en torno a MCP.
+
+En cambio, podrías exponer una herramienta MCP como:
+
+```text
+create_support_ticket
+```
+
+Detrás de esa herramienta, tu aplicación o API normal sigue haciendo el trabajo real.
+
+Un modelo mental útil es:
+
+```text
+Existing application/API
+  ↓
+MCP server exposes selected capabilities
+  ↓
+AI client discovers those capabilities
+```
+
+Así que, cuando se dice que MCP estandariza la integración de herramientas, eso es lo importante.
+
+Sin algo como MCP, cada host de IA podría requerir su propia integración personalizada.
+
+Con MCP, una misma capacidad podría exponerse mediante un protocolo común a varios clientes de IA compatibles.
+
+---
+
+## MCP no convierte algo automáticamente en un agente
+
+Esta distinción importa.
+
+Supongamos que el modelo tiene una herramienta:
+
+```text
+get_ticket_status
+```
+
+El usuario pregunta:
+
+> “¿Cuál es el estado del ticket 123?”
+
+El modelo llama a la herramienta una vez y devuelve el resultado.
+
+La aplicación usa una herramienta.
+
+Quizá use MCP.
+
+Pero no llamaría automáticamente agente autónomo a todo el sistema.
+
+La palabra **agente** resulta útil cuando el modelo decide algo sobre qué hacer a continuación.
+
+Por ejemplo:
+
+```text
+User
+  ↓
+Understand goal
+  ↓
+Decide which information is required
+  ↓
+Retrieve knowledge
+  ↓
+Call a diagnostic tool
+  ↓
+Inspect result
+  ↓
+Decide next action
+  ↓
+Maybe call another tool
+  ↓
+Produce answer or perform an action
+```
+
+Ahora el modelo participa en un flujo de varios pasos.
+
+No se limita a generar texto.
+
+Decide cómo avanzar hacia un objetivo.
+
+Los distintos frameworks definen los agentes de forma diferente, así que no existe un número mágico de llamadas a herramientas que convierta de repente una aplicación en agente.
+
+Mi distinción práctica es más sencilla:
+
+**Si mi código determina el flujo de principio a fin, principalmente tengo un flujo con IA dentro.**
+
+**Si el modelo decide partes importantes del siguiente paso, me estoy acercando a un comportamiento agéntico.**
+
+Esta distinción me ayuda a evitar añadir arquitectura de agentes cuando el código normal de una aplicación sería más claro y seguro.
+
+---
+
+## Un ejemplo completo
+
+Construyamos de nuevo nuestro escenario de soporte desde el principio.
+
+### Nivel 1: solo LLM
+
+Usuario:
+
+> “Mi VPN no funciona.”
+
+El modelo da consejos generales para resolver el problema.
+
+Útil para preguntas genéricas.
+
+Pero no conoce información específica de la empresa.
+
+### Nivel 2: añadir RAG
+
+Ahora la aplicación recupera la guía interna de resolución de problemas de VPN.
+
+El modelo puede responder:
+
+> “Según la guía actual de acceso remoto, primero verifica estos tres ajustes...”
+
+La respuesta ahora se basa en el conocimiento de la empresa.
+
+Pero la aplicación todavía no puede inspeccionar nada.
+
+### Nivel 3: añadir herramientas
+
+Supongamos que exponemos:
+
+- get_device_status
+- get_incident_status
+- get_ticket
+- create_ticket
+
+Pueden ser herramientas de funciones normales o capacidades expuestas mediante MCP.
+
+Ahora la IA puede interactuar con sistemas en vez de solo leer documentos.
+
+### Nivel 4: añadir comportamiento agéntico
+
+El usuario dice:
+
+> “Mi VPN ha fallado toda la mañana. ¿Puedes averiguar qué pasa?”
+
+El sistema ahora podría decidir:
+
+1. recuperar la política de resolución de problemas de VPN
+2. comprobar si hay una interrupción conocida
+3. inspeccionar el estado pertinente del dispositivo
+4. comparar el resultado con la guía de resolución
+5. decidir si sirve otro paso de diagnóstico
+6. crear un ticket de soporte si no puede resolver el problema
+7. explicarle al usuario qué ocurrió
+
+Esto se parece mucho más a un agente.
+
+El sistema persigue un resultado, no solo responde una pregunta aislada.
+
+---
+
+## Entonces, ¿dónde encaja Microsoft Foundry?
+
+Esta es otra área donde la terminología crea confusión innecesaria.
+
+Microsoft Foundry no es algo que necesites simplemente porque tu aplicación llama a un LLM.
+
+Y no reemplaza RAG, MCP ni los agentes.
+
+Piensa en Foundry en otro nivel.
+
+Proporciona un entorno administrado para crear y operar aplicaciones y agentes de IA usando modelos, herramientas, evaluación, observabilidad, identidad, gobernanza y capacidades relacionadas de la plataforma.
+
+Foundry Agent Service puede alojar y operar agentes.
+
+Esos agentes pueden usar herramientas.
+
+Entre esas herramientas puede haber servidores MCP.
+
+Esos agentes también pueden usar recuperación.
+
+Así que estos conceptos no compiten entre sí.
+
+Pueden coexistir en la misma arquitectura.
+
+Una vista simplificada podría ser así:
+
+```text
+Microsoft Foundry
+  ↓
+Agent
+  ├── Retrieval / knowledge
+  ├── MCP tools
+  ├── Other function tools
+  └── Model
+```
+
+Foundry ayuda a operar el sistema.
+
+MCP ayuda a estandarizar capacidades externas.
+
+RAG ayuda a proporcionar conocimiento.
+
+El agente decide cómo usar las capacidades para alcanzar un objetivo.
+
+El modelo se encarga del lenguaje y del razonamiento.
+
+Cuando separo esas responsabilidades, la arquitectura resulta mucho más fácil de entender.
+
+---
+
+## ¿Necesito Foundry para RAG?
+
+No.
+
+Puedes crear una aplicación RAG perfectamente válida con:
+
+- ASP.NET Core
+- un endpoint de LLM
+- Azure AI Search u otro sistema de recuperación
+- tu propio código de aplicación
+
+Esa puede ser exactamente la arquitectura correcta.
+
+Del mismo modo, puedes crear aplicaciones con llamadas a herramientas sin una plataforma de agentes administrada.
+
+Foundry empieza a resultar más atractivo cuando crece el problema operativo.
+
+Por ejemplo:
+
+- varios agentes
+- varias herramientas
+- identidades administradas
+- trazas
+- evaluación
+- supervisión
+- gobernanza
+- ciclo de vida de despliegue
+- controles de seguridad
+- gestión de modelos
+
+En ese punto, el problema difícil ya no es:
+
+> “¿Puedo llamar al modelo?”
+
+El problema difícil es:
+
+> “¿Cómo opero este sistema de IA de forma confiable?”
+
+Esa es una pregunta muy distinta.
+
+---
+
+## ¿Necesito MCP si tengo Foundry?
+
+De nuevo, resuelven problemas distintos.
+
+Los agentes de Foundry pueden conectarse a endpoints de servidores MCP.
+
+Por eso, usar Foundry no elimina MCP.
+
+Y usar MCP no requiere Foundry.
+
+Podrías tener:
+
+```text
+ASP.NET Core services
+  ↓
+MCP server
+  ↓
+Foundry agent
+```
+
+O:
+
+```text
+ASP.NET Core services
+  ↓
+MCP server
+  ↓
+another MCP-compatible AI client
+```
+
+Esa segunda posibilidad es una de las razones por las que MCP resulta interesante.
+
+El contrato de integración no está necesariamente ligado a un framework de agentes o a un proveedor de modelos.
+
+Pero tampoco expondría cada API interna como herramienta MCP.
+
+Eso repetiría uno de los errores de integración más antiguos con una tecnología nueva.
+
+Expón las capacidades que tengan sentido para la IA.
+
+Mantén las reglas de dominio donde corresponden.
+
+Mantén las APIs que ya son buenas APIs.
+
+MCP debería ser un límite de integración, no una excusa para rediseñarlo todo.
+
+---
+
+## ¿Puede RAG convertirse en una herramienta?
+
+Sí.
+
+Y aquí es donde las cajas de los diagramas de arquitectura empiezan a solaparse.
+
+Un agente podría tener herramientas como:
+
+- search_knowledge
+- get_customer
+- check_service_status
+- create_ticket
+
+En esa arquitectura, la recuperación es una capacidad disponible para el agente.
+
+El agente decide cuándo hace falta recuperar conocimiento.
+
+Esa es una forma de entender el RAG agéntico:
+
+**la recuperación pasa a formar parte del proceso de decisión del agente, en vez de ser un paso fijo que siempre ocurre exactamente de la misma manera.**
+
+Esto puede ser potente para preguntas complejas.
+
+Para preguntas sencillas también puede ser innecesario.
+
+La complejidad debe justificar su presencia.
+
+---
+
+## La tabla de decisiones que uso
+
+| Si mi sistema necesita... | Empezaría con... |
+| --- | --- |
+| Generar, resumir, clasificar o transformar texto | LLM |
+| Responder usando conocimiento privado o actualizado | RAG |
+| Dar a aplicaciones de IA acceso estandarizado a capacidades externas | MCP |
+| Decidir entre varias acciones o realizar trabajo en varios pasos | Agente |
+| Operar modelos y agentes con despliegue, evaluación, observabilidad, identidad y gobernanza administrados | Microsoft Foundry |
+
+La palabra importante de la tabla es **empezaría**.
+
+No son opciones excluyentes.
+
+Un sistema de producción podría terminar usando todas.
+
+Pero eso no significa que todos deban empezar con todas.
+
+---
+
+## Una arquitectura .NET no tiene que volverse extraña solo porque intervenga la IA
+
+Esto es especialmente importante para desarrolladores .NET que vienen de sistemas empresariales tradicionales.
+
+Ya sabes crear:
+
+- servicios de dominio
+- APIs
+- autorización
+- procesamiento en segundo plano
+- acceso a datos
+- telemetría
+- límites de integración
+
+No descartes esas ideas.
+
+Si ya tienes un servicio bien diseñado, como:
+
+```text
+TicketService
+```
+
+consérvalo.
+
+Tu API normal puede llamarlo.
+
+Un worker en segundo plano puede llamarlo.
+
+Una herramienta MCP puede llamarlo.
+
+La integración de IA debería apoyarse en una buena arquitectura de aplicación, no reemplazarla.
+
+Preferiría tener:
+
+```text
+Agent
+  ↓
+small, well-defined tool
+  ↓
+existing application service
+  ↓
+domain/data layer
+```
+
+a poner lógica de negocio importante dentro de la descripción de una herramienta o de un prompt.
+
+El modelo debería decidir **cuándo** puede ayudar una capacidad.
+
+Tu aplicación debería seguir controlando **qué puede hacer esa capacidad**.
+
+---
+
+## La seguridad importa más cuando el modelo puede actuar
+
+Hay una gran diferencia entre:
+
+> “Busca en la documentación de VPN.”
+
+y:
+
+> “Desactiva la cuenta de este empleado.”
+
+Cuando las herramientas pueden cambiar sistemas reales, la autorización, la validación, la auditabilidad y la aprobación humana pasan a ser preocupaciones de arquitectura.
+
+Que un modelo decida llamar a una herramienta no es una decisión de autorización.
+
+La aplicación subyacente todavía debe hacer cumplir los permisos.
+
+Para operaciones de mayor impacto, puede ser apropiado pedir confirmación humana antes de ejecutarlas.
+
+Me gusta separar mentalmente las herramientas en categorías como:
+
+- Lectura: recuperar información
+- Recomendación: sugerir una acción
+- Escritura: cambiar el estado del sistema
+- Alto impacto: realizar acciones destructivas o sensibles para la seguridad
+
+Cuanto más avanzo en esa lista, menos cómodo me siento dependiendo solo del modelo.
+
+Los agentes no eliminan los controles de ingeniería.
+
+Los vuelven más importantes.
+
+---
+
+## Cuatro errores que evitaría
+
+### 1. Empezar con un agente cuando basta un flujo normal
+
+Si la secuencia siempre es:
+
+```text
+Search → Summarize → Save
+```
+
+probablemente no necesito que un planificador autónomo decida esos mismos tres pasos cada vez.
+
+El código es determinista.
+
+A veces, eso es exactamente lo que quiero.
+
+### 2. Tratar MCP como reemplazo de una API
+
+Tus APIs de dominio siguen importando.
+
+MCP ofrece una interfaz estandarizada para que los sistemas de IA accedan a capacidades seleccionadas.
+
+Son responsabilidades distintas.
+
+### 3. Añadir RAG porque todos los diagramas de IA tienen una base de datos vectorial
+
+Si la aplicación no necesita conocimiento externo, la recuperación añade costo y complejidad sin resolver nada.
+
+### 4. Elegir la plataforma antes de entender el problema
+
+Foundry puede resolver problemas importantes de producción y operación.
+
+Pero esos problemas deberían existir antes de incorporar la solución.
+
+---
+
+## La arquitectura debería crecer con el problema
+
+Este es el modelo mental con el que me gustaría que empezaran más conversaciones sobre arquitectura de IA.
+
+Empieza aquí:
+
+```text
+User
+  ↓
+LLM
+```
+
+Luego pregunta:
+
+**¿Al modelo le falta conocimiento pertinente?**
+
+Añade recuperación.
+
+```text
+User
+  ↓
+RAG
+  ↓
+LLM
+```
+
+Luego pregunta:
+
+**¿Necesita acceder a sistemas externos?**
+
+Añade herramientas, quizá mediante MCP.
+
+```text
+User
+  ↓
+Agent or AI application
+  ├── Retrieval
+  └── Tools / MCP
+```
+
+Luego pregunta:
+
+**¿Necesita decidir y ejecutar varios pasos para alcanzar un objetivo?**
+
+Introduce comportamiento agéntico.
+
+Después pregunta:
+
+**¿Operar este sistema se ha convertido en la parte difícil?**
+
+Ahora una plataforma administrada como Microsoft Foundry empieza a tener mucho más sentido.
+
+Cada capa debería existir porque la arquitectura anterior no pudo resolver un requisito real de forma limpia.
+
+---
+
+## Una última pregunta
+
+Antes de añadir una tecnología de IA a una arquitectura, creo que vale la pena hacer una pregunta:
+
+**¿Qué no puede hacer hoy mi sistema?**
+
+Si no puede responder porque le falta conocimiento pertinente:
+
+Añade recuperación.
+
+Si no puede interactuar con los sistemas que necesita:
+
+Expón herramientas.
+
+Si varios clientes de IA necesitan una forma estandarizada de descubrir esas capacidades:
+
+Considera MCP.
+
+Si el sistema necesita elegir y ejecutar varios pasos para alcanzar un objetivo:
+
+Considera un agente.
+
+Si desplegar, evaluar, supervisar, proteger y gobernar todo eso se convierte en la parte difícil:
+
+Considera una plataforma como Microsoft Foundry.
+
+Ese orden importa.
+
+Porque el objetivo nunca fue crear un sistema RAG.
+
+Ni un servidor MCP.
+
+Ni un agente.
+
+Ni una arquitectura Foundry.
+
+El objetivo es resolver un problema.
+
+Todo lo demás es una herramienta.

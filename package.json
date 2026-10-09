@@ -7,6 +7,7 @@
     "lint": "eslint . --max-warnings=0",
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
+    "validate:i18n": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-i18n.mjs",
     "start": "npx --yes serve out -l ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "postbuild": "node scripts/clean-sentinels.mjs"

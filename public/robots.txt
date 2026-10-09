@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /open-source/__none
+Disallow: /writing/__none
+
+Sitemap: https://sakirsathe.com/sitemap.xml
+Host: https://sakirsathe.com

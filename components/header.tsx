@@ -4,14 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { nav, site, social, socialHref, socialTitle } from "@/data/site";
+import { site, social, socialHref, socialTitle } from "@/data/site";
 import { GitHubIcon, LinkedInIcon, Monogram } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { cn } from "@/lib/utils";
 import { SocialAnchor } from "@/components/social-anchor";
+import { getDictionary } from "@/lib/i18n/dictionary";
+import { getLocaleFromPath, localizePath } from "@/lib/i18n/locales";
 
 export function Header() {
   const pathname = usePathname();
+  const locale = getLocaleFromPath(pathname ?? "/");
+  const dictionary = getDictionary(locale);
+  const localizedNav = [
+    { href: "/engineering", label: dictionary.nav.engineering },
+    { href: "/work", label: dictionary.nav.work },
+    { href: "/open-source", label: dictionary.nav.openSource },
+    { href: "/writing", label: dictionary.nav.writing },
+    { href: "/labs", label: dictionary.nav.labs },
+    { href: "/about", label: dictionary.nav.about },
+  ].map((item) => ({ ...item, href: localizePath(item.href, locale) }));
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -66,14 +79,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="group flex items-center gap-2.5 text-fg" aria-label={`${site.name}, home`}>
+        <Link href={localizePath("/", locale)} className="group flex items-center gap-2.5 text-fg" aria-label={`${site.name}, ${dictionary.common.home.toLocaleLowerCase()}`}>
           <Monogram className="size-7 transition-transform duration-300 group-hover:-rotate-3" />
           <span className="text-[15px] font-medium tracking-tight">{site.name}</span>
         </Link>
 
-        <nav aria-label="Primary" className="hidden md:block">
+        <nav aria-label={dictionary.common.navigation} className="hidden md:block">
           <ul className="flex items-center gap-1">
-            {nav.map((item) => (
+            {localizedNav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -99,14 +112,16 @@ export function Header() {
             <LinkedInIcon className="size-[14px]" />
           </SocialAnchor>
           <span className="mx-1.5 hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
-          <ThemeToggle />
+          <LanguageSwitcher pathname={pathname ?? "/"} locale={locale} className="hidden sm:flex" />
+          <span className="mx-1 hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
+          <ThemeToggle labels={{ dark: dictionary.common.switchToDarkTheme, light: dictionary.common.switchToLightTheme }} />
           <button
             type="button"
             ref={trigger}
             className="ml-1 inline-flex size-11 items-center justify-center text-fg md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? dictionary.common.closeMenu : dictionary.common.openMenu}
             aria-haspopup="dialog"
             onPointerDown={() => { savedScroll.current = window.scrollY; }}
             onKeyDown={(event) => {
@@ -134,13 +149,13 @@ export function Header() {
       >
         <div className="bg-grid pointer-events-none absolute inset-0 mask-fade-b" aria-hidden="true" />
         <div className="relative flex h-16 items-center justify-between border-b border-line px-5">
-          <h2 id="mobile-menu-title" className="text-sm font-medium">Navigation</h2>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="inline-flex size-11 items-center justify-center"><X className="size-5" aria-hidden="true" /></button>
+          <h2 id="mobile-menu-title" className="text-sm font-medium">{dictionary.common.navigation}</h2>
+          <button type="button" onClick={() => setOpen(false)} aria-label={dictionary.common.closeMenu} className="inline-flex size-11 items-center justify-center"><X className="size-5" aria-hidden="true" /></button>
         </div>
-        <nav aria-label="Mobile" className="relative px-5 pt-6 pb-10">
-          <p className="meta mb-4">Index</p>
+        <nav aria-label={dictionary.common.navigation} className="relative px-5 pt-6 pb-10">
+          <p className="meta mb-4">{dictionary.common.index}</p>
           <ul className="border-t border-line">
-            {nav.map((item, i) => (
+            {localizedNav.map((item, i) => (
               <li key={item.href} className="rise border-b border-line" style={{ ["--d" as string]: i }}>
                 <Link href={item.href} onClick={() => setOpen(false)} aria-current={active(item.href) ? "page" : undefined} className="flex items-baseline justify-between py-4">
                   <span className={cn("text-2xl tracking-tight", active(item.href) ? "text-accent" : "text-fg")}>{item.label}</span>
@@ -149,6 +164,7 @@ export function Header() {
               </li>
             ))}
           </ul>
+          <LanguageSwitcher pathname={pathname ?? "/"} locale={locale} className="mt-8 border-t border-line pt-5" onNavigate={() => setOpen(false)} />
           <div className="mt-8 flex flex-col gap-3 text-sm text-muted">
             <SocialAnchor href={socialHref(social.github)} onClick={() => setOpen(false)} target="_blank" rel="noopener noreferrer" title={socialTitle(social.github)} className="flex min-h-11 items-center gap-2"><GitHubIcon className="size-4" /> GitHub</SocialAnchor>
             <SocialAnchor href={socialHref(social.linkedin)} onClick={() => setOpen(false)} target="_blank" rel="noopener noreferrer" title={socialTitle(social.linkedin)} className="flex min-h-11 items-center gap-2"><LinkedInIcon className="size-4" /> LinkedIn</SocialAnchor>

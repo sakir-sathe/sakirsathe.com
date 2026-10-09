@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { Capability, CaseStudy, LabArea, Post, Project } from "@/types";
+import type { Capability, LabArea, Post, Project, WorkContent, WorkRecord } from "@/types";
 import { Tag } from "@/components/ui";
+import { getDictionary } from "@/lib/i18n/dictionary";
+import { localizePath, type Locale } from "@/lib/i18n/locales";
 import { formatDate } from "@/lib/utils";
 
 export function CapabilityCard({ c }: { c: Capability }) {
@@ -20,30 +22,40 @@ export function CapabilityCard({ c }: { c: Capability }) {
   );
 }
 
-export function CaseStudyRow({ c }: { c: CaseStudy }) {
-  return (
-    <Link href={`/work/${c.slug}`} className="group grid gap-3 border-b border-line py-7 transition-colors md:grid-cols-[110px_1fr_1fr_24px] md:items-baseline md:gap-8">
+export function CaseStudyRow({ c, localizedContent, href, viewLabel = "View case study" }: { c: WorkRecord; localizedContent: WorkContent; href?: string | null; viewLabel?: string }) {
+  const destination = href === undefined ? `/work/${c.slug}` : href;
+  const className = destination
+    ? "group grid gap-3 border-b border-line py-7 transition-colors md:grid-cols-[110px_1fr_1fr_24px] md:items-baseline md:gap-8"
+    : "grid gap-3 border-b border-line py-7 md:grid-cols-[110px_1fr_1fr_24px] md:items-baseline md:gap-8";
+  const content = (
+    <>
       <span className="font-mono text-[11px] text-subtle transition-colors group-hover:text-accent">{c.index}</span>
       <div>
-        <h3 className="text-[19px] font-medium tracking-tight transition-transform duration-300 group-hover:translate-x-1">{c.title}</h3>
-        <p className="meta mt-2">{c.systemType}</p>
-        <p className="mt-3 text-sm text-accent">View case study <span aria-hidden="true">→</span></p>
+        <h3 className="text-[19px] font-medium tracking-tight transition-transform duration-300 group-hover:translate-x-1">{localizedContent.title}</h3>
+        <p className="meta mt-2">{localizedContent.systemType}</p>
+        {destination && <p className="mt-3 text-sm text-accent">{viewLabel} <span aria-hidden="true">→</span></p>}
       </div>
       <div className="flex flex-wrap gap-1.5">
         {c.technologies.slice(0, 6).map((t) => <Tag key={t}>{t}</Tag>)}
       </div>
-      <ArrowUpRight className="hidden size-4 text-subtle transition-all duration-300 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 md:block" aria-hidden="true" />
-    </Link>
+      {destination && <ArrowUpRight className="hidden size-4 text-subtle transition-all duration-300 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 md:block" aria-hidden="true" />}
+    </>
+  );
+
+  return destination ? (
+    <Link href={destination} className={className}>{content}</Link>
+  ) : (
+    <article className={className}>{content}</article>
   );
 }
 
-export function ProjectCard({ p, externalGithub = false }: { p: Project; externalGithub?: boolean }) {
+export function ProjectCard({ p, externalGithub = false, publicLabel = "public" }: { p: Project; externalGithub?: boolean; publicLabel?: string }) {
   const className = "ticks group block border border-line bg-raised p-6 transition-colors hover:border-line-strong";
   const content = (
     <>
       <div className="flex items-center justify-between">
         <h3 className="font-mono text-[15px] text-fg">{p.name}</h3>
-        <span className="meta">{p.status.replace("-", " ")}</span>
+        <span className="meta">{p.status === "public" ? publicLabel : p.status.replace("-", " ")}</span>
       </div>
       <p className="mt-3 text-sm leading-relaxed text-muted">{p.description}</p>
       <div className="mt-5 flex flex-wrap gap-1.5">{p.technologies.map((t) => <Tag key={t}>{t}</Tag>)}</div>
@@ -60,12 +72,13 @@ export function ProjectCard({ p, externalGithub = false }: { p: Project; externa
   );
 }
 
-export function PostRow({ p }: { p: Post }) {
+export function PostRow({ p, locale = "en" }: { p: Post; locale?: Locale }) {
+  const labels = getDictionary(locale).articlePage;
   return (
-    <Link href={`/writing/${p.slug}`} className="group grid gap-2 border-b border-line py-6 md:grid-cols-[140px_1fr] md:gap-8">
+    <Link href={localizePath(`/writing/${p.slug}`, locale)} className="group grid gap-2 border-b border-line py-6 md:grid-cols-[140px_1fr] md:gap-8">
       <div className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[12px] text-subtle">
-        <time dateTime={p.date}>{formatDate(p.date)}</time>
-        <span>{p.readingTime} min read</span>
+        <time dateTime={p.date}>{formatDate(p.date, locale)}</time>
+        <span>{labels.minutesRead.replace("{count}", String(p.readingTime))}</span>
       </div>
       <div>
         <h3 className="text-[18px] font-medium tracking-tight group-hover:text-accent">{p.title}</h3>
