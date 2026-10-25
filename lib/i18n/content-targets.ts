@@ -15,6 +15,11 @@ export const localeContentTargets = {
     "complex-product-configuration-platform": { en: "complex-product-configuration-platform", es: "complex-product-configuration-platform", hi: "complex-product-configuration-platform" },
   },
   writing: {
+    "is-ai-rotting-your-coding-brain": {
+      en: "is-ai-rotting-your-coding-brain",
+      es: "is-ai-rotting-your-coding-brain",
+      hi: "is-ai-rotting-your-coding-brain",
+    },
     "moving-to-costa-rica-what-id-tell-someone-coming-from-india-or-the-us": {
       en: "moving-to-costa-rica-what-id-tell-someone-coming-from-india-or-the-us",
       es: "moving-to-costa-rica-what-id-tell-someone-coming-from-india-or-the-us",

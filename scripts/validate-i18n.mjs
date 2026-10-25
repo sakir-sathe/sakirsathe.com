@@ -260,7 +260,7 @@ for (const locale of supportedLocales) {
 
 const publishedWritingByLocale = new Map([...writingLocales].map(([locale, posts]) => [locale, posts.filter((post) => post.published)]));
 const englishPosts = publishedWritingByLocale.get("en");
-assert.equal(englishPosts.length, 3, "English Writing must contain exactly three published articles");
+assert.ok(englishPosts.length > 0, "English Writing must contain at least one published article");
 assert.equal(publishedWritingByLocale.get("es").length, englishPosts.length, "each English article must have a Spanish translation");
 assert.equal(publishedWritingByLocale.get("hi").length, englishPosts.length, "each English article must have a Hindi translation");
 assert.deepEqual(readdirSync(writingRoot).filter((entry) => entry.endsWith(".mdx")), [], "root-level compatibility article copies must not remain");
@@ -361,17 +361,17 @@ assert.match(switcherSource, /हिन्दी/);
 
 
 function fencedBlocks(body) {
-  return [...body.matchAll(/^(`{3,}|~{3,})[^\n]*\r?\n([\s\S]*?)^\1\s*$/gm)].map((match) => match[2]);
+  return [...body.matchAll(/^(`{3,}|~{3,})[^\n]*\r?\n([\s\S]*?)^\1\s*$/gm)].map((match) => match[2].replace(/\r\n?/g, "\n"));
 }
 
 function sourceUrls(body) {
   return [...body.matchAll(/(?:href=["']([^"']+)["']|\]\((https?:\/\/[^)\s]+))/g)]
-    .map((match) => match[1] ?? match[2])
+    .map((match) => (match[1] ?? match[2]).replace(/^https:\/\/sakirsathe\.com\/(?:es\/|hi\/)?writing\//, "https://sakirsathe.com/writing/"))
     .sort();
 }
 
 function listHierarchy(body) {
-  return [...body.matchAll(/^(\s*)([-*+] |\d+\. )/gm)].map((match) => `${match[1].length}:${match[2].trim()}`);
+  return [...body.matchAll(/^([ \t]*)([-*+] |\d+\. )/gm)].map((match) => `${match[1].length}:${match[2].trim()}`);
 }
 
 function numericTokens(body) {
@@ -495,7 +495,7 @@ assert.equal(localizePath("/rss.xml", "hi"), "/hi/rss.xml");
 assert.ok(!localizePath("/rss.xml", "en").startsWith("/en/"));
 for (const locale of supportedLocales) {
   const posts = publishedWritingByLocale.get(locale);
-  assert.equal(posts.length, 3, `${locale} feed item count`);
+  assert.equal(posts.length, englishPosts.length, `${locale} feed item count`);
   for (const post of posts) {
     const expectedLink = locale === "en" ? `/writing/${post.slug}` : `/${locale}/writing/${post.slug}`;
     assert.equal(localizePath(`/writing/${post.slug}`, locale), expectedLink, `${locale} feed link stays in its locale`);

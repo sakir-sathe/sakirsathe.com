@@ -1,0 +1,359 @@
+---
+title: "Is AI Rotting Your Coding Brain?"
+description: "What the research actually says about AI and developer skills, what AI-first teams are doing in 2026, and the habits I'd use to stay sharp and current."
+date: "2026-10-25"
+locale: en
+translationKey: is-ai-rotting-your-coding-brain
+tags:
+  - AI
+  - Engineering
+  - Career
+  - Developer Productivity
+published: true
+featured: false
+---
+There is a small moment many developers now recognize.
+
+You open an empty file to write something simple. A recursive function. A regex. A retry loop with backoff.
+
+And your hands wait for the autocomplete.
+
+The internet has a name for this feeling: **AI brain rot**.
+
+It is a catchy phrase. It is also mostly wrong.
+
+After reading the research, I don't think AI is damaging anyone's brain. But it can quietly stop us from learning, and the skill it hurts most is the one we need to supervise it:
+
+**Debugging.**
+
+The good news is that the same research points to a fix. It is not "use AI less."
+
+It is **use AI differently**.
+
+In this post I'll look at what the research actually says, what AI-first teams are doing in practice, which skills matter now, and the habits I'd use to stay sharp and current.
+
+---
+
+## What the research actually says
+
+Before writing this, I wanted to know whether "AI brain rot" was a real thing or just a good headline.
+
+Four findings hold up. They all point in the same direction.
+
+### 1. AI can stop you from learning something new
+
+In January 2026, Anthropic published a [randomized controlled trial](https://www.anthropic.com/research/AI-assistance-coding-skills) with 52 mostly junior Python developers. Each one had to learn Trio, an async library none of them had used before.
+
+Half could use an AI assistant that would write the full solution on request. Half coded by hand.
+
+Then everyone took a quiz on what they had just used.
+
+- AI group: **50%**
+- Hand-coding group: **67%**
+
+That is almost two letter grades. And the AI group finished only about two minutes faster, a difference that was not statistically significant.
+
+The biggest gap was on debugging questions.
+
+### 2. How you use AI matters more than whether you use it
+
+This is the part I found most useful.
+
+The researchers looked at how each person in the AI group actually worked and found six patterns. Three of them handed the thinking to AI. Three kept the developer thinking.
+
+| How they used AI | Quiz score | Time |
+| --- | --- | --- |
+| Generated code, then asked follow-up questions | 86% | 24 min |
+| Asked for code plus explanations | 68% | 24 min |
+| Asked only conceptual questions | 65% | 22 min |
+| *Hand-coding group average (no AI)* | *67%* | *~25 min* |
+| Delegated everything to AI | 39% | 19.5 min |
+| Started asking, then gradually delegated | 35% | 22 min |
+| Relied on AI to debug and verify their code | 24% | 31 min |
+
+Each pattern had only 2 to 7 developers, so I read this as a direction, not a precise ranking.
+
+But the direction is clear. The developers who only asked conceptual questions hit plenty of errors, fixed them on their own, and were still the second-fastest group overall.
+
+**Learning and speed are not always a trade-off.**
+
+### 3. It is not only a coding problem
+
+A [field experiment with nearly 1,000 high school math students](https://doi.org/10.1073/pnas.2422633122), published in PNAS in 2025, found the same shape.
+
+With GPT-4 available during practice, grades went up 48%.
+
+When it was taken away for the exam, those students did **17% worse** than students who never had it.
+
+A tutor version with learning guardrails mostly removed that harm. The tool was not the problem. The way it was used was.
+
+### 4. You cannot feel it happening
+
+This one surprised me most.
+
+In [METR's 2025 study](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), 16 experienced open-source developers worked on real issues in projects they knew well.
+
+- Before: they expected AI to make them **24% faster**.
+- After: they believed it had made them **20% faster**.
+- Measured: it made them **19% slower**.
+
+METR now says that number is out of date, because the tools have improved. Their 2026 follow-up stalled partly because many developers refused to work without AI at all.
+
+But the lesson that stays is the perception gap:
+
+**Feeling productive and being productive are different measurements.**
+
+### Supporting signals
+
+- [Microsoft and Carnegie Mellon](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/) surveyed 319 knowledge workers. The more people trusted AI, the less critical thinking they reported. The more they trusted their own skills, the more they thought critically.
+- In [Stack Overflow's 2025 survey](https://tech.co/news/survey-developers-using-ai-more-trust-less), 84% of developers used or planned to use AI tools, but only 33% trusted their accuracy. The most common complaint was code that is almost right, but not quite.
+
+That last point matters.
+
+"Almost right" code is exactly what you need strong debugging and code-reading skills to catch.
+
+---
+
+## What the research does not say
+
+I think it matters to be honest here, because the scary version of this story spreads faster than the accurate one.
+
+**Is AI rotting your brain? Not proven. Can it put your learning at risk? Yes.**
+
+- **No one has tracked skills over years.** The learning studies measured skills within hours of the task. We do not know whether the gaps grow, shrink, or disappear over a career.
+- **The strongest evidence is about learning, not forgetting.** It shows AI can stop you from building a new skill. It does not show AI erases skills you already have.
+- **Agents may make it worse.** The Anthropic study used a chat sidebar. The researchers expect agentic tools, which need even less of you, to have a stronger effect.
+- **The viral brain scans are overhyped.** MIT's "Your Brain on ChatGPT" EEG study had 54 participants, only 18 in its key session, and was released as a preprint before peer review. Claims that brains were "shrinking" are false. It [measured connectivity, not brain size](https://eu.36kr.com/en/p/3371808872108801).
+- **Notice who funded the research.** The main coding study comes from Anthropic, a company that sells AI coding tools. If anything, that makes the negative result more interesting. But the independent PNAS and METR results matter too.
+
+And some skill loss is normal.
+
+Most of us stopped managing memory by hand when garbage collectors arrived. Forgetting the exact argument order of an API you use twice a year is not a crisis.
+
+The real question is:
+
+**Which skills can I afford to lose, and which ones can I not?**
+
+---
+
+## What AI-first teams are actually doing
+
+While researching this, I noticed something interesting.
+
+The teams getting the most from AI are not the ones generating the most code. They are the ones putting structure around it.
+
+Google's [2025 DORA report](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) surveyed nearly 5,000 technology professionals. About 90% use AI at work, and more than 80% believe it has made them more productive. AI is now linked to higher delivery throughput.
+
+But it is still linked to **lower delivery stability**.
+
+DORA's summary is that AI is an amplifier. It makes strong teams stronger and makes struggling teams' problems louder.
+
+So what are the stronger teams doing? Five practices keep showing up.
+
+### 1. Writing the spec before the prompt
+
+Spec-driven development has become one of the main answers to "vibe coding." Instead of one big prompt, you write down what the feature should do, then a technical plan, then small tasks, and only then let an agent implement.
+
+```
+Spec → Plan → Tasks → Implement → Review
+```
+
+GitHub's open-source [Spec Kit](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx), released in September 2025, now works with more than 30 AI coding agents. Even its maintainer compares agents to a very capable intern who needs close oversight.
+
+### 2. Keeping agent context in the repository
+
+Teams now store instructions for agents next to the code:
+
+- **AGENTS.md** holds project conventions, build and test commands, and rules any agent should follow. Since August 2025 it has been [adopted by more than 60,000 open-source projects](https://openai.com/index/agentic-ai-foundation/), and it is now governed by the Linux Foundation's Agentic AI Foundation.
+- **Tool-specific files** such as `.github/copilot-instructions.md` do the same job for a single tool.
+- **Agent Skills** are reusable `SKILL.md` folders that teach an agent one procedure, like how your team writes migrations or cuts a release. Anthropic introduced the format in October 2025 and [published it as an open standard in December 2025](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude). By April 2026, [more than 30 tools supported it](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026), including GitHub Copilot, Codex CLI, and Gemini CLI.
+
+A simple mental model: AGENTS.md is what every agent should always know about this repo. A skill is a playbook the agent loads only when a task needs it.
+
+### 3. Small batches and strong safety nets
+
+DORA's [AI Capabilities Model](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model) lists seven practices that amplify AI's benefits. Two of them are very traditional: **strong version control** and **working in small batches**.
+
+When AI increases the volume of change, small PRs, frequent commits, automated tests, and easy rollback are what keep stability from slipping.
+
+### 4. Connecting AI to real internal context
+
+Two more DORA capabilities are about data: healthy internal data, and AI tools that can actually reach it. This is where retrieval and MCP come in. I wrote about when you actually need each of them in [RAG, MCP, Agents, and Microsoft Foundry](https://sakirsathe.com/writing/rag-mcp-agents-microsoft-foundry-what-do-you-actually-need).
+
+### 5. A clear AI stance and a focus on users
+
+The last three are organizational: a clearly communicated position on which tools are allowed and how to use them, quality internal platforms, and a deep focus on the end user. Without that user focus, DORA found AI adoption can actually hurt team performance.
+
+### Why this matters for skill atrophy
+
+Look at what those practices ask humans to do:
+
+- write clear specifications
+- design the plan and break it into small tasks
+- curate context and conventions for agents
+- review, test, and roll back
+
+**AI-first does not mean human-last.**
+
+The best AI-first practices move developers up the stack, toward specification, design, and review. Those are exactly the skills that passive AI use weakens.
+
+---
+
+## The skills that matter now
+
+My rule is simple:
+
+**Protect the skills you need to judge AI output. Learn the skills you need to direct it. Let rote syntax go.**
+
+If I cannot tell whether generated code is correct, I am no longer supervising the tool. I am trusting it.
+
+### Skills I would protect
+
+| Skill | Why it matters more with AI | Quick self-test |
+| --- | --- | --- |
+| Debugging | AI code is often almost right, and the bug is yours to find | Fix a failing test using only logs and a debugger |
+| Reading code | You now approve far more code than you write | Explain a 50-line AI diff, line by line, before running it |
+| Data structures and complexity | AI happily writes O(n²) loops that pass small tests | Spot the slow path in a function and name a faster structure |
+| Concurrency and state | Race conditions, deadlocks, and async bugs hide in plausible code | Explain where two requests could interleave or an async call could block |
+| Language and runtime basics | Errors, memory, scoping, and types decide whether code works | Write a small utility from a blank file with autocomplete off |
+| System design | AI optimizes the snippet, not the architecture | Sketch how a feature fits your system before prompting for it |
+| Security basics | Generated code repeats insecure patterns it has seen | Find the injection, auth, or secret-handling flaw in a diff |
+
+### Skills worth learning
+
+| Skill | What it looks like in practice |
+| --- | --- |
+| Writing specs | Clear acceptance criteria, edge cases, and non-goals an agent can follow |
+| Breaking work down | Turning a feature into small tasks that are easy to review and roll back |
+| Context engineering | Keeping AGENTS.md, instruction files, and team skills accurate so agents follow your conventions |
+| Reviewing at scale | Reading AI diffs for what is missing, not just what is wrong |
+| Testing strategy | Tests that catch "almost right" code before it ships |
+| Choosing the right tool | Knowing when a problem needs an agent, retrieval, MCP, or plain code |
+
+Safe to let fade: exact syntax for APIs you rarely touch, boilerplate, and config formats you can look up in seconds.
+
+---
+
+## How I would use AI without losing the skill
+
+The goal is not to use AI less.
+
+The goal is to **keep your brain in the loop**.
+
+The research makes the difference look roughly like this:
+
+```
+Delegating:  Prompt → Paste → Tests pass → Ship
+Engaged:     Try → Get stuck → Ask why → Understand → Ship
+```
+
+Both ship the feature. Only one leaves you better at your job.
+
+### While you work
+
+1. **Try first, then ask.** Give yourself 15 minutes, or the first pass of a new task, before reaching for AI. Getting stuck is where the learning happens.
+2. **Ask why, not just what.** Request the code and an explanation together. Then ask a follow-up about the part you understood least.
+3. **Predict before you run.** Before accepting AI code, say what it will do and which edge cases could break it. If you can't, you are not ready to merge it.
+4. **Debug it yourself first.** Read the stack trace and form a hypothesis before pasting the error into a chat. Use AI to check your theory, not to replace it.
+5. **Explain it back.** After a task, describe the solution in your own words: in a commit message, a PR description, or to a teammate. Gaps show up fast.
+6. **Use learning modes when you are learning.** Claude Code's Learning and Explanatory modes and ChatGPT's Study Mode are designed to teach rather than hand over answers.
+
+### Outside of task work
+
+- **Do a no-AI rep.** Once a week, solve one small problem with AI and autocomplete turned off. Treat it like a gym session, not a test.
+- **Keep one project by hand.** A small side project where you write the code yourself, ideally in a language or domain you want to learn.
+
+---
+
+## How to keep yourself up to date
+
+The tools change every few months. That makes it tempting to let AI summarize everything for you.
+
+For the things that matter, I would do the opposite.
+
+- **Go to primary sources first.** Release notes, changelogs, official docs, and RFCs. AI training data lags behind new releases, so it may confidently describe last year's version.
+- **Try new things in a sandbox repo.** Keep a small throwaway repository for experiments: a new framework version, a new agent, a new MCP server. Write the first example by hand, then try it with AI.
+- **Follow a few practitioners, not a firehose.** Pick a handful of engineers and research groups you trust and read them properly, instead of skimming fifty headlines a day.
+- **Read research critically.** Check the sample size, who funded it, and what was actually measured. The "brain shrinking" headlines are a good reminder of why.
+- **Use AI to test you, not just tell you.** After learning something new, ask AI to quiz you or poke holes in your explanation.
+- **Read other people's code.** Review PRs carefully and read well-known open-source projects in your stack.
+- **Write and teach.** Blog posts, internal talks, and mentoring force you to understand something well enough to explain it.
+
+A simple rhythm I would start with:
+
+```
+Weekly:     30 minutes of release notes for your stack
+            1 no-AI practice problem
+Monthly:    1 new tool or feature, tried in a sandbox repo
+Quarterly:  Time a familiar task with and without AI
+            Update AGENTS.md and team skills with what you learned
+```
+
+The quarterly timing check matters more than it looks. The METR results show your gut feeling about productivity is a poor measure.
+
+---
+
+## If you are a junior developer
+
+You have the most to lose, because you are still building the skills experienced developers can coast on for a while.
+
+The Anthropic researchers say this directly: juniors under pressure to move fast may trade real skill growth for speed.
+
+- **Use AI as a tutor while learning** a language, framework, or codebase. Save delegation for things you already understand.
+- **Struggle a little on purpose.** Every bug you fix yourself builds the skill that showed the biggest gap in the research.
+- **Learn the new skills early.** Practice writing a short spec and reviewing an AI diff line by line. These are quickly becoming core junior skills.
+- **Practice without it.** In interviews and during incidents, you will often work without AI.
+
+---
+
+## If you lead a team
+
+If the only thing you measure is speed, you will get delegation.
+
+And the skill loss will stay invisible until an incident.
+
+- **Make learning an explicit goal** for junior developers, not just ticket throughput.
+- **Ask for explanations in code review.** Authors should be able to explain AI-written changes, not just confirm the tests pass.
+- **Rotate debugging and incident work** so everyone keeps those skills in practice.
+- **Invest in the boring foundations.** Small batches, strong version control, and a clear AI policy are among the practices DORA found make AI pay off. Add good tests and an up-to-date AGENTS.md so agents follow your conventions.
+- **Leave room for engaged AI use.** In the Anthropic study it cost only a few minutes compared with full delegation.
+
+---
+
+## The question I would ask
+
+Before accepting the next block of AI-generated code, one question is worth asking:
+
+**Could I explain this, and could I fix it if it broke at 2 a.m.?**
+
+If yes, AI made you faster.
+
+If no, AI did the work, and you skipped the learning.
+
+AI is not rotting our brains.
+
+But it will happily do our learning for us if we let it.
+
+The developers who do best in an AI-first world will not be the ones who type the least. They will be the ones who still understand everything they ship.
+
+The tools will keep getting better. Our ability to judge what they produce is the part only we can maintain.
+
+---
+
+## References
+
+- Shen and Tamkin, Anthropic: [How AI assistance impacts the formation of coding skills](https://www.anthropic.com/research/AI-assistance-coding-skills) (Jan 2026), and the [full paper on arXiv](https://www.arxiv.org/pdf/2601.20245)
+- Bastani et al.: [Generative AI without guardrails can harm learning](https://doi.org/10.1073/pnas.2422633122), PNAS (2025)
+- METR: [Measuring the impact of early-2025 AI on experienced open-source developer productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) (Jul 2025)
+- Rob Bowley: [METR's developer productivity research: 2026 update](https://blog.robbowley.net/2026/04/04/metrs-developer-productivity-research-2026-update/)
+- Google Cloud: [Announcing the 2025 DORA report](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) and [Introducing DORA's AI Capabilities Model](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model)
+- InfoQ: [DORA State of AI-assisted Software Development 2025](https://www.infoq.com/news/2025/09/dora-state-of-ai-in-dev-2025)
+- Visual Studio Magazine: [GitHub Spec Kit takes off as antidote to piecemeal vibe coding](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx)
+- OpenAI: [Agentic AI Foundation and AGENTS.md](https://openai.com/index/agentic-ai-foundation/)
+- AI Business: [Anthropic launches Skills open standard](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude) (Dec 2025)
+- Noqta: [SKILL.md open standard reaches 30+ AI coding tools](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026)
+- The Register: [Microsoft and CMU on generative AI and critical thinking](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/)
+- Tech.co: [Stack Overflow 2025 survey: developers using AI more but trusting it less](https://tech.co/news/survey-developers-using-ai-more-trust-less)
+- The Decoder: [MIT study on cognitive debt and its limitations](https://the-decoder.com/mit-study-shows-cognitive-debt-through-chatgpt-heres-what-it-means-in-real-world-practice/)
+- 36Kr: [How the media misread MIT's study](https://eu.36kr.com/en/p/3371808872108801)
+- Addy Osmani: [Avoiding skill atrophy in the age of AI](https://addyo.substack.com/p/avoiding-skill-atrophy-in-the-age)

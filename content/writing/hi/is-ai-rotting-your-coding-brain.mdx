@@ -1,0 +1,361 @@
+---
+title: "क्या AI आपकी coding skills को कमज़ोर कर रही है?"
+description: "AI और developers की skills के बारे में research असल में क्या कहती है, 2026 में AI-first teams क्या कर रही हैं, और अपनी skills को मजबूत बनाए रखने व खुद को updated रखने के लिए मैं कौन-सी आदतें अपनाऊँगा।"
+date: "2026-10-25"
+locale: hi
+translationKey: is-ai-rotting-your-coding-brain
+translationSourceHash: 2ea5a64ec7fa6740c77b41b2ccc7ee7b9a0d31e53b3de7e54ab741c175606822
+tags:
+  - AI
+  - Engineering
+  - Career
+  - Developer Productivity
+published: true
+featured: false
+---
+
+आजकल कई developers एक छोटे-से पल को पहचानते हैं।
+
+तुम कोई साधारण चीज़ लिखने के लिए खाली file खोलते हो। एक recursive function। एक regex। Backoff के साथ retry loop।
+
+और तुम्हारे हाथ autocomplete का इंतज़ार करते हैं।
+
+Internet ने इस एहसास को एक नाम दिया है: **AI brain rot**।
+
+यह सुनने में catchy है। और ज़्यादातर गलत भी।
+
+Research पढ़ने के बाद मुझे नहीं लगता कि AI किसी का दिमाग़ खराब कर रही है। लेकिन यह चुपचाप हमें सीखने से रोक सकती है, और जिस skill को यह सबसे ज़्यादा नुकसान पहुँचाती है, वही skill हमें AI की निगरानी के लिए चाहिए:
+
+**Debugging।**
+
+अच्छी बात यह है कि वही research इसका हल भी दिखाती है। हल यह नहीं है कि “AI का इस्तेमाल कम करो।”
+
+हल है **AI का इस्तेमाल अलग तरीके से करो**।
+
+इस लेख में मैं देखूँगा कि research असल में क्या कहती है, AI-first teams व्यवहार में क्या कर रही हैं, आज कौन-सी skills मायने रखती हैं, और कुशल व updated बने रहने के लिए मैं कौन-सी आदतें अपनाऊँगा।
+
+---
+
+## Research असल में क्या कहती है
+
+इसे लिखने से पहले मैं जानना चाहता था कि “AI brain rot” सचमुच कोई चीज़ है या बस एक अच्छा headline।
+
+चार findings पर भरोसा किया जा सकता है। सभी एक ही दिशा में इशारा करती हैं।
+
+### 1. AI तुम्हें कुछ नया सीखने से रोक सकती है
+
+जनवरी 2026 में Anthropic ने 52 ज़्यादातर junior Python developers के साथ एक [randomized controlled trial](https://www.anthropic.com/research/AI-assistance-coding-skills) प्रकाशित किया। हर किसी को Trio सीखना था—एक async library जिसे उनमें से किसी ने पहले इस्तेमाल नहीं किया था।
+
+आधे लोग ऐसा AI assistant इस्तेमाल कर सकते थे जो माँगने पर पूरा solution लिख देता। बाकी आधे ने हाथ से code किया।
+
+फिर सभी ने उस चीज़ पर quiz दिया जिसका उन्होंने अभी इस्तेमाल किया था।
+
+- AI group: **50%**
+- हाथ से code करने वाला group: **67%**
+
+यह लगभग दो letter grades का अंतर है। और AI group ने सिर्फ़ करीब दो मिनट पहले काम पूरा किया—यह अंतर statistically significant नहीं था।
+
+सबसे बड़ा अंतर debugging वाले सवालों में था।
+
+### 2. तुम AI का इस्तेमाल कैसे करते हो, यह इस बात से ज़्यादा मायने रखता है कि करते हो या नहीं
+
+यह हिस्सा मुझे सबसे उपयोगी लगा।
+
+Researchers ने देखा कि AI group के हर व्यक्ति ने वास्तव में कैसे काम किया और उन्हें छह patterns मिले। तीन में लोगों ने सोचने का काम AI को सौंप दिया। बाकी तीन में developer खुद सोचता रहा।
+
+| उन्होंने AI का इस्तेमाल कैसे किया | Quiz score | समय |
+| --- | --- | --- |
+| Code generate कराया, फिर follow-up सवाल पूछे | 86% | 24 min |
+| Code और explanations माँगे | 68% | 24 min |
+| सिर्फ conceptual सवाल पूछे | 65% | 22 min |
+| *हाथ से code करने वाले group का औसत (AI के बिना)* | *67%* | *~25 min* |
+| सब कुछ AI को सौंप दिया | 39% | 19.5 min |
+| सवाल पूछना शुरू किया, फिर धीरे-धीरे काम सौंप दिया | 35% | 22 min |
+| अपना code debug और verify करने के लिए AI पर निर्भर रहे | 24% | 31 min |
+
+हर pattern में केवल 2 से 7 developers थे, इसलिए मैं इसे सटीक ranking नहीं, बल्कि एक दिशा के रूप में देखता हूँ।
+
+लेकिन दिशा साफ़ है। जिन developers ने सिर्फ conceptual सवाल पूछे, उन्हें काफी errors मिले, उन्होंने उन्हें खुद ठीक किया, और फिर भी कुल मिलाकर वे दूसरे सबसे तेज़ group थे।
+
+**सीखने और तेज़ी से काम करने के बीच हमेशा समझौता नहीं होता।**
+
+### 3. यह सिर्फ coding की समस्या नहीं है
+
+2025 में PNAS में प्रकाशित, [लगभग 1,000 high school math students के साथ field experiment](https://doi.org/10.1073/pnas.2422633122) में भी यही pattern मिला।
+
+Practice के दौरान GPT-4 उपलब्ध होने पर grades 48% बढ़े।
+
+Exam के समय इसे हटा दिया गया, तो उन students ने उन students से **17% खराब** प्रदर्शन किया जिन्हें यह कभी मिला ही नहीं था।
+
+Learning guardrails वाले tutor version ने इस नुकसान को ज़्यादातर रोक दिया। समस्या tool नहीं था। समस्या यह थी कि उसका इस्तेमाल कैसे किया गया।
+
+### 4. तुम्हें इसका एहसास नहीं होता
+
+यह finding मुझे सबसे ज़्यादा चौंकाने वाली लगी।
+
+[METR के 2025 study](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) में 16 experienced open-source developers ने उन projects में असली issues पर काम किया जिन्हें वे अच्छी तरह जानते थे।
+
+- पहले: उन्हें लगा था कि AI उन्हें **24% तेज़** कर देगी।
+- बाद में: उनका मानना था कि AI ने उन्हें **20% तेज़** किया।
+- माप में: AI ने उन्हें **19% धीमा** किया।
+
+METR अब कहता है कि यह संख्या पुरानी हो चुकी है, क्योंकि tools बेहतर हुए हैं। उनका 2026 follow-up आंशिक रूप से इसलिए रुक गया क्योंकि कई developers ने AI के बिना काम करने से मना कर दिया।
+
+लेकिन जो सबक याद रहता है, वह perception gap है:
+
+**खुद को productive महसूस करना और सचमुच productive होना अलग-अलग माप हैं।**
+
+### कुछ और संकेत
+
+- [Microsoft और Carnegie Mellon](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/) ने 319 knowledge workers का survey किया। लोगों को AI पर जितना ज़्यादा भरोसा था, उन्होंने उतना ही कम critical thinking report किया। अपनी skills पर जितना भरोसा था, उन्होंने उतना ही ज़्यादा critical thinking की।
+- [Stack Overflow के 2025 survey](https://tech.co/news/survey-developers-using-ai-more-trust-less) में 84% developers AI tools इस्तेमाल करते थे या करने की योजना बना रहे थे, लेकिन सिर्फ़ 33% को उनकी accuracy पर भरोसा था। सबसे आम शिकायत थी कि code लगभग सही होता है, लेकिन पूरी तरह नहीं।
+
+यह आख़िरी बात मायने रखती है।
+
+“लगभग सही” code को पकड़ने के लिए मज़बूत debugging और code पढ़ने की skills चाहिए।
+
+---
+
+## Research क्या नहीं कहती
+
+मुझे लगता है कि यहाँ ईमानदार होना ज़रूरी है, क्योंकि इस कहानी का डरावना version सही version से तेज़ी से फैलता है।
+
+**क्या AI तुम्हारा दिमाग़ खराब कर रही है? साबित नहीं हुआ। क्या यह तुम्हारी learning को जोखिम में डाल सकती है? हाँ।**
+
+- **किसी ने सालों तक skills को track नहीं किया है।** Learning studies ने task के कुछ घंटों के भीतर skills मापीं। हमें नहीं पता कि career के दौरान ये अंतर बढ़ते हैं, घटते हैं या खत्म हो जाते हैं।
+- **सबसे मज़बूत evidence सीखने के बारे में है, भूलने के बारे में नहीं।** यह दिखाता है कि AI तुम्हें कोई नई skill बनाने से रोक सकती है। यह नहीं दिखाता कि AI तुम्हारी पहले से मौजूद skills मिटा देती है।
+- **Agents इसे और खराब कर सकते हैं।** Anthropic study में chat sidebar इस्तेमाल हुआ था। Researchers को लगता है कि agentic tools, जिन्हें तुम्हारी और भी कम ज़रूरत होती है, का असर ज़्यादा होगा।
+- **Viral brain scans को बढ़ा-चढ़ाकर बताया गया है।** MIT के “Your Brain on ChatGPT” EEG study में 54 participants थे, उसके मुख्य session में सिर्फ़ 18, और peer review से पहले इसे preprint के रूप में जारी किया गया। दिमाग़ “छोटा” होने के दावे गलत हैं। इसने [brain size नहीं, connectivity मापी](https://eu.36kr.com/en/p/3371808872108801)।
+- **ध्यान दो कि research को funding किसने दी।** मुख्य coding study Anthropic की है, जो AI coding tools बेचती है। अगर कुछ है, तो इससे negative result और दिलचस्प हो जाता है। लेकिन PNAS और METR के independent results भी मायने रखते हैं।
+
+और कुछ skills का खोना सामान्य है।
+
+Garbage collectors आने के बाद हममें से ज़्यादातर लोगों ने memory को हाथ से manage करना बंद कर दिया। जिस API को साल में दो बार इस्तेमाल करते हो, उसके arguments का exact क्रम भूल जाना कोई संकट नहीं है।
+
+असली सवाल है:
+
+**कौन-सी skills मैं खो सकता हूँ, और कौन-सी नहीं?**
+
+---
+
+## AI-first teams असल में क्या कर रही हैं
+
+इस पर research करते समय मुझे एक दिलचस्प बात दिखी।
+
+AI से सबसे ज़्यादा फ़ायदा उठाने वाली teams सबसे ज़्यादा code generate नहीं कर रहीं। वे उसके आसपास structure बना रही हैं।
+
+Google की [2025 DORA report](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) ने लगभग 5,000 technology professionals का survey किया। करीब 90% लोग काम पर AI इस्तेमाल करते हैं और 80% से ज़्यादा का मानना है कि इससे उनकी productivity बढ़ी है। AI अब ज़्यादा delivery throughput से जुड़ी है।
+
+लेकिन इसका संबंध अब भी **कम delivery stability** से है।
+
+DORA का निष्कर्ष है कि AI एक amplifier है। यह मज़बूत teams को और मज़बूत बनाती है और संघर्ष कर रही teams की समस्याओं को और ज़ोर से सामने लाती है।
+
+तो बेहतर teams क्या कर रही हैं? पाँच practices बार-बार दिखती हैं।
+
+### 1. Prompt से पहले spec लिखना
+
+Spec-driven development, “vibe coding” का एक मुख्य जवाब बन गया है। एक बड़े prompt के बजाय, पहले लिखो कि feature को क्या करना चाहिए, फिर technical plan, फिर छोटे tasks, और उसके बाद ही agent से implement करवाओ।
+
+```
+Spec → Plan → Tasks → Implement → Review
+```
+
+GitHub का open-source [Spec Kit](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx), जो सितंबर 2025 में जारी हुआ, अब 30 से ज़्यादा AI coding agents के साथ काम करता है। इसका maintainer भी agents की तुलना एक काबिल intern से करता है जिसे करीबी निगरानी चाहिए।
+
+### 2. Agent का context repository में रखना
+
+Teams अब code के साथ agents के लिए instructions भी रखती हैं:
+
+- **AGENTS.md** में project conventions, build और test commands, और वे rules होते हैं जिन्हें हर agent को follow करना चाहिए। अगस्त 2025 से इसे [60,000 से ज़्यादा open-source projects ने अपनाया है](https://openai.com/index/agentic-ai-foundation/), और अब इसे Linux Foundation की Agentic AI Foundation govern करती है।
+- **किसी खास tool की instruction files**, जैसे `.github/copilot-instructions.md`, एक tool के लिए यही काम करती हैं।
+- **Agent Skills** reusable `SKILL.md` folders होती हैं, जो agent को कोई procedure सिखाती हैं—जैसे तुम्हारी team migrations कैसे लिखती है या release कैसे तैयार करती है। Anthropic ने यह format अक्टूबर 2025 में पेश किया और दिसंबर 2025 में इसे [open standard के रूप में प्रकाशित किया](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude)। अप्रैल 2026 तक [30 से ज़्यादा tools इसे support करते थे](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026), जिनमें GitHub Copilot, Codex CLI और Gemini CLI शामिल हैं।
+
+एक आसान mental model: AGENTS.md वह जानकारी है जो हर agent को इस repo के बारे में हमेशा पता होनी चाहिए। Skill एक playbook है जिसे agent सिर्फ़ उस task के लिए load करता है जिसे इसकी ज़रूरत हो।
+
+### 3. छोटे batches और मज़बूत safety nets
+
+DORA का [AI Capabilities Model](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model) AI के फ़ायदों को बढ़ाने वाली सात practices बताता है। उनमें से दो बहुत पारंपरिक हैं: **मज़बूत version control** और **छोटे batches में काम करना**।
+
+जब AI changes की मात्रा बढ़ाती है, तो stability को गिरने से छोटे PRs, बार-बार commits, automated tests और आसानी से rollback करने की सुविधा ही रोकती है।
+
+### 4. AI को असली internal context से जोड़ना
+
+DORA की दो और capabilities data से जुड़ी हैं: अच्छा internal data और ऐसे AI tools जो उस तक पहुँच सकें। यहीं retrieval और MCP काम आते हैं। मैंने लिखा है कि तुम्हें इनमें से किसकी ज़रूरत कब पड़ती है: [RAG, MCP, Agents, and Microsoft Foundry](https://sakirsathe.com/hi/writing/rag-mcp-agents-microsoft-foundry-what-do-you-actually-need)।
+
+### 5. AI पर साफ़ रुख और users पर ध्यान
+
+आख़िरी तीन organizational हैं: कौन-से tools इस्तेमाल कर सकते हैं और कैसे—इस पर साफ़ संदेश; अच्छी internal platforms; और end user पर गहरा ध्यान। DORA ने पाया कि users पर इस ध्यान के बिना AI adoption team performance को नुकसान पहुँचा सकता है।
+
+### Skills के कमज़ोर पड़ने के लिए यह क्यों मायने रखता है
+
+देखो कि ये practices लोगों से क्या करने को कहती हैं:
+
+- स्पष्ट specifications लिखना
+- plan बनाना और उसे छोटे tasks में बाँटना
+- agents के लिए context और conventions तैयार करना
+- review, test और rollback करना
+
+**AI-first का मतलब human-last नहीं है।**
+
+बेहतर AI-first practices developers को ऊपर के स्तर पर ले जाती हैं—specification, design और review की तरफ़। यही वे skills हैं जिन्हें AI का passive इस्तेमाल कमज़ोर करता है।
+
+---
+
+## आज कौन-सी skills मायने रखती हैं
+
+मेरा नियम आसान है:
+
+**उन skills को बचाकर रखो जिनसे तुम AI के output को परखते हो। उसे दिशा देने वाली skills सीखो। बार-बार इस्तेमाल होने वाली exact syntax को जाने दो।**
+
+अगर मैं यह नहीं बता सकता कि generated code सही है या नहीं, तो मैं अब tool की निगरानी नहीं कर रहा। मैं उस पर भरोसा कर रहा हूँ।
+
+### वे skills जिन्हें मैं बचाकर रखूँगा
+
+| Skill | AI के साथ यह ज़्यादा क्यों मायने रखती है | जल्दी से खुद को जाँचने का तरीका |
+| --- | --- | --- |
+| Debugging | AI का code अक्सर लगभग सही होता है, और bug तुम्हें ढूँढ़ना होता है | सिर्फ logs और debugger इस्तेमाल करके fail हो रहा test ठीक करो |
+| Code पढ़ना | अब तुम जितना code लिखते हो, उससे कहीं ज़्यादा approve करते हो | चलाने से पहले 50-line AI diff को line by line समझाओ |
+| Data structures और complexity | AI खुशी-खुशी O(n²) loops लिखती है जो छोटे tests पास कर लेते हैं | Function में धीमा रास्ता पहचानो और कोई तेज़ structure बताओ |
+| Concurrency और state | Race conditions, deadlocks और async bugs सही लगने वाले code में छिपे रहते हैं | समझाओ कि दो requests कहाँ interleave हो सकती हैं या async call कहाँ block हो सकती है |
+| Language और runtime की बुनियादी बातें | Errors, memory, scope और types तय करते हैं कि code काम करेगा या नहीं | Autocomplete बंद करके खाली file से एक छोटा utility लिखो |
+| System design | AI snippet को optimize करती है, architecture को नहीं | AI से prompt करने से पहले sketch करो कि feature तुम्हारे system में कैसे बैठेगा |
+| Security की बुनियादी बातें | Generated code ऐसे insecure patterns दोहराता है जिन्हें उसने देखा है | Diff में injection, auth या secret-handling की कमी ढूँढ़ो |
+
+### सीखने लायक skills
+
+| Skill | व्यवहार में यह कैसी दिखती है |
+| --- | --- |
+| Specs लिखना | स्पष्ट acceptance criteria, edge cases और non-goals जिन्हें agent follow कर सके |
+| काम को हिस्सों में बाँटना | Feature को छोटे tasks में बदलना जिन्हें review और rollback करना आसान हो |
+| Context engineering | AGENTS.md, instruction files और team skills को सही रखना ताकि agents conventions follow करें |
+| बड़े पैमाने पर review करना | AI diffs में सिर्फ़ गलतियाँ नहीं, बल्कि क्या छूट गया है यह पढ़ना |
+| Testing strategy | ऐसे tests जो “लगभग सही” code को ship होने से पहले पकड़ लें |
+| सही tool चुनना | जानना कि समस्या के लिए agent, retrieval, MCP या साधारण code में से क्या चाहिए |
+
+जिन्हें कम होना देना सुरक्षित है: उन APIs की exact syntax जिन्हें तुम शायद ही कभी छूते हो, boilerplate, और ऐसे config formats जिन्हें कुछ ही seconds में देख सकते हो।
+
+---
+
+## Skill खोए बिना मैं AI का इस्तेमाल कैसे करूँगा
+
+लक्ष्य AI का कम इस्तेमाल करना नहीं है।
+
+लक्ष्य है **अपने दिमाग़ को प्रक्रिया में शामिल रखना**।
+
+Research के मुताबिक अंतर मोटे तौर पर ऐसा दिखता है:
+
+```
+Delegating:  Prompt → Paste → Tests pass → Ship
+Engaged:     Try → Get stuck → Ask why → Understand → Ship
+```
+
+दोनों से feature ship होता है। सिर्फ़ एक तरीका तुम्हें अपने काम में बेहतर बनाता है।
+
+### काम करते समय
+
+1. **पहले कोशिश करो, फिर पूछो।** AI लेने से पहले खुद को 15 मिनट दो, या नए task पर पहली कोशिश तो करो। सीखना वहीं होता है जहाँ तुम अटकते हो।
+2. **सिर्फ़ क्या नहीं, क्यों पूछो।** Code के साथ explanation भी माँगो। फिर उस हिस्से पर follow-up पूछो जिसे तुम सबसे कम समझे।
+3. **चलाने से पहले अनुमान लगाओ।** AI code स्वीकारने से पहले बताओ कि यह क्या करेगा और कौन-से edge cases इसे तोड़ सकते हैं। अगर नहीं बता सकते, तो इसे merge करने के लिए तैयार नहीं हो।
+4. **पहले खुद debug करो।** Error को chat में paste करने से पहले stack trace पढ़ो और एक hypothesis बनाओ। AI से अपनी theory जाँचो, उसकी जगह लेने को मत कहो।
+5. **समाधान अपने शब्दों में समझाओ।** Task के बाद solution को अपने शब्दों में बताओ: commit message में, PR description में या teammate को। समझ की कमी जल्दी सामने आती है।
+6. **सीखते समय learning modes इस्तेमाल करो।** Claude Code के Learning और Explanatory modes और ChatGPT का Study Mode जवाब थमाने के बजाय सिखाने के लिए बनाए गए हैं।
+
+### Task के काम के बाहर
+
+- **बिना AI अभ्यास करो।** हफ़्ते में एक बार AI और autocomplete बंद करके कोई छोटी problem हल करो। इसे test नहीं, gym session समझो।
+- **एक project हाथ से करते रहो।** कोई छोटा side project जिसमें code तुम खुद लिखो—बेहतर होगा कि उस language या domain में जिसे तुम सीखना चाहते हो।
+
+---
+
+## खुद को updated कैसे रखें
+
+Tools हर कुछ महीनों में बदलते हैं। इससे मन करता है कि AI से सब कुछ summarize करवा लें।
+
+जो चीज़ें मायने रखती हैं, उनके लिए मैं इसका उल्टा करूँगा।
+
+- **पहले primary sources पर जाओ।** Release notes, changelogs, official docs और RFCs। AI का training data नए releases से पीछे होता है, इसलिए वह पिछले साल का version पूरे भरोसे से बता सकती है।
+- **नई चीज़ें sandbox repo में आज़माओ।** Experiments के लिए एक छोटा throwaway repository रखो: framework का नया version, नया agent या नया MCP server। पहला example हाथ से लिखो, फिर AI के साथ आज़माओ।
+- **बहुत सारे updates के बजाय कुछ practitioners को follow करो।** भरोसेमंद engineers और research groups में से कुछ चुनो और उन्हें ठीक से पढ़ो—दिन में पचास headlines सरसरी तौर पर देखने के बजाय।
+- **Research को आलोचनात्मक नज़र से पढ़ो।** Sample size, funding किसने दी, और असल में क्या मापा गया—यह देखो। “दिमाग़ सिकुड़ने” वाली headlines याद दिलाती हैं कि ऐसा करना क्यों ज़रूरी है।
+- **AI से खुद को test करवाओ, सिर्फ़ जवाब मत लो।** कुछ नया सीखने के बाद AI से quiz लेने या तुम्हारी explanation में कमियाँ खोजने को कहो।
+- **दूसरों का code पढ़ो।** PRs ध्यान से review करो और अपने stack के जाने-माने open-source projects पढ़ो।
+- **लिखो और सिखाओ।** Blog posts, internal talks और mentoring तुम्हें किसी चीज़ को इतना समझने पर मजबूर करते हैं कि उसे समझा सको।
+
+एक आसान routine जिससे मैं शुरुआत करूँगा:
+
+```
+Weekly:     30 minutes of release notes for your stack
+            1 no-AI practice problem
+Monthly:    1 new tool or feature, tried in a sandbox repo
+Quarterly:  Time a familiar task with and without AI
+            Update AGENTS.md and team skills with what you learned
+```
+
+हर तीन महीने वाला timing check जितना लगता है, उससे ज़्यादा मायने रखता है। METR के नतीजे दिखाते हैं कि productivity के बारे में तुम्हारा अंदाज़ा भरोसेमंद माप नहीं है।
+
+---
+
+## अगर तुम junior developer हो
+
+तुम्हारे पास खोने के लिए सबसे ज़्यादा है, क्योंकि तुम अभी वे skills बना रहे हो जिनके सहारे experienced developers कुछ समय तक अभ्यास किए बिना काम चला सकते हैं।
+
+Anthropic के researchers यह सीधे कहते हैं: तेज़ी से काम करने के दबाव में juniors असली skill growth के बदले speed चुन सकते हैं।
+
+- **Language, framework या codebase सीखते समय AI को tutor की तरह इस्तेमाल करो।** काम सौंपना उन चीज़ों के लिए बचाकर रखो जिन्हें तुम पहले से समझते हो।
+- **जान-बूझकर थोड़ा संघर्ष करो।** हर bug जिसे तुम खुद ठीक करते हो, उस skill को मज़बूत करता है जिसमें research में सबसे बड़ा अंतर दिखा।
+- **नई skills जल्दी सीखो।** छोटी spec लिखने और AI diff को line by line review करने का अभ्यास करो। ये तेज़ी से junior roles की core skills बन रही हैं।
+- **इसके बिना अभ्यास करो।** Interviews और incidents के दौरान तुम्हें अक्सर AI के बिना काम करना होगा।
+
+---
+
+## अगर तुम team lead करते हो
+
+अगर तुम सिर्फ़ speed मापोगे, तो तुम्हें delegation मिलेगा।
+
+और skill loss तब तक दिखाई नहीं देगा जब तक कोई incident न हो।
+
+- **Junior developers के लिए learning को साफ़ लक्ष्य बनाओ**, सिर्फ़ tickets की throughput को नहीं।
+- **Code review में explanations माँगो।** Authors को AI द्वारा लिखे changes समझाने आने चाहिए, सिर्फ़ यह confirm करना नहीं कि tests pass हैं।
+- **Debugging और incident work की बारी बदलते रहो**, ताकि हर कोई उन skills का अभ्यास करता रहे।
+- **उबाऊ बुनियाद में निवेश करो।** छोटे batches, मज़बूत version control और साफ़ AI policy उन practices में हैं जिनसे DORA के मुताबिक AI से फ़ायदा होता है। अच्छे tests और updated AGENTS.md भी रखो ताकि agents conventions follow करें।
+- **AI के साथ सक्रिय रूप से काम करने की गुंजाइश दो।** Anthropic study में इसमें पूरी तरह काम सौंपने के मुकाबले सिर्फ़ कुछ मिनट ज़्यादा लगे।
+
+---
+
+## मैं कौन-सा सवाल पूछूँगा
+
+AI-generated code का अगला block स्वीकारने से पहले एक सवाल पूछना चाहिए:
+
+**क्या मैं इसे समझा सकता हूँ, और अगर यह रात के 2 बजे टूटे तो क्या इसे ठीक कर सकता हूँ?**
+
+अगर हाँ, तो AI ने तुम्हें तेज़ किया।
+
+अगर नहीं, तो काम AI ने किया और सीखने का मौका तुमने छोड़ दिया।
+
+AI हमारा दिमाग़ खराब नहीं कर रही।
+
+लेकिन अगर हम उसे करने दें, तो वह खुशी-खुशी हमारी सारी learning हमारे लिए कर देगी।
+
+AI-first दुनिया में सबसे अच्छा करने वाले developers वे नहीं होंगे जो सबसे कम type करेंगे। वे होंगे जो ship की गई हर चीज़ को अब भी समझते होंगे।
+
+Tools बेहतर होते रहेंगे। उनके output को परखने की हमारी क्षमता ही वह चीज़ है जिसे सिर्फ़ हम बनाए रख सकते हैं।
+
+---
+
+## संदर्भ
+
+- Shen और Tamkin, Anthropic: [How AI assistance impacts the formation of coding skills](https://www.anthropic.com/research/AI-assistance-coding-skills) (जनवरी 2026), और [arXiv पर पूरा paper](https://www.arxiv.org/pdf/2601.20245)
+- Bastani et al.: [Generative AI without guardrails can harm learning](https://doi.org/10.1073/pnas.2422633122), PNAS (2025)
+- METR: [Measuring the impact of early-2025 AI on experienced open-source developer productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) (जुलाई 2025)
+- Rob Bowley: [METR's developer productivity research: 2026 update](https://blog.robbowley.net/2026/04/04/metrs-developer-productivity-research-2026-update/)
+- Google Cloud: [Announcing the 2025 DORA report](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) और [Introducing DORA's AI Capabilities Model](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model)
+- InfoQ: [DORA State of AI-assisted Software Development 2025](https://www.infoq.com/news/2025/09/dora-state-of-ai-in-dev-2025)
+- Visual Studio Magazine: [GitHub Spec Kit takes off as antidote to piecemeal vibe coding](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx)
+- OpenAI: [Agentic AI Foundation and AGENTS.md](https://openai.com/index/agentic-ai-foundation/)
+- AI Business: [Anthropic launches Skills open standard](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude) (दिसंबर 2025)
+- Noqta: [SKILL.md open standard reaches 30+ AI coding tools](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026)
+- The Register: [Microsoft and CMU on generative AI and critical thinking](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/)
+- Tech.co: [Stack Overflow 2025 survey: developers using AI more but trusting it less](https://tech.co/news/survey-developers-using-ai-more-trust-less)
+- The Decoder: [MIT study on cognitive debt and its limitations](https://the-decoder.com/mit-study-shows-cognitive-debt-through-chatgpt-heres-what-it-means-in-real-world-practice/)
+- 36Kr: [How the media misread MIT's study](https://eu.36kr.com/en/p/3371808872108801)
+- Addy Osmani: [Avoiding skill atrophy in the age of AI](https://addyo.substack.com/p/avoiding-skill-atrophy-in-the-age)

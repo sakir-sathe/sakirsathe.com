@@ -1,0 +1,361 @@
+---
+title: "¿La IA está atrofiando tu capacidad para programar?"
+description: "Qué dice realmente la investigación sobre la IA y las habilidades de los desarrolladores, qué hacen los equipos AI-first en 2026 y qué hábitos usaría para mantenerme al día y conservar mis habilidades bien afinadas."
+date: "2026-10-25"
+locale: es
+translationKey: is-ai-rotting-your-coding-brain
+translationSourceHash: 2ea5a64ec7fa6740c77b41b2ccc7ee7b9a0d31e53b3de7e54ab741c175606822
+tags:
+  - AI
+  - Engineering
+  - Career
+  - Developer Productivity
+published: true
+featured: false
+---
+
+Hay un pequeño momento que muchos desarrolladores reconocen hoy.
+
+Abres un archivo vacío para escribir algo sencillo. Una función recursiva. Una expresión regular. Un ciclo de reintentos con backoff.
+
+Y tus manos esperan el autocompletado.
+
+Internet tiene un nombre para esta sensación: **deterioro mental por IA**.
+
+Es una frase pegadiza. También es, en gran medida, equivocada.
+
+Después de leer la investigación, no creo que la IA esté dañando el cerebro de nadie. Pero sí puede impedirnos aprender poco a poco, y la habilidad que más perjudica es la que necesitamos para supervisarla:
+
+**Depuración.**
+
+Lo bueno es que la misma investigación apunta a una solución. No es «usar menos la IA».
+
+Es **usar la IA de otra manera**.
+
+En este artículo revisaré qué dice realmente la investigación, qué hacen los equipos AI-first en la práctica, qué habilidades importan ahora y qué hábitos usaría para mantenerme al día y con las habilidades afiladas.
+
+---
+
+## Qué dice realmente la investigación
+
+Antes de escribir esto, quería saber si «deterioro mental por IA» era algo real o solo un buen titular.
+
+Cuatro hallazgos se sostienen. Todos apuntan en la misma dirección.
+
+### 1. La IA puede impedirte aprender algo nuevo
+
+En enero de 2026, Anthropic publicó un [ensayo controlado aleatorizado](https://www.anthropic.com/research/AI-assistance-coding-skills) con 52 desarrolladores de Python, en su mayoría principiantes. Cada uno tenía que aprender Trio, una biblioteca asíncrona que ninguno había usado antes.
+
+La mitad podía usar un asistente de IA que escribiría la solución completa si se lo pedían. La otra mitad programó a mano.
+
+Después, todos hicieron una prueba sobre lo que acababan de usar.
+
+- Grupo con IA: **50%**
+- Grupo que programó a mano: **67%**
+
+Eso es casi una diferencia de dos notas. Y el grupo con IA terminó solo unos dos minutos más rápido, una diferencia que no fue estadísticamente significativa.
+
+La mayor diferencia estuvo en las preguntas de debugging.
+
+### 2. Cómo usas la IA importa más que si la usas
+
+Esta fue la parte que más me sirvió.
+
+Los investigadores observaron cómo trabajó cada persona del grupo con IA y encontraron seis patrones. En tres, los participantes dejaron que la IA pensara por ellos. En los otros tres, el desarrollador siguió pensando.
+
+| Cómo usaron la IA | Puntuación de la prueba | Tiempo |
+| --- | --- | --- |
+| Generaron código y luego hicieron preguntas de seguimiento | 86% | 24 min |
+| Pidieron código y explicaciones | 68% | 24 min |
+| Solo hicieron preguntas conceptuales | 65% | 22 min |
+| *Promedio del grupo que programó a mano (sin IA)* | *67%* | *~25 min* |
+| Delegaron todo a la IA | 39% | 19.5 min |
+| Empezaron preguntando y poco a poco delegaron | 35% | 22 min |
+| Dejaron que la IA depurara y verificara su código | 24% | 31 min |
+
+Cada patrón incluía solo de 2 a 7 desarrolladores, así que interpreto esto como una tendencia, no como una clasificación precisa.
+
+Pero la tendencia está clara. Los desarrolladores que solo hicieron preguntas conceptuales se toparon con muchos errores, los corrigieron por su cuenta y aun así fueron el segundo grupo más rápido en general.
+
+**Aprender y avanzar rápido no siempre son objetivos opuestos.**
+
+### 3. No es solo un problema de programación
+
+Un [experimento de campo con casi 1,000 estudiantes de matemáticas de secundaria](https://doi.org/10.1073/pnas.2422633122), publicado en PNAS en 2025, encontró el mismo patrón.
+
+Con GPT-4 disponible durante la práctica, las calificaciones subieron un 48%.
+
+Cuando lo quitaron para el examen, esos estudiantes obtuvieron resultados **17% peores** que quienes nunca lo tuvieron.
+
+Una versión de tutor con límites para el aprendizaje eliminó en gran medida ese daño. La herramienta no era el problema. Lo era la forma de usarla.
+
+### 4. No puedes sentir que está pasando
+
+Este fue el hallazgo que más me sorprendió.
+
+En el [estudio de METR de 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), 16 desarrolladores experimentados de código abierto trabajaron en problemas reales de proyectos que conocían bien.
+
+- Antes: esperaban que la IA los hiciera **24% más rápidos**.
+- Después: creían que los había hecho **20% más rápidos**.
+- Medición: los hizo **19% más lentos**.
+
+METR ahora dice que esa cifra está desactualizada porque las herramientas han mejorado. Su seguimiento de 2026 se estancó en parte porque muchos desarrolladores se negaron a trabajar sin IA.
+
+Pero la lección que queda es la brecha de percepción:
+
+**Sentirse productivo y ser productivo son mediciones distintas.**
+
+### Señales complementarias
+
+- [Microsoft y Carnegie Mellon](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/) encuestaron a 319 trabajadores del conocimiento. Cuanta más confianza tenían en la IA, menos pensamiento crítico reportaban. Cuanta más confianza tenían en sus propias habilidades, más pensaban críticamente.
+- En la [encuesta de Stack Overflow de 2025](https://tech.co/news/survey-developers-using-ai-more-trust-less), el 84% de los desarrolladores usaba o planeaba usar herramientas de IA, pero solo el 33% confiaba en su precisión. La queja más frecuente era que el código está casi bien, pero no del todo.
+
+Ese último punto importa.
+
+El código «casi bien» es exactamente lo que necesitas habilidades sólidas de debugging y lectura de código para detectar.
+
+---
+
+## Lo que la investigación no dice
+
+Creo que es importante ser honestos aquí, porque la versión alarmista de esta historia se difunde más rápido que la precisa.
+
+**¿La IA te está deteriorando el cerebro? No está demostrado. ¿Puede poner en riesgo tu aprendizaje? Sí.**
+
+- **Nadie ha seguido las habilidades durante años.** Los estudios de aprendizaje midieron las habilidades durante las horas posteriores a la tarea. No sabemos si las brechas crecen, se reducen o desaparecen a lo largo de una carrera.
+- **La evidencia más sólida trata sobre aprender, no sobre olvidar.** Muestra que la IA puede impedirte desarrollar una habilidad nueva. No muestra que borre habilidades que ya tienes.
+- **Los agentes podrían empeorarlo.** El estudio de Anthropic usó un panel de chat. Los investigadores esperan que las herramientas agénticas, que requieren todavía menos participación de tu parte, tengan un efecto mayor.
+- **Las imágenes cerebrales virales están exageradas.** El estudio de EEG «Your Brain on ChatGPT» del MIT tuvo 54 participantes, solo 18 en su sesión clave y se publicó como preprint antes de la revisión por pares. Las afirmaciones de que los cerebros se estaban «encogiendo» son falsas. [Midió conectividad, no el tamaño del cerebro](https://eu.36kr.com/en/p/3371808872108801).
+- **Fíjate quién financió la investigación.** El principal estudio de programación es de Anthropic, una empresa que vende herramientas de programación con IA. Si acaso, eso hace más interesante el resultado negativo. Pero también importan los resultados independientes de PNAS y METR.
+
+Y cierta pérdida de habilidades es normal.
+
+La mayoría dejamos de gestionar la memoria a mano cuando llegaron los recolectores de basura. Olvidar el orden exacto de los argumentos de una API que usas dos veces al año no es una crisis.
+
+La verdadera pregunta es:
+
+**¿Qué habilidades puedo permitirme perder y cuáles no?**
+
+---
+
+## Qué hacen realmente los equipos AI-first
+
+Mientras investigaba, noté algo interesante.
+
+Los equipos que más provecho sacan de la IA no son los que generan más código. Son los que le dan estructura.
+
+El [informe DORA de 2025 de Google](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) encuestó a casi 5,000 profesionales de tecnología. Alrededor del 90% usa IA en el trabajo y más del 80% cree que los ha hecho más productivos. Ahora la IA está vinculada con un mayor volumen de entregas.
+
+Pero también sigue vinculada con una **menor estabilidad en las entregas**.
+
+El resumen de DORA es que la IA funciona como un amplificador. Hace que los equipos sólidos sean aún más fuertes y hace más visibles los problemas de los equipos que tienen dificultades.
+
+Entonces, ¿qué hacen los equipos más sólidos? Se repiten cinco prácticas.
+
+### 1. Escribir la spec antes del prompt
+
+El desarrollo guiado por especificaciones se ha convertido en una de las principales respuestas al «vibe coding». En vez de un solo prompt enorme, escribes qué debe hacer la funcionalidad, luego un plan técnico, después tareas pequeñas y solo entonces dejas que un agente la implemente.
+
+```
+Spec → Plan → Tasks → Implement → Review
+```
+
+El [Spec Kit](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx) de código abierto de GitHub, publicado en septiembre de 2025, ya funciona con más de 30 agentes de programación con IA. Incluso su mantenedor compara a los agentes con un pasante muy capaz que necesita supervisión cercana.
+
+### 2. Mantener el contexto del agente en el repositorio
+
+Los equipos ahora guardan instrucciones para agentes junto al código:
+
+- **AGENTS.md** contiene las convenciones del proyecto, los comandos de compilación y pruebas, y las reglas que debe seguir cualquier agente. Desde agosto de 2025, lo han [adoptado más de 60,000 proyectos de código abierto](https://openai.com/index/agentic-ai-foundation/), y ahora lo gobierna Agentic AI Foundation de Linux Foundation.
+- Los **archivos específicos de una herramienta**, como `.github/copilot-instructions.md`, hacen lo mismo para una sola herramienta.
+- Las **Agent Skills** son carpetas reutilizables `SKILL.md` que enseñan a un agente un procedimiento, como la forma en que tu equipo escribe migraciones o prepara una versión. Anthropic presentó el formato en octubre de 2025 y lo [publicó como estándar abierto en diciembre de 2025](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude). Para abril de 2026, [más de 30 herramientas lo admitían](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026), entre ellas GitHub Copilot, Codex CLI y Gemini CLI.
+
+Un modelo mental sencillo: AGENTS.md es lo que todo agente debería saber siempre sobre este repositorio. Una skill es una guía práctica que el agente carga solo cuando la tarea la requiere.
+
+### 3. Lotes pequeños y redes de seguridad sólidas
+
+El [AI Capabilities Model de DORA](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model) enumera siete prácticas que amplifican los beneficios de la IA. Dos son muy tradicionales: **un control de versiones sólido** y **trabajar en lotes pequeños**.
+
+Cuando la IA aumenta el volumen de cambios, los PR pequeños, los commits frecuentes, las pruebas automatizadas y la posibilidad de revertir fácilmente son lo que evita que baje la estabilidad.
+
+### 4. Conectar la IA con el contexto interno real
+
+Otras dos capacidades de DORA tienen que ver con los datos: datos internos en buen estado y herramientas de IA que puedan acceder a ellos. Aquí entran retrieval y MCP. Escribí sobre cuándo realmente necesitas cada uno en [RAG, MCP, Agents, and Microsoft Foundry](https://sakirsathe.com/es/writing/rag-mcp-agents-microsoft-foundry-what-do-you-actually-need).
+
+### 5. Una postura clara sobre la IA y foco en los usuarios
+
+Las últimas tres son organizacionales: comunicar con claridad qué herramientas están permitidas y cómo usarlas, contar con buenas plataformas internas y enfocarse profundamente en el usuario final. Sin ese foco en el usuario, DORA descubrió que la adopción de IA puede perjudicar el desempeño del equipo.
+
+### Por qué esto importa para el deterioro de habilidades
+
+Fíjate en lo que estas prácticas piden a las personas:
+
+- escribir especificaciones claras
+- diseñar el plan y dividirlo en tareas pequeñas
+- seleccionar el contexto y las convenciones para los agentes
+- revisar, probar y revertir
+
+**AI-first no significa human-last.**
+
+Las mejores prácticas AI-first hacen que los desarrolladores suban de nivel y se enfoquen en especificaciones, diseño y revisión. Esas son precisamente las habilidades que el uso pasivo de IA debilita.
+
+---
+
+## Las habilidades que importan ahora
+
+Mi regla es sencilla:
+
+**Protege las habilidades que necesitas para evaluar el resultado de la IA. Aprende las habilidades que necesitas para dirigirla. Deja que se oxide la sintaxis repetitiva.**
+
+Si no puedo saber si el código generado es correcto, ya no estoy supervisando la herramienta. Estoy confiando en ella.
+
+### Habilidades que protegería
+
+| Habilidad | Por qué importa más con IA | Prueba rápida |
+| --- | --- | --- |
+| Debugging | El código de IA suele estar casi bien, y te toca encontrar el error | Corrige una prueba fallida usando solo logs y un debugger |
+| Lectura de código | Ahora apruebas mucho más código del que escribes | Explica un diff de IA de 50 líneas, línea por línea, antes de ejecutarlo |
+| Estructuras de datos y complejidad | La IA escribe con gusto ciclos O(n²) que pasan pruebas pequeñas | Detecta el camino lento de una función y nombra una estructura más rápida |
+| Concurrencia y estado | Las condiciones de carrera, los deadlocks y los errores async se ocultan en código verosímil | Explica dónde podrían intercalarse dos solicitudes o bloquearse una llamada async |
+| Fundamentos del lenguaje y del runtime | Los errores, la memoria, el scope y los tipos determinan si el código funciona | Escribe una utilidad pequeña desde un archivo vacío con el autocompletado desactivado |
+| Diseño de sistemas | La IA optimiza el fragmento, no la arquitectura | Esboza cómo encaja una funcionalidad en tu sistema antes de pedirle a la IA |
+| Fundamentos de seguridad | El código generado repite patrones inseguros que ha visto | Encuentra en un diff el problema de inyección, autenticación o manejo de secretos |
+
+### Habilidades que vale la pena aprender
+
+| Habilidad | Cómo se ve en la práctica |
+| --- | --- |
+| Escribir specs | Criterios de aceptación claros, casos límite y aspectos fuera de alcance que un agente pueda seguir |
+| Dividir el trabajo | Convertir una funcionalidad en tareas pequeñas y fáciles de revisar y revertir |
+| Ingeniería de contexto | Mantener AGENTS.md, los archivos de instrucciones y las skills del equipo al día para que los agentes sigan tus convenciones |
+| Revisar a escala | Leer diffs de IA para detectar lo que falta, no solo lo que está mal |
+| Estrategia de pruebas | Pruebas que detecten el código «casi correcto» antes de que se publique |
+| Elegir la herramienta adecuada | Saber cuándo un problema necesita un agente, retrieval, MCP o código normal |
+
+Puedes dejar que se desvanezca sin problema: la sintaxis exacta de APIs que casi nunca usas, el boilerplate y los formatos de configuración que puedes consultar en segundos.
+
+---
+
+## Cómo usaría la IA sin perder la habilidad
+
+El objetivo no es usar menos IA.
+
+El objetivo es **mantener tu cerebro en el proceso**.
+
+La investigación muestra una diferencia más o menos así:
+
+```
+Delegating:  Prompt → Paste → Tests pass → Ship
+Engaged:     Try → Get stuck → Ask why → Understand → Ship
+```
+
+Ambos enfoques entregan la funcionalidad. Solo uno te deja mejor preparado para tu trabajo.
+
+### Mientras trabajas
+
+1. **Intenta primero y pregunta después.** Dedícate 15 minutos, o el primer intento de una tarea nueva, antes de recurrir a la IA. El aprendizaje ocurre cuando te atascas.
+2. **Pregunta por qué, no solo qué.** Pide el código junto con una explicación. Luego pregunta sobre la parte que menos entendiste.
+3. **Predice antes de ejecutar.** Antes de aceptar código de IA, di qué hará y qué casos límite podrían romperlo. Si no puedes, todavía no estás listo para integrarlo.
+4. **Depura primero por tu cuenta.** Lee el stack trace y formula una hipótesis antes de pegar el error en un chat. Usa la IA para comprobar tu teoría, no para sustituirla.
+5. **Explícalo con tus propias palabras.** Después de una tarea, describe la solución con tus palabras: en un mensaje de commit, una descripción del PR o a un compañero. Las lagunas aparecen rápido.
+6. **Usa modos de aprendizaje cuando estés aprendiendo.** Los modos Learning y Explanatory de Claude Code y Study Mode de ChatGPT están diseñados para enseñar, no para darte respuestas sin más.
+
+### Fuera del trabajo de cada tarea
+
+- **Haz una práctica sin IA.** Una vez por semana, resuelve un problema pequeño con la IA y el autocompletado desactivados. Tómalo como una sesión de gimnasio, no como un examen.
+- **Mantén un proyecto propio hecho a mano.** Un proyecto paralelo pequeño en el que escribas el código tú mismo, idealmente en un lenguaje o dominio que quieras aprender.
+
+---
+
+## Cómo mantenerte al día
+
+Las herramientas cambian cada pocos meses. Eso hace tentador dejar que la IA te resuma todo.
+
+Para lo que importa, yo haría lo contrario.
+
+- **Empieza por las fuentes primarias.** Notas de versión, changelogs, documentación oficial y RFC. Los datos de entrenamiento de la IA van por detrás de las versiones nuevas, así que puede describir con seguridad la versión del año pasado.
+- **Prueba cosas nuevas en un repositorio sandbox.** Mantén un repositorio pequeño y desechable para experimentar: una versión nueva de un framework, un agente nuevo o un servidor MCP nuevo. Escribe el primer ejemplo a mano y luego pruébalo con IA.
+- **Sigue a unos cuantos profesionales, no a una avalancha de información.** Elige unos pocos ingenieros y grupos de investigación de confianza y léelos con atención, en lugar de revisar cincuenta titulares al día.
+- **Lee la investigación con criterio.** Revisa el tamaño de la muestra, quién la financió y qué se midió realmente. Los titulares sobre «el cerebro que se encoge» son un buen recordatorio de por qué hacerlo.
+- **Usa la IA para ponerte a prueba, no solo para que te cuente.** Después de aprender algo nuevo, pídele que te haga preguntas o que señale fallas en tu explicación.
+- **Lee el código de otras personas.** Revisa PR con atención y lee proyectos conocidos de código abierto en tu stack.
+- **Escribe y enseña.** Las publicaciones de blog, las charlas internas y la mentoría te obligan a entender algo lo bastante bien como para explicarlo.
+
+Un ritmo sencillo para empezar:
+
+```
+Weekly:     30 minutes of release notes for your stack
+            1 no-AI practice problem
+Monthly:    1 new tool or feature, tried in a sandbox repo
+Quarterly:  Time a familiar task with and without AI
+            Update AGENTS.md and team skills with what you learned
+```
+
+La revisión trimestral importa más de lo que parece. Los resultados de METR muestran que la intuición sobre tu productividad es una mala medida.
+
+---
+
+## Si eres desarrollador junior
+
+Tienes más que perder porque todavía estás desarrollando las habilidades que los desarrolladores con experiencia pueden dejar de practicar durante un tiempo.
+
+Los investigadores de Anthropic lo dicen directamente: los juniors bajo presión para avanzar rápido pueden cambiar el crecimiento real de sus habilidades por velocidad.
+
+- **Usa la IA como tutora mientras aprendes** un lenguaje, un framework o una base de código. Deja la delegación para cosas que ya entiendes.
+- **Esfuérzate un poco a propósito.** Cada error que corriges por tu cuenta fortalece la habilidad que mostró la mayor brecha en la investigación.
+- **Aprende pronto las habilidades nuevas.** Practica escribir una spec breve y revisar un diff de IA línea por línea. Se están convirtiendo rápidamente en habilidades básicas para perfiles junior.
+- **Practica sin ella.** En entrevistas y durante incidentes, a menudo trabajarás sin IA.
+
+---
+
+## Si lideras un equipo
+
+Si lo único que mides es la velocidad, obtendrás delegación.
+
+Y la pérdida de habilidades seguirá siendo invisible hasta que haya un incidente.
+
+- **Haz del aprendizaje un objetivo explícito** para los desarrolladores junior, no solo del volumen de tickets.
+- **Pide explicaciones en el code review.** Quien hizo el cambio debe poder explicar lo que escribió la IA, no solo confirmar que pasan las pruebas.
+- **Rota el trabajo de debugging y de incidentes** para que todos mantengan esas habilidades en práctica.
+- **Invierte en los fundamentos menos llamativos.** Los lotes pequeños, un control de versiones sólido y una política clara sobre IA están entre las prácticas que DORA encontró útiles para que la IA dé resultados. Añade buenas pruebas y un AGENTS.md actualizado para que los agentes sigan tus convenciones.
+- **Deja espacio para usar la IA de forma activa.** En el estudio de Anthropic solo costó unos minutos más que delegar todo.
+
+---
+
+## La pregunta que me haría
+
+Antes de aceptar el siguiente bloque de código generado por IA, vale la pena hacerse una pregunta:
+
+**¿Podría explicar esto y podría arreglarlo si se rompiera a las 2 a. m.?**
+
+Si sí, la IA te hizo más rápido.
+
+Si no, la IA hizo el trabajo y tú te saltaste el aprendizaje.
+
+La IA no está deteriorando nuestro cerebro.
+
+Pero, si la dejamos, hará todo nuestro aprendizaje por nosotros con mucho gusto.
+
+Los desarrolladores que mejor les vaya en un mundo AI-first no serán quienes menos escriban. Serán quienes sigan entendiendo todo lo que publican.
+
+Las herramientas seguirán mejorando. Nuestra capacidad para evaluar lo que producen es lo único que solo nosotros podemos mantener.
+
+---
+
+## Referencias
+
+- Shen y Tamkin, Anthropic: [How AI assistance impacts the formation of coding skills](https://www.anthropic.com/research/AI-assistance-coding-skills) (ene. 2026) y el [artículo completo en arXiv](https://www.arxiv.org/pdf/2601.20245)
+- Bastani et al.: [Generative AI without guardrails can harm learning](https://doi.org/10.1073/pnas.2422633122), PNAS (2025)
+- METR: [Measuring the impact of early-2025 AI on experienced open-source developer productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) (jul. 2025)
+- Rob Bowley: [METR's developer productivity research: 2026 update](https://blog.robbowley.net/2026/04/04/metrs-developer-productivity-research-2026-update/)
+- Google Cloud: [Announcing the 2025 DORA report](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report) e [Introducing DORA's AI Capabilities Model](https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model)
+- InfoQ: [DORA State of AI-assisted Software Development 2025](https://www.infoq.com/news/2025/09/dora-state-of-ai-in-dev-2025)
+- Visual Studio Magazine: [GitHub Spec Kit takes off as antidote to piecemeal vibe coding](https://visualstudiomagazine.com/articles/2026/05/12/github-spec-kit-takes-off-as-antidote-to-piecemeal-vibe-coding.aspx)
+- OpenAI: [Agentic AI Foundation and AGENTS.md](https://openai.com/index/agentic-ai-foundation/)
+- AI Business: [Anthropic launches Skills open standard](https://aibusiness.com/foundation-models/anthropic-launches-skills-open-standard-claude) (dic. 2025)
+- Noqta: [SKILL.md open standard reaches 30+ AI coding tools](https://noqta.tn/en/news/skill-md-open-standard-30-ai-coding-tools-adoption-2026)
+- The Register: [Microsoft and CMU on generative AI and critical thinking](https://www.theregister.com/2025/02/11/microsoft_study_ai_critical_thinking/)
+- Tech.co: [Stack Overflow 2025 survey: developers using AI more but trusting it less](https://tech.co/news/survey-developers-using-ai-more-trust-less)
+- The Decoder: [MIT study on cognitive debt and its limitations](https://the-decoder.com/mit-study-shows-cognitive-debt-through-chatgpt-heres-what-it-means-in-real-world-practice/)
+- 36Kr: [How the media misread MIT's study](https://eu.36kr.com/en/p/3371808872108801)
+- Addy Osmani: [Avoiding skill atrophy in the age of AI](https://addyo.substack.com/p/avoiding-skill-atrophy-in-the-age)
