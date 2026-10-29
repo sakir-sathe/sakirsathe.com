@@ -15,6 +15,11 @@ export const localeContentTargets = {
     "complex-product-configuration-platform": { en: "complex-product-configuration-platform", es: "complex-product-configuration-platform", hi: "complex-product-configuration-platform" },
   },
   writing: {
+    "guarded-ai-software-factory": {
+      en: "guarded-ai-software-factory",
+      es: "guarded-ai-software-factory",
+      hi: "guarded-ai-software-factory",
+    },
     "is-ai-rotting-your-coding-brain": {
       en: "is-ai-rotting-your-coding-brain",
       es: "is-ai-rotting-your-coding-brain",

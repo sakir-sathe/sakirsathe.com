@@ -22,10 +22,11 @@ import { absoluteUrl, cn, formatDate, pageMetadata } from "@/lib/utils";
 export function articleMetadata(post: Post): Metadata {
   const image = post.image ? (post.image.startsWith("/") ? absoluteUrl(post.image) : post.image) : undefined;
   const path = post.locale === "en" ? `/writing/${post.slug}` : `/${post.locale}/writing/${post.slug}`;
+  const seoTitle = post.seoTitle ?? post.title;
   return {
-    ...pageMetadata({ title: post.title, description: post.description, path, type: "article", locale: post.locale }),
+    ...pageMetadata({ title: seoTitle, description: post.description, path, type: "article", locale: post.locale }),
     openGraph: {
-      title: post.title,
+      title: seoTitle,
       description: post.description,
       url: post.canonicalUrl,
       siteName: site.name,
@@ -40,7 +41,7 @@ export function articleMetadata(post: Post): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
+      title: seoTitle,
       description: post.description,
       ...(image ? { images: [image] } : {}),
     },

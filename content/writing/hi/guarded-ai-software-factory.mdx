@@ -1,0 +1,393 @@
+---
+title: "Pair Programmer से Delivery Pipeline तक: Guarded AI Software Factory बनाना"
+seoTitle: "Guarded AI Software Factory बनाना: Agents, CI और Human Control"
+description: "मैं software delivery को AI agents, deterministic CI और human authority के बीच कैसे बाँटता हूँ, और code सस्ता होने के साथ verification क्यों अधिक महत्वपूर्ण हो जाता है।"
+cardSummary: "Coding agents अब कुछ मिनटों में CRUD feature का अधिकांश हिस्सा बना सकते हैं, इसलिए मुश्किल अब code जनरेट करने से हटकर उस पर भरोसा करने की हो गई है। इस लेख में उस guarded delivery pipeline का वर्णन है जिसे मैं आज़मा रहा हूँ: agents तर्क करते हैं, CI सत्यापन करता है और architecture, security तथा production पर अधिकार इंसानों के पास रहता है।"
+date: "2026-10-28"
+locale: hi
+translationKey: guarded-ai-software-factory
+translationSourceHash: 2a1277371aeea129bec627af7f64237a5b183b4f69dc3d43fa88a872344c092f
+tags:
+  - Agentic Engineering
+  - AI Coding Agents
+  - CI/CD
+  - Software Architecture
+  - DevSecOps
+  - Multi-Tenant SaaS
+  - .NET
+  - Azure
+published: true
+featured: false
+---
+
+*AI agents, deterministic CI, browser testing और human control किस तरह किसी feature को engineering Story से deployed development environment तक पहुँचा सकते हैं, और automation को मैं जानबूझकर कहाँ रोकता हूँ।*
+
+कुछ साल पहले full-stack feature बनाने में मेरा ज़्यादातर समय implementation में जाता था: entity, migration, endpoints, validation, form और tests। आज मैं एक coding agent को उचित दायरे वाली CRUD Story दे सकता हूँ और कुछ ही मिनटों में implementation का बड़ा हिस्सा वापस पा सकता हूँ।
+
+इससे software development का अर्थशास्त्र बदल जाता है। लेकिन इन tools के साथ गंभीरता से प्रयोग करने के बाद मुझे यकीन हो गया है कि code generation अब दिलचस्प समस्या नहीं रही।
+
+दिलचस्प समस्या है भरोसा।
+
+मैंने जिन enterprise systems पर काम किया है (document-processing platforms, reporting और analytics, Azure-hosted .NET services, identity और authorization layers, OCR और RAG pipelines), उनमें feature लिखना शायद ही कभी सबसे मुश्किल हिस्सा रहा। मुश्किल हिस्से थे tenant isolation, authorization, migration safety, retries और idempotency, backward compatibility, observability, और यह जानना कि deployment के बाद system सच में सही व्यवहार कर रहा है। Code तेज़ी से टाइप होने से इनमें से कोई समस्या दूर नहीं होती।
+
+इसलिए मैंने यह पूछना शुरू किया कि "क्या agent यह लिख सकता है?" के बजाय: delivery lifecycle का कितना हिस्सा मैं सुरक्षित रूप से delegate कर सकता हूँ, और मुझे कैसे पता चलेगा?
+
+यह सवाल एक प्रयोग बन गया। AI को सिर्फ pair programmer की तरह इस्तेमाल करने के बजाय, मैंने ऐसा delivery system डिज़ाइन करना शुरू किया जिसमें agents lifecycle के सीमित हिस्सों की ज़िम्मेदारी लें, जबकि architecture, product decisions, security boundaries, production control और अंतिम जवाबदेही इंसानों के पास रहे।
+
+**लक्ष्य engineer को software development से हटाना नहीं है। लक्ष्य है engineer को हर कदम खुद करने से आगे बढ़ाकर उस system को डिज़ाइन, govern और बेहतर बनाने की ओर ले जाना जो उन कदमों को पूरा करता है।**
+
+## Autocomplete से delivery systems तक
+AI-assisted development लगभग चार चरणों से गुज़रा है।
+
+1. **Autocomplete.** Model अगली line या function सुझाता था। Local, उपयोगी और आँखों से verify करना आसान।
+2. **Pair programming.** हमने model से component implement करने, stack trace समझाने या tests का draft बनाने को कहा। हर कदम अब भी इंसान के नियंत्रण में था।
+3. **Coding agents.** Agent task लेता है, repository explore करता है, कई files edit करता है, commands चलाता है और pull request खोलता है। उदाहरण के लिए, GitHub का Copilot cloud agent अब [ephemeral cloud environment में बदलावों की योजना बनाता और उन्हें implement करता है](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github), pull request वापस सौंपने से पहले tests और linters चलाते हुए।
+4. **Agentic delivery systems.** अगला कदम कोई अकेला, अधिक शक्तिशाली agent नहीं है। यह specialized agents, deterministic automation, policies और human checkpoints का नियंत्रित system है।
+
+चौथा चरण उस pattern का अनुसरण करता है जिसे हमारे उद्योग ने कई बार दोहराया है। Manual server configuration, infrastructure as code बनी। Manual deployments, CI/CD बने। Manual regression testing, automated suites बनी। Manual runbooks, orchestration बने। हर बार engineers ने दोहराए जाने वाले कदम खुद करना बंद किया और उसे करने वाला system डिज़ाइन करना शुरू किया; और जिन लोगों ने यह काम अच्छी तरह किया, वे उस कदम को इतनी गहराई से समझते थे कि उसे encode कर सकें।
+
+Implementation work का manual orchestration अगला कदम है। इससे इंसान हटते नहीं; बस उनका काम करने वाला loop बदलता है। Kief Morris, हर artifact की जाँच करने वाले humans *in* the loop से humans *on* the loop की ओर बदलाव बताते हैं, जहाँ खराब परिणाम आने पर [artifact को patch करने के बजाय उसे बनाने वाले harness को बदला जाता है](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html)। यह अंतर उस चीज़ से बहुत मिलता-जुलता है जिसे मैं बनाने की कोशिश कर रहा हूँ।
+
+## प्रयोग का architecture
+यह प्रयोग एक निजी full-stack application पर चल रहा है जिसे मैं बना रहा हूँ: .NET API, आधुनिक web frontend और relational database, Azure पर hosted। यहाँ product खुद प्रासंगिक नहीं है। उसके चारों ओर की delivery pipeline मायने रखती है।
+
+```text
+Engineering Story
+  |
+Implementation agent
+  |
+Story branch + pull request
+  |
+Deterministic CI
+ /        |        \
+Build   Unit + integration tests   Migration checks
+ \        |        /
+  +--> Browser regression --> Independent AI review
+CI red gate ---------------------\
+Blocking finding -----------------+--> Repair agent (max 3 cycles) --> CI
+                                       |
+                                       +-- limit reached --> NEEDS_OWNER_ACTION
+
+Independent AI review (clean)
+  |
+Verified milestone --> Development deployment --> Deployed smoke tests
+  |
+Human review of the running product
+  `-- human decision only --> Production
+```
+हर चरण का एक काम है:
+
+- **Implementation agent.** Story और repository की governance files पढ़ता है, अपनी branch पर ठीक एक Story implement करता है, tests लिखता है और pull request खोलता है। वह कभी merge नहीं करता।
+- **Deterministic CI.** तर्क नहीं करता। यह compile करता है, test suites चलाता है, disposable database पर migrations लागू करता है और evidence तैयार करता है।
+- **Browser regression.** असली UI चलाता है। Form सही तरह save करे, लेकिन अपना validation message कभी render न करे, तो यह ऐसा defect है जो API test नहीं पकड़ पाएगा।
+- **Independent AI review.** कोई दूसरा model, Story और repository के rules के आधार पर diff पढ़ता है। Implementer खुद अपना review नहीं करता।
+- **Repair agent.** CI fail होने या reviewer द्वारा blocking finding उठाए जाने पर implementation agent को उसे ठीक करने के सीमित प्रयास मिलते हैं।
+- **Verified milestone और development deployment.** सभी gates पास करने वाली Stories integration branch में merge होती हैं, जो अपने-आप development environment में deploy होती है और वहाँ deployed system पर smoke tests चलते हैं।
+- **Human review.** मैं सिर्फ diff नहीं, बल्कि चल रहे product का मूल्यांकन करता हूँ। Production पर नियंत्रण इंसानों का ही रहता है।
+
+## तीन तरह की ज़िम्मेदारी
+प्रयोग में सबसे उपयोगी design decision यह था कि यह तय करने से पहले कि हर delivery responsibility किसके पास होगी, उसे तीन categories में बाँटना।
+
+| श्रेणी | ज़िम्मेदार | उदाहरण | मुख्य क्षमता |
+| --- | --- | --- | --- |
+| तर्क-विचार | AI agents | Story को समझना, अपरिचित repository को explore करना, application logic implement करना, tests लिखना, pull request review करना, failure समझाना, सीमित defect ठीक करना, documentation update करना | कुछ अस्पष्टता में व्याख्या और संश्लेषण |
+| Deterministic verification | CI और automation | Compilation, unit और integration tests, migration verification, static analysis, type checking, dependency और secret scanning, production builds, browser regression, health और deployment checks | दोहराने योग्य, कम लागत वाला, स्पष्ट प्रमाण |
+| Human authority | Engineers और product owners | Product की दिशा, pricing, business rules, बड़े architecture decisions, security boundaries, scope changes, production deployment, credential changes, data को नष्ट करने वाली कार्रवाइयाँ, महत्वपूर्ण risk स्वीकार करना | उद्देश्य, जवाबदेही और परिणामकारी trade-offs |
+
+Reasoning वह जगह है जहाँ models अपनी लागत को उचित ठहराते हैं। Deterministic verification वह जगह है जहाँ उनसे बिल्कुल नहीं पूछना चाहिए: **AI यह प्रस्ताव दे सकता है कि कुछ सही है। CI को जहाँ तक संभव हो, उस दावे को साबित करना होगा।** Birgitta Böckeler [computational और inferential controls](https://martinfowler.com/articles/harness-engineering.html) के बीच यही अंतर बताती हैं: tests, linters और type checkers तेज़ और भरोसेमंद होते हैं, जबकि AI review और LLM-as-judge धीमे, महँगे और non-deterministic होते हैं। मेरा कामकाजी नियम सरल है। अगर computational control किसी सवाल का जवाब दे सकता है, तो inferential control से वह सवाल नहीं पूछना चाहिए।
+
+Human authority वह category है जिसे teams अक्सर अस्पष्ट छोड़ देती हैं, और व्यापक repository access वाला agent उस खाली जगह को खुशी-खुशी भर देगा। Agentic engineering तभी काम करती है जब ये सीमाएँ लिखी जाएँ और लागू की जाएँ, न कि मानकर चला जाए।
+
+## एक agent को सब कुछ क्यों नहीं करना चाहिए
+वैचारिक तौर पर इस प्रयोग में पाँच भूमिकाएँ हैं।
+
+| भूमिका | इसे कौन निभाता है | यह किस सवाल का जवाब देती है |
+| --- | --- | --- |
+| निर्माता (Builder) | Implementation agent (model A) | इस Story को कैसे पूरा करूँ? |
+| समीक्षक (Reviewer) | Second agent (model B, different vendor) | क्या यह diff वही करता है जो Story कहती है, और ऐसा कुछ नहीं करता जो उसे नहीं करना चाहिए? |
+| निर्णायक (Judge) | CI | क्या यह build होता है, tests पास करता है और migration लागू करता है? |
+| User-behavior verifier | Browser automation | क्या व्यक्ति सही चीज़ देख और कर पाता है? |
+| निर्णय-अधिकार | Human | क्या हमें यही चाहिए, और क्या risk स्वीकार्य है? |
+
+इसमें कुछ नया नहीं है। हम लेखकों को अपने pull requests खुद approve नहीं करने देते, और किसी एक व्यक्ति को अकेले production change लिखने, approve करने और deploy करने नहीं देते। Agents पर भी यही तर्क लागू होता है, एक खास वजह से: आपस में जुड़े blind spots। अपने ही output को review करता model उन्हीं assumptions को साझा करता है जिनसे वह output बना। अगर implementation के दौरान उसने acceptance criterion को गलत समझा, तो review करते समय भी उसे उसी तरह गलत समझने की संभावना है।
+
+दूसरा model, बेहतर हो कि किसी दूसरे vendor का हो और Story तथा repository rules हाथ में लेकर स्पष्ट रूप से skeptic की भूमिका में prompt किया गया हो, diff को अलग नज़रिए से देखता है और अलग समस्याएँ पकड़ता है। यह एक और signal है, proof नहीं। दो models एक ही दिशा में गलत हो सकते हैं, और LLM reviewer पूरे आत्मविश्वास के साथ गलत हो सकता है। इसीलिए reviewer की findings repair या किसी इंसान तक जाती हैं, सीधे merge तक कभी नहीं।
+
+Platforms भी इसी pattern की ओर बढ़ रहे हैं। GitHub का cloud agent पूरा होने से पहले [Copilot code review से दूसरी राय लेता है और CodeQL तथा secret scanning चलाता है](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations), और वह अपना pull request approve या merge नहीं कर सकता।
+
+## AI के दौर में CI कम नहीं, और ज़्यादा महत्वपूर्ण है
+**कोई feature इसलिए पूरा नहीं होता कि model कहता है "Implementation complete." वह तब पूरा होता है जब deterministic evidence दिखाता है कि आवश्यक व्यवहार काम करता है।**
+
+मैं अक्सर यह तर्क सुनता हूँ कि बेहतर models का मतलब है हमें कम tests चाहिए। मुझे इसका उल्टा सही लगता है। अगर कोई agent कुछ ही मिनटों में दर्जन भर files में कई सौ lines बना सकता है, तो इंसान का line-by-line review उसके साथ scale नहीं कर सकता। Morris भी यही बात कहते हैं: [agents, इंसानों की जाँच करने की रफ़्तार से तेज़ code generate करते हैं](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html), इसलिए हर चीज़ inspect करने पर ज़ोर देने से हम bottleneck बन जाते हैं। गति बनाए रखने का एकमात्र तरीका verification को ऐसी machines में ले जाना है जो generation जितनी तेज़ चलती हैं।
+
+इससे लगभग हर उस काम की अहमियत बढ़ जाती है जिसके बारे में हम पहले से जानते थे कि करना चाहिए:
+
+- domain rules के लिए unit tests, और mocks के बजाय असली database के साथ integration tests;
+- API और messaging boundaries पर contract tests;
+- खाली database और मौजूदा schema, दोनों पर migration validation;
+- user को दिखाई देने वाले व्यवहार के लिए browser automation;
+- static analysis, dependency scanning और secret scanning;
+- observability और post-deployment verification।
+**Code जितना सस्ता generate करना होता जाता है, भरोसेमंद verification उतना ही मूल्यवान होता जाता है।**
+
+व्यवहार से जुड़ी एक सावधानी। Implementation लिखने वाले उसी agent के tests उसकी ही interpretation साझा करते हैं; अगर उसने requirement गलत समझी, तो test उसी गलत समझ को ईमानदारी से encode करेगा। Böckeler कहती हैं कि [AI-generated test suites अभी अपने दम पर functional confidence देने के लिए पर्याप्त अच्छे नहीं हैं](https://martinfowler.com/articles/harness-engineering.html)। Naresh Jain के हालिया harness experiment में agents को [इंसानों द्वारा सहमत contracts और ऐसे examples देकर जिनको वे कमज़ोर नहीं कर सकते थे](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html), अपेक्षाएँ स्वतंत्र रखी गईं। मैं भी कुछ ऐसा ही करता हूँ: हर Story के acceptance criteria से कुछ tests बनते हैं जिन्हें मैं authoritative मानता हूँ, और agent के instructions उसे build पास कराने के लिए उन tests को edit करने से रोकते हैं।
+
+Vendors भी यह अंतर स्पष्ट करते हैं। GitHub अपने agentic workflows को [deterministic CI/CD के विकल्प के तौर पर नहीं, बल्कि उसके साथ](https://theregister.com/2026/02/17/github_previews_agentic_workflows) रखता है और strict reproducibility की ज़रूरत वाले मुख्य build तथा release processes में इनके इस्तेमाल की सलाह नहीं देता।
+
+## Story एक implementation contract है
+एक ऐसी Story लें जो multi-tenant SaaS application में customer management जोड़ती है: customer records बनाना और edit करना, tenant-safe APIs, persistence, normalized contact details, mobile UI, localization, integration tests और browser tests।
+
+"Build customer management" एक इच्छा है, Story नहीं। Agent खुशी-खुशी इसे कुछ बना देगा, लेकिन request में हर कमी आपके लिए agent का लिया हुआ एक decision बन जाती है। इसलिए इस प्रयोग में Story को contract के रूप में लिखा जाता है:
+
+```
+STORY: Customer records (create, edit, list)
+
+Domain
+- A Customer belongs to exactly one tenant.
+- Email is optional; when present it is trimmed, lower-cased and unique per tenant.
+- Phone numbers are normalized to E.164 before persistence.
+
+API and security
+- Tenant is resolved from the authenticated principal, never from the request.
+- Requests that carry a tenantId field are rejected with 400.
+- Cross-tenant reads return 404, not 403.
+
+UI
+- Mobile-first form; every label and error message is localized.
+- Server-side validation is authoritative; client validation mirrors it.
+
+Acceptance evidence
+- Integration tests: tenant A cannot read, update or list tenant B's customers.
+- Migration applies cleanly to an empty database and to the current schema.
+- Browser test: create, edit, then see the normalized phone in the list on a phone-sized viewport.
+
+Out of scope
+- Import/export, duplicate merging, a customer portal, any change to auth or roles.
+
+Stop with NEEDS_OWNER_ACTION if
+- An acceptance criterion conflicts with existing behavior.
+- The change needs a new service, dependency or schema outside the Customer aggregate.
+```
+Agent को उस दायरे में कुछ भी implement करने की अनुमति है, उससे बाहर कुछ भी नहीं। बेहतर autonomous engineering की शुरुआत बेहतर engineering specifications से होती है। अस्पष्ट Story से autonomous व्यवहार भी अस्पष्ट होगा; agent अस्पष्टता का समाधान करेगा, बस ज़रूरी नहीं कि आपके तरीके से।
+
+### मददगार बनने की कोशिश ही जोखिम है
+Agents को मददगार बनने के लिए train किया जाता है, और codebase में यह मददगार प्रवृत्ति scope बढ़ाने लगती है। "जब यहाँ हूँ, तो architecture भी साफ कर दूँ।" "Redis से यह तेज़ हो जाएगा।" "एक generic repository abstraction जोड़ देता हूँ।" "Authentication बीच में आ रहा है; इसे बदल देता हूँ।" इनमें से हर बात अकेले में ठीक लगती है। लेकिन सब मिलकर दो घंटे की Story को नए infrastructure वाले, review न किए जा सकने वाले diff में बदल देते हैं।
+
+इसलिए मेरी repository के instructions में अटकल पर आधारित काम को स्पष्ट रूप से मना किया गया है:
+
+- जब तक Story की ज़रूरत न हो, microservices, queues या caches न जोड़ें।
+- मदद मिल सकती है, इस वजह से Redis या कोई नया infrastructure न जोड़ें।
+- Feature को आसान बनाने के लिए authentication या authorization में बदलाव न करें।
+- Production infrastructure या deployment configuration न बदलें।
+- Pricing, product या business-rule decisions न लें।
+- किसी भी कारण से tenant isolation को कमज़ोर न करें।
+- ऐसी abstractions न जोड़ें जिनका मौजूदा Story उपयोग नहीं करती।
+यह बात देखने से ज़्यादा महत्वपूर्ण है, क्योंकि बाद में इन failures को पकड़ना मुश्किल होता है। Böckeler बताती हैं कि deterministic और model-based sensors, दोनों ही [overengineering, अनावश्यक features या गलत समझे गए instructions को भरोसेमंद ढंग से नहीं पकड़ते](https://martinfowler.com/articles/harness-engineering.html)। इन्हें शुरुआत में ही रोकना पड़ता है। अनुमत decision space छोटा हो तो autonomy अधिक सुरक्षित होती है।
+
+## सुरक्षित तरीके से रुकना भी एक feature है
+जब agent ऐसे decision पर पहुँचे जो किसी इंसान को लेना चाहिए, तो उसे अनुमान नहीं लगाना चाहिए। मेरे setup में वह रुककर `NEEDS_OWNER_ACTION` report करता है और एक छोटी structured note देता है: वह क्या कर रहा था, किस decision की ज़रूरत है, उसे कौन-से विकल्प दिखते हैं, वह किसकी सिफारिश करेगा, और उसने जानबूझकर क्या नहीं छुआ है।
+
+ये triggers पहले से तय हैं:
+
+- अस्पष्ट या परस्पर विरोधी acceptance criteria;
+- कोई dependency, credential या environment उपलब्ध न होना;
+- architecture का decision;
+- security का decision;
+- commercial या product decision;
+- Story के scope और code की वास्तविक ज़रूरत के बीच टकराव;
+- production पर असर डालने वाली कोई भी कार्रवाई।
+मैं इसे integration pipelines की तरह देखता हूँ। कोई अच्छी तरह डिज़ाइन किया गया data job ऐसा record मिलने पर जिसे वह process न कर सके, उसे dead-letter path पर भेजकर किसी को alert करता है; वह चुपचाप warehouse में अपना सबसे अच्छा अनुमान नहीं लिख देता। Mature autonomous system को भी यही चाहिए: यह कहने का तय, कम लागत वाला और बिना झेंप का तरीका कि *मैं ज़िम्मेदारी से यह निर्णय नहीं ले सकता।* रुकने वाला agent fail नहीं हो रहा। पूरे आत्मविश्वास से अनुमान लगाने वाला agent fail हो रहा है।
+
+### सीमित repair loops
+जब CI fail होता है या reviewer blocking finding उठाता है, तो implementation agent को उसे ठीक करने का मौका मिलता है: failure evidence पढ़े, code बदले, push करे और gates को फिर चलने दे। लेकिन सिर्फ तीन बार। तीसरे असफल cycle के बाद पूरी failure history के साथ Story `NEEDS_OWNER_ACTION` में चली जाती है।
+
+इस सीमा के दो कारण हैं। पहला reliability है। अगर तीन प्रयासों में समाधान नहीं मिला, तो समस्या शायद ही कोई typo हो; आम तौर पर यह गलत diagnosis, environment की समस्या या Story में खामी होती है, और अधिक प्रयास सिर्फ आत्मविश्वास से भरे गलत fixes बनाते हैं। दूसरा कारण cost है। सीमा न हो तो agent खुशी-खुशी loop में चलता रहेगा: code बदलेगा, tests दोबारा चलाएगा, error की नई व्याख्या करेगा, फिर code बदलेगा—और करीब पहुँचे बिना tokens तथा runner minutes खर्च करता रहेगा। Distributed systems में unbounded retries bug हैं, और यहाँ भी।
+
+अगर इस्तेमाल करें तो tooling इसे support करती है। Claude Code GitHub Action में [`--max-turns`, workflow timeouts और concurrency limits](https://code.claude.com/docs/en/github-actions) उपलब्ध हैं, और default रूप से bot actors द्वारा trigger किए जाने से मना करता है ताकि bots इसे loop में न चला सकें। GitHub Agentic Workflows, हर run पर inference spend को [`max-ai-credits` से सीमित करने](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/about-github-agentic-workflows) देते हैं। फिर भी मैं अपनी orchestration में repair counter रखता हूँ, क्योंकि मेरी सीमा हर run पर नहीं, हर Story पर लागू होती है।
+
+## Reasoning भी एक budget है
+Agentic engineering, compute, database capacity और cloud spend के साथ एक नया resource लाती है: reasoning, जिसे tokens या credits में मापा जाता है। मैं इसे भी उसी तरह देखता हूँ। यह सीमित है, bill में दिखता है और इसमें waste आम तौर पर usage की नहीं, design की समस्या होती है।
+
+मेरा सिद्धांत है: **जहाँ कोई deterministic tool जवाब दे सकता है, वहाँ महँगी reasoning खर्च न करें।**
+
+- Project compile होता है या नहीं, यह model से न पूछें। Compiler चलाएँ।
+- Tests पास होते हैं या नहीं, यह न पूछें। Tests चलाएँ।
+- Deployment log में साफ़ समझाई गई infrastructure failure को agent से बार-बार न पढ़वाएँ।
+- ऐसी टूटी हुई branch को recover करने में tokens खर्च न करें जिसे Story से दोबारा बनाया जा सकता है।
+- जब तक approaches की तुलना जैसे कोई सोच-समझकर चुना कारण न हो, एक ही problem पर कई agents parallel में न चलाएँ।
+जहाँ reasoning मूल्यवान है, वहाँ AI का उपयोग करें। जहाँ determinism उपलब्ध है, वहाँ automation का।
+
+Economics हमेशा सहज समझ में नहीं आते, इसलिए अनुमान लगाने के बजाय उन्हें मापना चाहिए। Jain के experiment में frontier model को पूरे behavioral harness के साथ चलाने पर [लगभग दस गुना tokens लगे और लागत करीब सात गुना हुई](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html), जबकि नतीजा नहीं बदला, क्योंकि model हर स्थिति में सभी acceptance tests पास कर चुका था। उसी harness ने cost-optimized model को 10 में से 3 accepted runs से 10 में से 10 तक पहुँचाया, और प्रति run लागत बिना harness वाले frontier model से कम रही। इससे मैं यह निष्कर्ष नहीं निकालता कि "हमेशा harness इस्तेमाल करें" या "कभी harness न इस्तेमाल करें"। बल्कि *कब* और *कितनी बार* verification चलाना है, यह कीमत वाला engineering decision है, और सबसे सस्ता भरोसेमंद configuration model तथा task पर निर्भर करता है।
+
+## Blast radius बढ़ने पर autonomy घटनी चाहिए
+Story branch दोबारा बनाना सस्ता है। Production data नहीं। Permissions में यह अंतर दिखना चाहिए।
+
+| Environment | Agent autonomy | आवश्यक gates | निर्णय कौन लेता है |
+| --- | --- | --- | --- |
+| Story branch | उच्च: commit, push, rerun, recreate | हर push पर CI | Agent, Story के scope के भीतर |
+| Milestone / integration branch | सिर्फ verified pull requests के ज़रिए merge | सभी deterministic gates और independent review | Automated policy |
+| Development environment | Verification के बाद automatic deployment | Deployed system पर smoke tests और health checks | Automated policy; इंसान नतीजे की समीक्षा करता है |
+| Production | कोई नहीं | Human approval, rollback plan | इंसान |
+
+महत्वपूर्ण बात यह है कि इन सीमाओं को लागू *कैसे* किया जाता है। "Production पर कभी deploy न करें" कहने वाला instruction एक मार्गदर्शन है। Agent के पास न होने वाली deployment identity एक control है। मैं दोनों चाहता हूँ, लेकिन सिर्फ दूसरा मुझे निश्चिंत होकर सोने देता है। Branch protection, required checks, environment protection rules और सीमित दायरे वाले deployment credentials असल काम करते हैं; instructions बस यह घटाते हैं कि agent कितनी बार इनसे टकराए। GitHub अपने agent पर भी यही विचार लागू करता है, जो [सिर्फ एक branch पर push कर सकता है और branch protections तथा required checks के अधीन रहता है](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations)।
+
+यही तर्क तय करता है कि agent किन चीज़ों तक पहुँच सकता है। Simon Willison का ["lethal trifecta"](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) (private data तक पहुँच, untrusted content का सामना और बाहर संवाद करने का तरीका) ठीक उस configuration का वर्णन करता है जिसमें लापरवाह CI agent पहुँच सकता है: repository secrets, किसी के भी लिखे issue text और खुला network egress। Prompt-level defense से ज़्यादा महत्वपूर्ण इन तीन में से किसी एक को हटाना है; इसलिए मेरी pipeline के agents production secrets के बिना और सीमित outbound access के साथ चलते हैं।
+
+## हर prompt में नहीं, invariants एक बार encode करें
+Multi-tenant systems इसका सबसे स्पष्ट उदाहरण हैं। API implement करने वाले agent को browser से भेजे गए tenant identifier पर कभी भरोसा नहीं करना चाहिए। Business authority trusted, authenticated, server-side context से आनी चाहिए। यह बात स्पष्ट लगती है, फिर भी हर Story में दोहराने की ज़रूरत पड़े तो agent ऐसा नियम हर बार अलग तरह से खोजेगा।
+
+```
+// Wrong: authority comes from the client
+var customers = await db.Customers
+    .Where(c => c.TenantId == request.TenantId)
+    .ToListAsync();
+
+// Better: authority comes from validated token claims, enforced once for every query
+modelBuilder.Entity<Customer>()
+    .HasQueryFilter(c => c.TenantId == _tenantContext.TenantId);
+```
+Global query filter एक convention को architecture में बदलता है। आखिरी कदम architecture को evidence में बदलता है: हर tenant-owned entity पर चलने वाला cross-tenant integration test, ताकि बिना filter जोड़ी गई नई entity से build fail हो। Agent को नियम याद रखने की ज़रूरत नहीं; वह इसे bypass नहीं कर सकता।
+
+### Engineering constitution
+जिन repositories में agents काम करते हैं, उन्हें अब ऐसी governance की ज़रूरत बढ़ रही है जिसे इंसान पढ़ सके और machine भी। बड़े tools हर task पर repository-level instruction files पहले से पढ़ते हैं: Claude Code, [`CLAUDE.md` के conventions का पालन करता है](https://code.claude.com/docs/en/github-actions), और GitHub के agents repository के [custom instructions](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github) का उपयोग करते हैं। मैं इसे engineering constitution कहता हूँ। इसमें परिभाषित है:
+
+- स्वीकृत architecture और समर्थित patterns;
+- branch conventions और pipeline में AI की भूमिकाएँ;
+- आवश्यक tests और कौन-से tests authoritative हैं;
+- repair cycles की अधिकतम संख्या;
+- environment और production संबंधी प्रतिबंध;
+- tenant isolation, authorization rules और secret handling समेत security invariants;
+- localization की अपेक्षाएँ;
+- scope की सीमाएँ और `NEEDS_OWNER_ACTION` triggers।
+यह नए engineer के onboarding documentation की तरह काम करता है, बस इसका पाठक हर task पर नए सिरे से आता है और सच में इसे पढ़ता है। Repository context का agent output की quality पर असर, मेरे आज़माए लगभग किसी भी prompt tweak से ज़्यादा होता है। हालांकि दो बातें सीखने को मिलीं। इसे संक्षिप्त रखें, क्योंकि हर run पर load होता है और हर बार tokens खर्च करता है। और इसे enforcement नहीं, guidance मानें: जो भी invariant सच में मायने रखता है, उसे test, analyzer rule या platform permission के रूप में भी लागू होना चाहिए।
+
+## Coding agents के बारे में Enterprise RAG ने क्या सिखाया
+मैंने enterprise AI assistants बनाने में काफी समय लगाया है: document repositories पर retrieval, Azure AI Search indexes, Foundry experiments, और grounded answers देने वाली OCR pipelines। आज RAG demo बनाना आसान है। एक notebook, एक index, एक prompt—और दोपहर तक कुछ प्रभावशाली चलने लगता है।
+
+असली सवाल तब आते हैं जब इसे production system बनाना हो। Authentication कैसे संभाला जाएगा? Retrieval के समय authorization कैसे लागू होगा, ताकि किसी user को ऐसा document passage कभी न दिखे जिसे खोलने की अनुमति उसे नहीं है? Grounding कैसे verify होगा? Hallucinations का मूल्यांकन कैसे होगा? Tools पर सीमाएँ कैसे लगेंगी? इंसान नियंत्रण कैसे संभालेगा? Responses कैसे observe होंगे, failures से कैसे उबरेंगे और लागत कैसे नियंत्रित होगी?
+
+Coding agents के साथ भी यही प्रक्रिया है। Agent से code लिखवाना demo है। उसके चारों ओर identity, permissions, evidence, escalation, observability और cost control वाला system बनाना, ताकि वह सुरक्षित रूप से काम कर सके—यही असली engineering problem है।
+
+DORA team भी एक अलग दिशा से लगभग इसी निष्कर्ष पर पहुँची: 2025 के उसके research में पाया गया कि [AI एक amplifier की तरह काम करता है](https://dora.dev/dora-report-2025/), जो organization की मौजूदा खूबियों और कमियों दोनों को बढ़ाता है। कमज़ोर tests और अस्पष्ट ownership वाली team में agent डालने से कमज़ोर tests और अस्पष्ट ownership ही बढ़ेंगे।
+
+## Engineer और architect की भूमिका में क्या बदलाव आएगा
+मुझे नहीं लगता कि इससे software engineering खत्म हो जाएगी। मुझे लगता है कि ज़िम्मेदारी abstraction के एक स्तर ऊपर जाएगी: दोहराव वाले implementation पर कम समय, और problem definition, domain modeling, evidence बन सकने वाले acceptance criteria, security तथा system boundaries, test strategy, observability, failure analysis, agent orchestration और business outcomes की समीक्षा पर ज़्यादा समय।
+
+Junior और mid-level implementation का काम निश्चित रूप से बदलेगा। लेकिन मजबूत fundamentals पहले से *ज़्यादा* महत्वपूर्ण होंगे, कम नहीं, क्योंकि किसी को तय करना होगा कि "सही" का मतलब क्या है और यह पहचानना होगा कि evidence कब भ्रामक है। Model implementation generate कर सकता है। वह अपने-आप यह तय नहीं कर सकता कि business को क्या चाहिए।
+
+Architects के लिए बदलाव और स्पष्ट है। पहले architecture का मतलब application डिज़ाइन करना था। Agentic environment में इसका अर्थ उस engineering system को डिज़ाइन करना भी है जो application बनाता है:
+
+- कौन-से agents मौजूद हैं और हर agent क्या बदल सकता है;
+- वे कौन-से tools call कर सकते हैं और किन चीज़ों तक पहुँच सकते हैं;
+- कौन-से tests authoritative हैं;
+- कहाँ human approval अनिवार्य है;
+- failures को आगे कैसे escalate किया जाता है;
+- environments को कैसे सुरक्षित रखा जाता है;
+- AI cost कैसे मापी और सीमित की जाती है;
+- पूरी प्रक्रिया का audit कैसे होता है।
+अब architecture में software factory खुद भी शामिल है।
+
+## क्या गलत हो सकता है
+Agentic delivery engineering problems को खत्म नहीं करती। बस वे कहाँ दिखाई देती हैं, यह बदल जाता है।
+
+| समस्या का प्रकार | यह कैसे दिखती है | मुख्य नियंत्रण |
+| --- | --- | --- |
+| Scope drift (दायरे से भटकना) | नई abstractions, infrastructure या refactors जिनकी Story ने माँग नहीं की | स्पष्ट out-of-scope list; reviewer Story के मुकाबले diff जाँचता है |
+| Invented requirements (गढ़ी हुई ज़रूरतें) | ऐसा व्यवहार जो उचित लगता है, पर किसी ने निर्दिष्ट नहीं किया | Contract-style Stories; अस्पष्टता पर `NEEDS_OWNER_ACTION` |
+| False completion claims (पूरा होने का झूठा दावा) | Tests fail या गायब हों, फिर भी "Implementation complete" | Completion सिर्फ gate results से तय |
+| Self-confirming tests (अपनी ही धारणा की पुष्टि करने वाले tests) | Tests में code वाली वही गलत व्याख्या encode हो | Authoritative acceptance tests जिन्हें agent edit नहीं कर सकता |
+| Correlated reviewer blind spots (समीक्षकों की मिली-जुली चूक) | Builder और reviewer दोनों एक ही समस्या चूक जाएँ | अलग model या vendor; नतीजों की human review |
+| Flaky browser tests (अस्थिर browser tests) | Repair loops non-determinism के पीछे भागें | Flaky tests को quarantine करें; उन्हें अलग task की तरह ठीक करें |
+| Token runaway और loops | कुछ converge न हो, फिर भी लागत बढ़ती जाए | Repair cap, turn limits, प्रति-run credit caps |
+| Stale repository context (पुराना repository context) | Agent ऐसे rules अपनाए जिनका codebase अब उपयोग नहीं करता | Constitution की code की तरह समीक्षा; इसे संक्षिप्त रखें |
+| Wrong branch or target (गलत branch या target) | काम गलत base या environment पर पहुँच जाए | Branch protection; agent अपनी branch के बाहर push न कर सके |
+| Permission mistakes (permissions की गलतियाँ) | Agent उन secrets या environments तक पहुँच सके जहाँ उसे नहीं पहुँचना चाहिए | Least-privilege identities; production credentials न हों |
+| Security regressions (security में पीछे जाना) | Authorization या tenant checks कमज़ोर हो जाएँ | Cross-tenant tests, analyzers, security scanning |
+| CI configuration mistakes (CI configuration की गलतियाँ) | Gates पास दिखें क्योंकि वे कभी चले ही नहीं | Pipeline changes को human-owned मानें |
+| Overconfidence (अति-आत्मविश्वास) | Evidence से तेज़ी से भरोसा बढ़े | Metrics, नीचे देखें |
+
+मेरे लिए सबसे महत्वपूर्ण अंतर **unbounded** और **bounded** autonomy के बीच है। Unbounded autonomy का मतलब है agent को कोई goal और व्यापक access देकर उम्मीद करना। Bounded autonomy का मतलब है कि system स्पष्ट सीमाओं के भीतर, अपने-आप परिभाषित काम कर सके, जबकि उन सीमाओं को तय करने और बदलने की ज़िम्मेदारी इंसानों की रहे। मेरी दिलचस्पी सिर्फ दूसरे तरीके में है।
+
+सीमाओं के बिना autonomy एक demo है। Guardrails के साथ autonomy engineering system बन सकती है।
+
+## अपनी repository पर इसे आज़माएँ
+शुरुआत करने के लिए custom orchestrator की ज़रूरत नहीं है। एक repository, आपका मौजूदा agent और एक हफ्ते का अनुशासित काम आपको ज़्यादातर रास्ते तक पहुँचा देगा।
+
+1. **एक पन्ने का constitution लिखें।** उसे वहाँ रखें जहाँ आपका agent पहले से देखता है (`AGENTS.md`, `CLAUDE.md` या `.github/copilot-instructions.md`)। इसे छोटा रखें; एक अंश नीचे है।
+2. **CI को काम पूरा होने की परिभाषा बनाएँ।** Default branch पर build, tests, fresh database के विरुद्ध migration और browser smoke test को required status checks बनाएँ। Direct pushes रोकें।
+3. **Authoritative tests सुरक्षित रखें।** Acceptance tests को अपने folder में रखें और उस पर required code-owner review के लिए `CODEOWNERS` का उपयोग करें, ताकि agent tests जोड़ तो सके, लेकिन चुपचाप "passing" का अर्थ न बदल सके।
+4. **पहले दिखाई गई संरचना में एक Story को contract की तरह लिखें**, जिसमें out-of-scope list और escalation triggers शामिल हों।
+5. **Agent को अपनी branch पर implement करने दें।** Issue को Copilot के cloud agent को assign करें, या Claude Code GitHub Action के साथ `@claude` का उल्लेख करें। Run पर सीमा रखें: Claude के लिए `--max-turns` और job का `timeout-minutes`; Copilot के PRs में workflow runs को default रूप से इंसान की मंज़ूरी का इंतज़ार करना पड़ता है, जो शुरुआत के लिए उचित है।
+6. **किसी अलग model से independent reviewer जोड़ें**, उदाहरण के लिए Claude से बने PR पर Copilot code review, या Copilot से बने PR पर Claude review workflow।
+7. **Production का नियंत्रण किसी इंसान के पास रखें।** Required reviewers वाला environment protection rule इस्तेमाल करें, और agent को production credentials बिल्कुल न दें।
+8. **पहली Story से आँकड़े दर्ज करें:** runs, repair cycles, credits, manual edits और escaped defects।
+
+```
+# AGENTS.md (excerpt)
+
+## Definition of done
+Done means every required CI check is green. Never report completion otherwise.
+
+## Invariants
+- The tenant comes from the authenticated principal, never from request input.
+- Do not modify files under tests/acceptance/.
+
+## Out of bounds
+- No new services, infrastructure or dependencies without approval.
+- No changes to authentication, CI workflows or deployment configuration.
+
+## Escalation
+Stop and reply NEEDS_OWNER_ACTION when requirements are ambiguous, a security,
+architecture or product decision is needed, or three repair attempts have failed.
+```
+कम जोखिम वाली Stories से शुरुआत करें, किसी non-critical क्षेत्र में। दायरा तभी बढ़ाएँ जब आँकड़े दिखाएँ कि system ने यह भरोसा हासिल कर लिया है।
+
+## मुझे कैसे पता चलेगा कि यह काम करता है
+मापन के बिना AI productivity के दावे ज़्यादातर किस्से होते हैं, और हमारे अंदाज़े भरोसेमंद नहीं होते। 2025 की शुरुआत के tools पर METR के randomized trial में अनुभवी open-source developers ने [AI के साथ 19% ज़्यादा समय लिया, फिर भी उन्हें लगा कि वे लगभग 20% तेज़ हो गए थे](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/). नए tools उस आँकड़े को चाहे जैसे बदलें, perception gap ही सीख है: अगर मैं मापूँगा नहीं, तो मुझे वही सच लगेगा जो अच्छा महसूस होता है।
+
+इसलिए प्रयोग में हर Story के लिए ये बातें दर्ज होती हैं:
+
+| माप | यह क्यों मायने रखता है |
+| --- | --- |
+| इंसानी हस्तक्षेप | Autonomy का वास्तविक माप |
+| Agent runs | Story के लिए कितनी orchestration चाहिए |
+| खर्च हुए Tokens / AI credits | Delivered Story की प्रति-इकाई लागत |
+| Repair cycles | क्या शुरुआती प्रयास समाधान तक पहुँच रहे हैं |
+| हर gate पर CI failures | कौन-से checks सच में समस्याएँ पकड़ रहे हैं |
+| Reviewer findings (blocking बनाम advisory) | क्या independent review अपनी लागत को उचित ठहराता है |
+| DEV से पहले पकड़ी गई regressions | Gates का मूल्य |
+| Story से DEV तक का समय | End-to-end flow, न कि typing speed |
+| हाथ से edit किए गए code का अनुपात | इंसान अब भी कितना implement कर रहा है |
+| छूटकर production तक पहुँचे defects | वे failures जिन्हें system नहीं पकड़ पाया |
+| Owner की स्वीकृति | क्या नतीजा वही था जो मैं सचमुच चाहता था |
+
+अंततः मैं ऐसा बयान देना चाहता हूँ: *"एक full-stack Story को सभी deterministic gates पास करने से पहले X agent runs, Y repair cycles, Z credits और N manual code changes की ज़रूरत पड़ी।"* इतनी Stories के आँकड़े अभी मेरे पास नहीं हैं कि ईमानदारी से प्रकाशित कर सकूँ। जब होंगे, तो मैं उन्हें प्रकाशित करूँगा—उन Stories समेत जिनके नतीजे तारीफ़ के लायक नहीं हैं।
+
+## एक और दिलचस्प सवाल
+मैंने enterprise systems बनाने में कई साल बिताए हैं जहाँ reliability, authentication, data integrity और deployment safety किसी एक function की खूबसूरती से कहीं ज़्यादा मायने रखते थे। यह अनुभव मुझे coding agents को लेकर उत्साहित भी करता है और सतर्क भी।
+
+Productivity का अवसर स्पष्ट है और मैं इन tools का सक्रिय रूप से उपयोग करता हूँ। लेकिन सबसे बड़ा अवसर keystrokes की जगह लेने में नहीं है। यह software delivery के काम करने के तरीके को नए सिरे से डिज़ाइन करने में है।
+
+मैं खुद से बढ़ते तौर पर यह पूछता हूँ कि "मैं यह feature कितनी जल्दी लिख सकता हूँ?" के बजाय "क्या मैं ऐसा system डिज़ाइन कर सकता हूँ जहाँ इस *class* के features हर कदम खुद किए बिना सुरक्षित रूप से deliver हों?" यह कहीं ज़्यादा दिलचस्प engineering problem है, और इसे अप्रासंगिक बनाने के बजाय CI/CD, identity, failure recovery और production support के बारे में मेरी सीखी हर बात का उपयोग करती है।
+
+उच्च प्रदर्शन करने वाली teams की अगली पीढ़ी शायद इस बात से परिभाषित न हो कि वे कितने AI tools इस्तेमाल करती हैं। शायद वे इस बात से पहचानी जाएँ कि इंसानों, reasoning agents और deterministic systems के बीच ज़िम्मेदारी कितनी अच्छी तरह बाँटती हैं।
+
+AI लिखता और तर्क करता है। Automation सत्यापन करता है। इंसान उद्देश्य, सीमाएँ और जवाबदेही तय करते हैं। और engineer इन तीनों को जोड़ने वाला system अधिकाधिक डिज़ाइन करता है।
+
+**Software engineering के भविष्य में शायद हमें खुद कम code लिखना पड़े। लेकिन क्या बनना चाहिए, सही होने का अर्थ क्या है और हर decision कौन या क्या ले सकता है—यह तय करने में हमें कहीं बेहतर होना होगा।**
+
+---
+
+## आगे पढ़ें
+
+- [GitHub Copilot on GitHub.com](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github), GitHub Docs
+- [Risks and mitigations for GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations), GitHub Docs
+- [GitHub Agentic Workflows](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/about-github-agentic-workflows), GitHub Docs (public preview)
+- [GitHub previews Agentic Workflows as part of continuous AI concept](https://theregister.com/2026/02/17/github_previews_agentic_workflows), The Register, Feb 2026
+- [Claude Code GitHub Actions](https://code.claude.com/docs/en/github-actions), Anthropic
+- [Humans and Agents in Software Engineering Loops](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html), Kief Morris, Mar 2026
+- [Harness engineering for coding agent users](https://martinfowler.com/articles/harness-engineering.html), Birgitta Böckeler, Apr 2026
+- [Are Harnesses Worth the Cost?](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html), Naresh Jain, Oct 2026
+- [The lethal trifecta for AI agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), Simon Willison, Jun 2025
+- [2025 DORA State of AI-assisted Software Development](https://dora.dev/dora-report-2025/), DORA / Google Cloud
+- [Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), METR, Jul 2025

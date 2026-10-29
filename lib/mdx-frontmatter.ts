@@ -29,12 +29,18 @@ export function parseMdxFrontmatter(source: string, filename: string) {
 }
 
 export function validatePostFrontmatter(data: Record<string, unknown>, filename: string, expectedLocale: Locale): PostFrontmatter {
-  const allowed = new Set(["title", "description", "date", "locale", "translationKey", "translationSourceHash", "updated", "tags", "published", "featured", "image", "imageAlt"]);
+  const allowed = new Set(["title", "seoTitle", "description", "cardSummary", "date", "locale", "translationKey", "translationSourceHash", "updated", "tags", "published", "featured", "image", "imageAlt"]);
   const unknown = Object.keys(data).filter((key) => !allowed.has(key));
   if (unknown.length) throw new Error(`${filename}: unsupported frontmatter field(s): ${unknown.join(", ")}.`);
 
   const requiredString = (field: "title" | "description"): string => {
     const value = data[field];
+    if (typeof value !== "string" || !value.trim()) throw new Error(`${filename}: "${field}" must be a non-empty string.`);
+    return value.trim();
+  };
+  const optionalString = (field: "seoTitle" | "cardSummary"): string | undefined => {
+    const value = data[field];
+    if (value === undefined) return undefined;
     if (typeof value !== "string" || !value.trim()) throw new Error(`${filename}: "${field}" must be a non-empty string.`);
     return value.trim();
   };
@@ -88,6 +94,10 @@ export function validatePostFrontmatter(data: Record<string, unknown>, filename:
     featured: data.featured,
   };
 
+  const seoTitle = optionalString("seoTitle");
+  if (seoTitle) frontmatter.seoTitle = seoTitle;
+  const cardSummary = optionalString("cardSummary");
+  if (cardSummary) frontmatter.cardSummary = cardSummary;
   if (data.translationSourceHash !== undefined) frontmatter.translationSourceHash = data.translationSourceHash as string;
 
   if (data.updated !== undefined) frontmatter.updated = validDate("updated");

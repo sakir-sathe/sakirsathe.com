@@ -82,7 +82,7 @@ export function PostRow({ p, locale = "en" }: { p: Post; locale?: Locale }) {
       </div>
       <div>
         <h3 className="text-[18px] font-medium tracking-tight group-hover:text-accent">{p.title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted">{p.description}</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted">{p.cardSummary ?? p.description}</p>
         <div className="mt-3 flex flex-wrap gap-1.5">{p.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</div>
       </div>
     </Link>

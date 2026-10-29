@@ -1,0 +1,392 @@
+---
+title: "De programar en pareja a un pipeline de entrega: cómo construir una fábrica de software con IA y controles"
+seoTitle: "Cómo construir una fábrica de software con IA: agentes, CI y control humano"
+description: "Cómo distribuyo la entrega de software entre agentes de IA, CI determinista y autoridad humana, y por qué la verificación importa más a medida que el código se vuelve más barato."
+cardSummary: "Los agentes de programación ya pueden producir la mayor parte de una funcionalidad CRUD en minutos, así que el problema difícil pasó de generar código a confiar en él. Este artículo describe el pipeline de entrega con controles que estoy probando, donde los agentes razonan, CI verifica y las personas conservan la autoridad sobre la arquitectura, la seguridad y producción."
+date: "2026-10-28"
+locale: es
+translationKey: guarded-ai-software-factory
+translationSourceHash: 2a1277371aeea129bec627af7f64237a5b183b4f69dc3d43fa88a872344c092f
+tags:
+  - Agentic Engineering
+  - AI Coding Agents
+  - CI/CD
+  - Software Architecture
+  - DevSecOps
+  - Multi-Tenant SaaS
+  - .NET
+  - Azure
+published: true
+featured: false
+---
+
+*Cómo los agentes de IA, la CI determinista, las pruebas en el navegador y el control humano pueden llevar una funcionalidad desde una Story de ingeniería hasta un entorno de desarrollo desplegado, y en qué punto decido detener la automatización.*
+
+Hace unos años, la mayor parte del tiempo que dedicaba a crear una funcionalidad full stack se iba en la implementación: la entidad, la migración, los endpoints, la validación, el formulario y las pruebas. Hoy puedo asignarle a un agente de programación una Story CRUD con un alcance razonable y recibir, en cuestión de minutos, gran parte de esa implementación.
+
+Eso cambia la economía del desarrollo de software. Pero, después de experimentar en serio con estas herramientas, estoy convencido de que generar código ya no es el problema interesante.
+
+El problema interesante es la confianza.
+
+En los sistemas empresariales en los que he trabajado (plataformas de procesamiento de documentos, informes y analítica, servicios .NET alojados en Azure, capas de identidad y autorización, pipelines de OCR y RAG), implementar la funcionalidad rara vez era la parte más difícil. Lo difícil era el aislamiento entre tenants, la autorización, la seguridad de las migraciones, los reintentos y la idempotencia, la compatibilidad con versiones anteriores, la observabilidad y saber que el sistema realmente se comportaba de forma correcta después del despliegue. Ninguno de esos problemas desaparece porque el código se haya escrito más rápido.
+
+Así que la pregunta que empecé a hacerme no era «¿puede el agente escribir esto?», sino: ¿qué partes del ciclo de entrega puedo delegar con seguridad y cómo lo sabría?
+
+Esa pregunta se convirtió en un experimento. En lugar de usar la IA solo como asistente de programación, empecé a diseñar un sistema de entrega en el que los agentes se hacen responsables de partes acotadas del ciclo, mientras que la arquitectura, las decisiones de producto, los límites de seguridad, el control de producción y la responsabilidad final siguen en manos humanas.
+
+**El objetivo no es quitar al ingeniero del desarrollo de software. Es pasar de ejecutar manualmente cada paso a diseñar, gobernar y mejorar el sistema que los ejecuta.**
+
+## De la autocompletación a los sistemas de entrega
+El desarrollo asistido por IA ha avanzado, a grandes rasgos, por cuatro etapas.
+
+1. **Autocompletación.** El modelo sugería la siguiente línea o función. Algo local, útil y fácil de verificar a simple vista.
+2. **Programación en pareja.** Le pedíamos a un modelo que implementara un componente, explicara un stack trace o preparara pruebas. La persona seguía dirigiendo cada paso.
+3. **Agentes de programación.** Un agente recibe una tarea, explora el repositorio, edita muchos archivos, ejecuta comandos y abre un pull request. Por ejemplo, el agente en la nube de Copilot de GitHub ahora [planifica e implementa cambios en un entorno efímero en la nube](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github), ejecuta pruebas y linters antes de entregar un pull request.
+4. **Sistemas de entrega agénticos.** El siguiente paso no es un único agente más potente. Es un sistema controlado de agentes especializados, automatización determinista, políticas y puntos de control humanos.
+La cuarta etapa sigue un patrón que nuestra industria ha repetido varias veces. La configuración manual de servidores se convirtió en infraestructura como código. Los despliegues manuales se convirtieron en CI/CD. Las pruebas de regresión manuales se convirtieron en suites automatizadas. Los runbooks manuales se convirtieron en orquestación. En cada caso, los ingenieros dejaron de ejecutar un paso repetitivo y empezaron a diseñar el sistema que lo ejecuta; quienes lo hicieron bien conocían ese paso lo suficiente como para codificarlo.
+
+La orquestación manual del trabajo de implementación es lo siguiente. Eso no elimina a las personas; cambia el ciclo en el que trabajan. Kief Morris describe el cambio de las personas *dentro* del ciclo, inspeccionando cada artefacto, a las personas *supervisando* el ciclo, donde ante un resultado incorrecto se [cambia el arnés que lo produjo en vez de corregir el artefacto](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html). Esa distinción refleja de cerca lo que intento construir.
+
+## La arquitectura del experimento
+El experimento se ejecuta en una aplicación full stack privada que estoy desarrollando: una API .NET, un frontend web moderno y una base de datos relacional, alojados en Azure. El producto en sí no es relevante aquí. Lo importante es el pipeline de entrega que lo rodea.
+
+```text
+Engineering Story
+  |
+Implementation agent
+  |
+Story branch + pull request
+  |
+Deterministic CI
+ /        |        \
+Build   Unit + integration tests   Migration checks
+ \        |        /
+  +--> Browser regression --> Independent AI review
+CI red gate ---------------------\
+Blocking finding -----------------+--> Repair agent (max 3 cycles) --> CI
+                                       |
+                                       +-- limit reached --> NEEDS_OWNER_ACTION
+
+Independent AI review (clean)
+  |
+Verified milestone --> Development deployment --> Deployed smoke tests
+  |
+Human review of the running product
+  `-- human decision only --> Production
+```
+Cada etapa tiene una sola responsabilidad:
+
+- **Agente de implementación.** Lee la Story y los archivos de gobernanza del repositorio, implementa exactamente una Story en su propia rama, escribe pruebas y abre un pull request. Nunca hace merge.
+- **CI determinista.** No razona. Compila, ejecuta las suites de pruebas, aplica migraciones a una base de datos descartable y genera evidencia.
+- **Regresión en el navegador.** Interactúa con la interfaz real. Si un formulario guarda correctamente, pero nunca muestra su mensaje de validación, es un defecto que una prueba de API no detectará.
+- **Revisión independiente con IA.** Otro modelo compara el diff con la Story y las reglas del repositorio. El agente que implementó el cambio no lo revisa.
+- **Agente de reparación.** Si CI falla o el revisor señala un hallazgo bloqueante, el agente de implementación recibe un número acotado de intentos para corregirlo.
+- **Hito verificado y despliegue en desarrollo.** Las Stories que superan todos los controles se integran en una rama de integración, que se despliega automáticamente en un entorno de desarrollo donde se ejecutan pruebas de humo contra el sistema desplegado.
+- **Revisión humana.** Evalúo el producto en ejecución, no solo el diff. Producción sigue bajo control humano.
+
+## Tres tipos de responsabilidad
+La decisión de diseño más útil del experimento fue clasificar cada responsabilidad de entrega en una de tres categorías antes de decidir quién, o qué, se haría cargo.
+
+| Categoría | Responsable | Ejemplos | Fortaleza |
+| --- | --- | --- | --- |
+| Razonamiento | Agentes de IA | Comprender una Story, explorar un repositorio desconocido, implementar lógica de aplicación, escribir pruebas, revisar un pull request, explicar un fallo, reparar un defecto acotado, actualizar documentación | Interpretación y síntesis ante cierto grado de ambigüedad |
+| Verificación determinista | CI y automatización | Compilación, pruebas unitarias y de integración, verificación de migraciones, análisis estático, comprobación de tipos, análisis de dependencias y secretos, builds de producción, regresión en el navegador, comprobaciones de estado y despliegue | Evidencia repetible, económica y binaria |
+| Autoridad humana | Ingenieros y responsables de producto | Dirección del producto, precios, reglas de negocio, decisiones importantes de arquitectura, límites de seguridad, cambios de alcance, despliegue a producción, cambios de credenciales, operaciones destructivas sobre datos, aceptación de riesgos significativos | Intención, responsabilidad y decisiones con consecuencias |
+
+El razonamiento es donde los modelos justifican su costo. La verificación determinista es donde no se debe consultar a los modelos: **la IA puede proponer que algo es correcto. CI debe demostrar todo lo posible de esa afirmación.** Birgitta Böckeler establece la misma distinción entre [controles computacionales e inferenciales](https://martinfowler.com/articles/harness-engineering.html): las pruebas, los linters y los verificadores de tipos son rápidos y confiables, mientras que la revisión con IA y el uso de un LLM como juez son más lentos, más costosos y no deterministas. Mi regla de trabajo es sencilla: si un control computacional puede responder una pregunta, no debería recurrirse a uno inferencial.
+
+La autoridad humana es la categoría que los equipos suelen dejar implícita, y un agente con amplio acceso al repositorio llenará con gusto cualquier vacío implícito. La ingeniería agéntica solo funciona cuando estos límites se documentan y se hacen cumplir, no cuando se dan por sentados.
+
+## Por qué un solo agente no debería hacerlo todo
+Conceptualmente, el experimento tiene cinco funciones.
+
+| Función | Quién la desempeña | Pregunta que responde |
+| --- | --- | --- |
+| Constructor | Agente de implementación (modelo A) | ¿Cómo cumplo esta Story? |
+| Revisor | Segundo agente (modelo B, de otro proveedor) | ¿Este diff hace lo que indica la Story y nada de lo que no debería? |
+| Evaluador | CI | ¿Compila, pasa las pruebas y aplica las migraciones? |
+| Verificador del comportamiento de usuario | Automatización del navegador | ¿Una persona ve y puede hacer lo correcto? |
+| Autoridad | Persona | ¿Esto es lo que queremos y el riesgo es aceptable? |
+
+Nada de esto es nuevo. No permitimos que los autores aprueben sus propios pull requests, ni que una sola persona escriba, apruebe y despliegue por sí sola un cambio a producción. La misma lógica se aplica a los agentes, por una razón más específica: los puntos ciegos correlacionados. Un modelo que revisa su propio resultado comparte las suposiciones que lo produjeron. Si interpretó mal un criterio de aceptación durante la implementación, tenderá a interpretarlo igual durante la revisión.
+
+Un segundo modelo, idealmente de otro proveedor y con instrucciones explícitas para cuestionar el cambio, además de la Story y las reglas del repositorio, abordará el diff de otra manera y detectará cosas distintas. Es otra señal, no una prueba. Dos modelos pueden equivocarse en la misma dirección, y un revisor basado en LLM puede estar completamente equivocado con mucha seguridad. Por eso los hallazgos del revisor se envían a reparación o a una persona, nunca directamente a un merge.
+
+Las plataformas convergen en el mismo patrón. Antes de completar su trabajo, el agente en la nube de GitHub [recibe una segunda opinión de la revisión de código de Copilot y ejecuta CodeQL y el análisis de secretos](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations); además, no puede aprobar ni hacer merge de su propio pull request.
+
+## CI importa más en la era de la IA, no menos
+**Una funcionalidad no está terminada porque un modelo diga «Implementación completa». Está terminada cuando la evidencia determinista demuestra que el comportamiento requerido funciona.**
+
+Oigo con frecuencia el argumento de que los mejores modelos implican que necesitamos menos pruebas. Creo lo contrario. Si un agente puede producir varios cientos de líneas repartidas en una docena de archivos en minutos, la revisión humana línea por línea no puede escalar al mismo ritmo. Morris plantea lo mismo: [los agentes generan código más rápido de lo que las personas pueden inspeccionarlo](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html), así que insistir en revisarlo todo nos convierte en el cuello de botella. La única forma de mantener el ritmo es trasladar la verificación a máquinas que se ejecutan tan rápido como se genera el código.
+
+Eso aumenta el valor de casi todo lo que ya sabíamos que debíamos hacer:
+
+- pruebas unitarias para las reglas de dominio y pruebas de integración contra una base de datos real, no contra mocks de ella;
+- pruebas de contrato en los límites de API y mensajería;
+- validación de migraciones contra una base de datos vacía y contra el esquema actual;
+- automatización del navegador para comprobar el comportamiento visible para el usuario;
+- análisis estático y análisis de dependencias y secretos;
+- observabilidad y verificación posterior al despliegue.
+**Cuanto más barato sea generar código, más valiosa será una verificación confiable.**
+
+Una advertencia basada en la práctica. Las pruebas escritas por el mismo agente que escribió la implementación comparten su interpretación; si entendió mal el requisito, la prueba codifica fielmente esa interpretación errónea. Böckeler observa que [las suites de pruebas generadas por IA todavía no son lo bastante buenas](https://martinfowler.com/articles/harness-engineering.html) como para brindar confianza funcional por sí solas. En el reciente experimento de Naresh Jain sobre arneses, las expectativas se mantuvieron independientes al proporcionar a los agentes [contratos y ejemplos acordados por personas que no podían debilitar](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html). Hago algo similar: convierto los criterios de aceptación de cada Story en un pequeño conjunto de pruebas que considero autoritativas, y las instrucciones del agente le prohíben editarlas para hacer que el build pase.
+
+Incluso los proveedores trazan esta línea. GitHub presenta sus flujos de trabajo agénticos [junto a CI/CD determinista, no como sustituto](https://theregister.com/2026/02/17/github_previews_agentic_workflows), y recomienda no usarlos en procesos centrales de build y release que requieren reproducibilidad estricta.
+
+## Una Story es un contrato de implementación
+Tomemos una Story que introduce la gestión de clientes en una aplicación SaaS multiinquilino: crear y editar registros de clientes, APIs seguras por tenant, persistencia, datos de contacto normalizados, una interfaz móvil, localización, pruebas de integración y pruebas en el navegador.
+
+«Crear la gestión de clientes» es un deseo, no una Story. Un agente lo convertirá con gusto en algo, pero cada vacío en la solicitud se vuelve una decisión que toma por ti. Por eso, en el experimento, la Story se redacta como un contrato:
+
+```text
+STORY: Customer records (create, edit, list)
+
+Domain
+- A Customer belongs to exactly one tenant.
+- Email is optional; when present it is trimmed, lower-cased and unique per tenant.
+- Phone numbers are normalized to E.164 before persistence.
+
+API and security
+- Tenant is resolved from the authenticated principal, never from the request.
+- Requests that carry a tenantId field are rejected with 400.
+- Cross-tenant reads return 404, not 403.
+
+UI
+- Mobile-first form; every label and error message is localized.
+- Server-side validation is authoritative; client validation mirrors it.
+
+Acceptance evidence
+- Integration tests: tenant A cannot read, update or list tenant B's customers.
+- Migration applies cleanly to an empty database and to the current schema.
+- Browser test: create, edit, then see the normalized phone in the list on a phone-sized viewport.
+
+Out of scope
+- Import/export, duplicate merging, a customer portal, any change to auth or roles.
+
+Stop with NEEDS_OWNER_ACTION if
+- An acceptance criterion conflicts with existing behavior.
+- The change needs a new service, dependency or schema outside the Customer aggregate.
+```
+El agente puede implementar cualquier cosa dentro de esos límites y nada fuera de ellos. Una mejor ingeniería autónoma empieza con mejores especificaciones de ingeniería. Una Story ambigua produce un comportamiento autónomo ambiguo; el agente resolverá la ambigüedad, pero no necesariamente como tú lo harías.
+
+### El peligro de querer ayudar
+Los agentes están entrenados para ayudar, y en una base de código esa disposición se convierte fácilmente en una ampliación del alcance. «Ya que estoy aquí, voy a ordenar la arquitectura». «Esto sería más rápido con Redis». «Voy a introducir una abstracción de repositorio genérica». «La autenticación estorba; la voy a modificar». Cada idea parece razonable por separado. En conjunto, convierten una Story de dos horas en un diff imposible de revisar que incluye nueva infraestructura.
+
+Por eso, las instrucciones de mi repositorio prohíben explícitamente el trabajo especulativo:
+
+- No introduzcas microservicios, colas ni cachés a menos que la Story los requiera.
+- No agregues Redis ni infraestructura nueva porque podría ser útil.
+- No modifiques la autenticación ni la autorización para facilitar una funcionalidad.
+- No cambies la infraestructura de producción ni la configuración de despliegue.
+- No tomes decisiones sobre precios, producto ni reglas de negocio.
+- No debilites el aislamiento entre tenants por ningún motivo.
+- No agregues abstracciones que la Story actual no utilice.
+Esto importa más de lo que parece, porque estos fallos son difíciles de detectar después. Böckeler señala que ni los sensores deterministas ni los basados en modelos [detectan de forma confiable el exceso de ingeniería, las funcionalidades innecesarias o las instrucciones malinterpretadas](https://martinfowler.com/articles/harness-engineering.html). Hay que prevenirlos desde el principio. La autonomía es más segura cuando el espacio de decisiones permitidas es más pequeño.
+
+## Detenerse de forma segura es una funcionalidad
+Cuando un agente llega a una decisión que le corresponde a una persona, no debe adivinar. En mi configuración, se detiene y reporta `NEEDS_OWNER_ACTION` junto con una nota estructurada y breve: qué estaba haciendo, qué decisión se necesita, qué opciones identifica, cuál recomendaría y qué dejó deliberadamente sin tocar.
+
+Los casos que activan esto se definen de antemano:
+
+- criterios de aceptación ambiguos o contradictorios;
+- falta una dependencia, credencial o entorno;
+- se necesita una decisión de arquitectura;
+- se necesita una decisión de seguridad;
+- se necesita una decisión comercial o de producto;
+- hay un conflicto entre el alcance de la Story y lo que realmente requiere el código;
+- cualquier acción que afecte producción.
+Pienso en esto como en los pipelines de integración. Cuando un proceso de datos bien diseñado encuentra un registro que no puede procesar, lo envía a una cola de mensajes fallidos y alerta a alguien; no escribe silenciosamente una suposición en el almacén de datos. Un sistema autónomo maduro necesita lo mismo: una forma definida, sencilla y sin complicaciones de decir *no puedo decidir esto de manera responsable*. Un agente que se detiene no está fallando. El que adivina con seguridad sí.
+
+### Ciclos de reparación acotados
+Cuando CI falla o el revisor señala un hallazgo bloqueante, el agente de implementación tiene la oportunidad de corregirlo: leer la evidencia del fallo, cambiar el código, hacer push y dejar que los controles vuelvan a ejecutarse. Pero solo tres veces. Después del tercer ciclo fallido, la Story pasa a `NEEDS_OWNER_ACTION` con todo el historial de fallos adjunto.
+
+Hay dos motivos para establecer el límite. El primero es la confiabilidad. Si después de tres intentos no hay convergencia, rara vez se trata de un error tipográfico; normalmente se debe a un diagnóstico incorrecto, un problema del entorno o un defecto en la Story, y más intentos solo generan soluciones incorrectas con mayor seguridad. El segundo es el costo. Sin un límite, un agente repetirá alegremente el ciclo: cambiar el código, volver a ejecutar las pruebas, reinterpretar el error, cambiar el código otra vez y consumir tokens y minutos del runner sin acercarse a una solución. Los reintentos ilimitados son un error en los sistemas distribuidos, y también lo son aquí.
+
+Las herramientas permiten hacer esto. La GitHub Action de Claude Code expone [`--max-turns`, los tiempos límite de los workflows y los límites de concurrencia](https://code.claude.com/docs/en/github-actions), y de manera predeterminada no permite que la activen actores de tipo bot, para que estos no puedan generar un ciclo. GitHub Agentic Workflows permite [limitar el gasto en inferencia por ejecución con `max-ai-credits`](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/about-github-agentic-workflows). De todos modos, mantengo el contador de reparaciones en mi propia orquestación, porque el límite que me importa es por Story, no por ejecución.
+
+## El razonamiento es un presupuesto
+La ingeniería agéntica incorpora un nuevo recurso junto con la capacidad de cómputo, la capacidad de la base de datos y el gasto en la nube: el razonamiento, medido en tokens o créditos. Lo trato de la misma forma. Es finito, aparece en la factura y, por lo general, desperdiciarlo es un problema de diseño, no de uso.
+
+El principio que sigo: **no gastes en razonamiento costoso cuando una herramienta determinista puede responder la pregunta.**
+
+- No le preguntes a un modelo si el proyecto compila. Ejecuta el compilador.
+- No preguntes si pasan las pruebas. Ejecútalas.
+- No hagas que un agente vuelva a leer una y otra vez un fallo de infraestructura que el registro del despliegue ya explica.
+- No gastes tokens recuperando una rama dañada que puedes recrear a partir de la Story.
+- No ejecutes varios agentes en paralelo sobre el mismo problema a menos que tengas un motivo deliberado, como comparar enfoques.
+Usa la IA cuando el razonamiento aporte valor. Usa la automatización cuando haya una opción determinista.
+
+La economía no siempre es intuitiva, y precisamente por eso hay que medirla en vez de darla por sentada. En el experimento de Jain, envolver un modelo de frontera en un arnés conductual completo [usó aproximadamente diez veces más tokens y costó cerca de siete veces más](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html) sin cambiar el resultado, porque el modelo superó todas las pruebas de aceptación con o sin el arnés. El mismo arnés llevó un modelo optimizado para reducir costos de 3 ejecuciones aceptadas de 10 a 10 de 10, con un costo por ejecución inferior al del modelo de frontera sin arnés. La conclusión que saco no es «usa siempre un arnés» ni «no uses nunca un arnés». Es que *cuándo* y *con qué frecuencia* se ejecuta la verificación es una decisión de ingeniería que tiene un costo, y la configuración confiable más económica depende del modelo y de la tarea.
+
+## La autonomía debe disminuir a medida que aumenta el radio de impacto
+Recrear una rama de Story cuesta poco. No ocurre lo mismo con los datos de producción. Los permisos deben reflejar esa diferencia.
+
+| Entorno | Autonomía del agente | Controles requeridos | Quién decide |
+| --- | --- | --- | --- |
+| Rama de Story | Alta: hacer commit, push, volver a ejecutar, recrear | CI en cada push | El agente, dentro del alcance de la Story |
+| Rama de hito / integración | Merge solo mediante pull requests verificados | Todos los controles deterministas y revisión independiente | Política automatizada |
+| Entorno de desarrollo | Despliegue automático después de la verificación | Pruebas de humo y comprobaciones de estado contra el sistema desplegado | Política automatizada; una persona revisa el resultado |
+| Producción | Ninguna | Aprobación humana, plan de reversión | Persona |
+
+El detalle importante es *cómo* se hacen cumplir estos límites. Una instrucción que dice «nunca despliegues a producción» es una guía. Una identidad de despliegue que el agente no tiene es un control. Quiero ambas cosas, pero solo la segunda me deja dormir tranquilo. La protección de ramas, las comprobaciones obligatorias, las reglas de protección de entornos y las credenciales de despliegue con permisos acotados hacen el trabajo real; las instrucciones solo reducen la frecuencia con la que el agente se topa con esos límites. GitHub aplica la misma idea a su propio agente, que [solo puede hacer push a una rama y sigue sujeto a las protecciones de ramas y las comprobaciones obligatorias](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations).
+
+El mismo razonamiento determina a qué puede acceder un agente. La ["lethal trifecta"](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) de Simon Willison (acceso a datos privados, exposición a contenido no confiable y una forma de comunicarse con el exterior) describe exactamente la configuración en la que puede acabar un agente de CI mal protegido: secretos del repositorio, texto de issues escrito por cualquiera y acceso abierto a la red saliente. Eliminar cualquiera de esos elementos importa más que cualquier defensa a nivel de prompt, así que los agentes de mi pipeline se ejecutan sin secretos de producción y con acceso saliente restringido.
+
+## Codifica las invariantes una sola vez, no en cada prompt
+Los sistemas multiinquilino ofrecen el ejemplo más claro. Un agente que implementa una API nunca debe confiar en un identificador de tenant enviado por el navegador. La autoridad sobre las reglas de negocio debe provenir de un contexto confiable, autenticado y del lado del servidor. Parece obvio, pero es precisamente el tipo de regla que un agente redescubrirá de forma inconsistente si hay que repetirla en cada Story.
+
+```
+// Wrong: authority comes from the client
+var customers = await db.Customers
+    .Where(c => c.TenantId == request.TenantId)
+    .ToListAsync();
+
+// Better: authority comes from validated token claims, enforced once for every query
+modelBuilder.Entity<Customer>()
+    .HasQueryFilter(c => c.TenantId == _tenantContext.TenantId);
+```
+El filtro global de consulta convierte una convención en arquitectura. El paso final convierte la arquitectura en evidencia: una prueba de integración entre tenants que se ejecuta contra cada entidad propiedad de un tenant, para que una entidad nueva agregada sin filtro haga fallar el build. El agente no necesita recordar la regla; no puede eludirla.
+
+### La constitución de ingeniería
+Los repositorios en los que trabajan agentes necesitan cada vez más una gobernanza legible tanto por personas como por máquinas. Las principales herramientas ya leen los archivos de instrucciones del repositorio en cada tarea: Claude Code [sigue las convenciones de `CLAUDE.md`](https://code.claude.com/docs/en/github-actions), y los agentes de GitHub usan las [instrucciones personalizadas](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github) del repositorio. A la mía la llamo constitución de ingeniería. Define:
+
+- la arquitectura aprobada y los patrones admitidos;
+- las convenciones de ramas y las funciones de IA en el pipeline;
+- las pruebas requeridas y cuáles son autoritativas;
+- el número máximo de ciclos de reparación;
+- las restricciones de los entornos y de producción;
+- las invariantes de seguridad, incluido el aislamiento entre tenants, las reglas de autorización y el manejo de secretos;
+- las expectativas de localización;
+- los límites del alcance y las condiciones que activan `NEEDS_OWNER_ACTION`.
+Funciona como la documentación de incorporación de un nuevo ingeniero, salvo que quien la lee empieza desde cero en cada tarea y realmente la consulta. El contexto del repositorio influye más en la calidad de los resultados del agente que casi cualquier ajuste de prompt que haya probado. Aun así, hay dos lecciones. Mantenla concisa, porque se carga en cada ejecución y consume tokens cada vez. Y trátala como una guía, no como un mecanismo de cumplimiento: toda invariante realmente importante también debería existir como prueba, regla de análisis o permiso de plataforma.
+
+## Lo que el RAG empresarial me enseñó sobre los agentes de programación
+He dedicado bastante tiempo a crear asistentes de IA empresariales: recuperación sobre repositorios de documentos, índices de Azure AI Search, experimentos con Foundry y pipelines de OCR que alimentan respuestas fundamentadas. Hoy es fácil crear una demo de RAG. Una libreta, un índice, un prompt y algo impresionante funcionan en una tarde.
+
+Las preguntas reales aparecen cuando hay que convertirla en un sistema de producción. ¿Cómo se gestiona la autenticación? ¿Cómo se hace cumplir la autorización durante la recuperación, para que una persona nunca vea un fragmento de un documento que no puede abrir? ¿Cómo se verifica que las respuestas estén fundamentadas? ¿Cómo se evalúan las alucinaciones? ¿Cómo se restringen las herramientas? ¿Cómo puede intervenir una persona? ¿Cómo se observan las respuestas, se recuperan los fallos y se controlan los costos?
+
+Los agentes de programación siguen exactamente la misma curva. Lograr que un agente escriba código es la demo. Construir el sistema que lo rodea para que pueda operar de forma segura, con identidad, permisos, evidencia, escalamiento, observabilidad y control de costos, es el verdadero problema de ingeniería.
+
+El equipo de DORA llegó a una conclusión similar desde una perspectiva muy distinta: su investigación de 2025 encontró que [la IA actúa como amplificador](https://dora.dev/dora-report-2025/) y magnifica las fortalezas y disfunciones existentes de una organización. Si se introduce un agente en un equipo con pruebas débiles y responsabilidades poco claras, amplificará las pruebas débiles y las responsabilidades poco claras.
+
+## Qué ocurre con el ingeniero y con el arquitecto
+No creo que esto ponga fin a la ingeniería de software. Creo que la responsabilidad sube un nivel de abstracción: menos tiempo en la implementación repetitiva y más en definir problemas, modelar dominios, establecer criterios de aceptación que puedan convertirse en evidencia, definir límites de seguridad y del sistema, diseñar estrategias de pruebas, observabilidad, análisis de fallos, orquestación de agentes y revisión de resultados de negocio.
+
+Sin duda cambiará el trabajo de implementación para perfiles junior y de nivel intermedio. Pero los fundamentos sólidos se vuelven *más* importantes, no menos, porque alguien tiene que definir qué significa «correcto» y reconocer cuándo la evidencia es engañosa. Un modelo puede generar una implementación. No puede decidir de forma independiente qué debería querer el negocio.
+
+Para los arquitectos, el cambio es más marcado. Antes, la arquitectura significaba diseñar la aplicación. En un entorno agéntico también significa diseñar el sistema de ingeniería que construye la aplicación:
+
+- qué agentes existen y qué puede cambiar cada uno;
+- qué herramientas pueden invocar y a qué pueden acceder;
+- qué pruebas son autoritativas;
+- dónde es obligatoria la aprobación humana;
+- cómo se escalan los fallos;
+- cómo se protegen los entornos;
+- cómo se mide y limita el costo de la IA;
+- cómo se audita todo el proceso.
+Ahora la arquitectura también incluye la propia fábrica de software.
+
+## Qué puede salir mal
+La entrega agéntica no elimina los problemas de ingeniería. Cambia dónde aparecen.
+
+| Modo de fallo | Cómo se manifiesta | Control principal |
+| --- | --- | --- |
+| Desviación del alcance | Abstracciones, infraestructura o refactorizaciones nuevas que la Story nunca pidió | Lista explícita de lo que queda fuera del alcance; el revisor compara el diff con la Story |
+| Requisitos inventados | Comportamiento plausible que nadie especificó | Stories con formato de contrato; `NEEDS_OWNER_ACTION` ante ambigüedades |
+| Afirmaciones falsas de finalización | «Implementación completa» con pruebas fallidas o ausentes | La finalización se define únicamente por los resultados de los controles |
+| Pruebas que se confirman a sí mismas | Las pruebas codifican la misma interpretación errónea que el código | Pruebas de aceptación autoritativas que el agente no puede editar |
+| Puntos ciegos correlacionados entre revisores | El constructor y el revisor pasan por alto el mismo problema | Otro modelo o proveedor; revisión humana de los resultados |
+| Pruebas inestables en el navegador | Ciclos de reparación que persiguen la falta de determinismo | Aislar las pruebas inestables; corregirlas como trabajo independiente |
+| Consumo descontrolado de tokens y ciclos | El costo aumenta sin que haya convergencia | Límite de reparaciones, límite de turnos y límite de créditos por ejecución |
+| Contexto obsoleto del repositorio | El agente sigue reglas que la base de código ya no utiliza | Revisar la constitución como código y mantenerla concisa |
+| Rama o destino incorrectos | El trabajo termina en la base o el entorno equivocados | Protección de ramas; el agente no puede hacer push fuera de su rama |
+| Errores de permisos | El agente puede acceder a secretos o entornos que no debería | Identidades con privilegio mínimo; sin credenciales de producción |
+| Regresiones de seguridad | Se debilitan la autorización o las comprobaciones de tenant | Pruebas entre tenants, analizadores y análisis de seguridad |
+| Errores en la configuración de CI | Los controles pasan porque nunca se ejecutaron | Los cambios en el pipeline son responsabilidad humana |
+| Exceso de confianza | La confianza crece más rápido que la evidencia | Métricas, más adelante |
+
+La distinción que más me importa es entre autonomía **ilimitada** y **acotada**. La autonomía ilimitada consiste en darle un objetivo y amplio acceso a un agente, y cruzar los dedos. La autonomía acotada significa que el sistema puede realizar por sí solo un trabajo bien definido, dentro de restricciones explícitas, mientras las personas siguen siendo responsables de definir y cambiar esas restricciones. Solo me interesa la segunda.
+
+La autonomía sin límites es una demo. La autonomía con protecciones puede convertirse en un sistema de ingeniería.
+
+## Cómo probarlo en tu propio repositorio
+No necesitas un orquestador personalizado para empezar. Con un solo repositorio, el agente que ya usas y una semana de disciplina puedes avanzar la mayor parte del camino.
+
+1. **Escribe una constitución de una página.** Colócala donde tu agente ya suele buscar (`AGENTS.md`, `CLAUDE.md` o `.github/copilot-instructions.md`). Mantenla breve; abajo hay un fragmento.
+2. **Haz que CI defina cuándo el trabajo está terminado.** Marca el build, las pruebas, la migración contra una base de datos recién creada y una prueba de humo en el navegador como comprobaciones de estado obligatorias en la rama predeterminada. Bloquea los push directos.
+3. **Protege las pruebas autoritativas.** Mantén las pruebas de aceptación en su propia carpeta y usa `CODEOWNERS` con revisión obligatoria del responsable del código, para que un agente pueda agregar pruebas, pero no cambiar silenciosamente qué significa que algo «pase».
+4. **Redacta una Story como contrato** con la estructura mostrada antes, incluida la lista de elementos fuera del alcance y las condiciones de escalamiento.
+5. **Deja que el agente la implemente en su propia rama.** Asigna el issue al agente en la nube de Copilot o menciona a `@claude` con la GitHub Action de Claude Code. Limita la ejecución: usa `--max-turns` y `timeout-minutes` en un job de Claude; de manera predeterminada, los pull requests de Copilot esperan la aprobación de una persona para ejecutar workflows, un punto de partida razonable.
+6. **Agrega un revisor independiente que use otro modelo**, por ejemplo, la revisión de código de Copilot para un pull request creado con Claude, o el workflow de revisión de Claude para uno creado con Copilot.
+7. **Mantén producción bajo control humano.** Usa una regla de protección del entorno con revisores obligatorios y no le des al agente ninguna credencial de producción.
+8. **Registra los datos de la primera Story:** ejecuciones, ciclos de reparación, créditos, ediciones manuales y defectos que escaparon.
+
+```
+# AGENTS.md (excerpt)
+
+## Definition of done
+Done means every required CI check is green. Never report completion otherwise.
+
+## Invariants
+- The tenant comes from the authenticated principal, never from request input.
+- Do not modify files under tests/acceptance/.
+
+## Out of bounds
+- No new services, infrastructure or dependencies without approval.
+- No changes to authentication, CI workflows or deployment configuration.
+
+## Escalation
+Stop and reply NEEDS_OWNER_ACTION when requirements are ambiguous, a security,
+architecture or product decision is needed, or three repair attempts have failed.
+```
+Empieza con Stories de bajo riesgo en un área no crítica. Amplía los límites solo cuando los datos demuestren que el sistema se lo ha ganado.
+
+## Cómo sabré si esto funciona
+Sin mediciones, las afirmaciones sobre productividad con IA son, en su mayoría, anécdotas, y nuestras impresiones no son confiables. En el ensayo aleatorizado de METR sobre herramientas de principios de 2025, desarrolladores experimentados de código abierto [tardaron un 19% más con IA, aunque creían que los había hecho aproximadamente un 20% más rápidos](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/). Independientemente de lo que las herramientas más recientes hagan con esa cifra, la lección está en la brecha de percepción: si no mido, creeré lo que me haga sentir bien.
+
+Por eso, el experimento registra estos datos para cada Story:
+
+| Métrica | Por qué importa |
+| --- | --- |
+| Intervenciones humanas | La medida real de la autonomía |
+| Ejecuciones del agente | Cuánta orquestación requiere una Story |
+| Tokens / créditos de IA consumidos | Costo unitario de una Story entregada |
+| Ciclos de reparación | Si los primeros intentos convergen |
+| Fallos de CI por control | Qué comprobaciones realmente detectan problemas |
+| Hallazgos del revisor (bloqueantes o consultivos) | Si la revisión independiente justifica su costo |
+| Regresiones detectadas antes de DEV | El valor de los controles |
+| Tiempo desde la Story hasta DEV | Flujo de principio a fin, no velocidad de escritura |
+| Proporción de código editado manualmente | Cuánto sigue implementando la persona |
+| Defectos que escaparon | Fallos que el sistema no detectó |
+| Aceptación del responsable | Si el resultado era lo que realmente quería |
+
+La afirmación que algún día quiero poder hacer sería algo así: *«Una Story full stack requirió X ejecuciones del agente, Y ciclos de reparación, Z créditos y N cambios manuales en el código antes de superar todos los controles deterministas».* Todavía no tengo datos de suficientes Stories para publicar esa afirmación con honestidad. Cuando los tenga, los publicaré, incluso si el resultado no es favorable.
+
+## Una pregunta más interesante
+He pasado años creando sistemas empresariales en los que la confiabilidad, la autenticación, la integridad de los datos y la seguridad del despliegue importaban mucho más que la elegancia de una función en particular. Esa experiencia hace que los agentes de programación me entusiasmen y, a la vez, me hagan ser cauteloso.
+
+La oportunidad de productividad es evidente y uso estas herramientas activamente. Pero la mayor oportunidad no está en reemplazar pulsaciones de teclas. Está en rediseñar el funcionamiento de la entrega de software.
+
+Cada vez me pregunto menos «¿con qué rapidez puedo escribir esta funcionalidad?» y más «¿puedo diseñar un sistema para entregar con seguridad *esta clase* de funcionalidad sin ejecutar manualmente cada paso?». Es un problema de ingeniería mucho más interesante, que aprovecha todo lo que aprendí sobre CI/CD, identidad, recuperación ante fallos y soporte de producción, en vez de volverlo obsoleto.
+
+La próxima generación de equipos de alto rendimiento quizá no se defina por la cantidad de herramientas de IA que utiliza. Quizá se defina por la eficacia con que distribuye la responsabilidad entre las personas, los agentes de razonamiento y los sistemas deterministas.
+
+La IA escribe y razona. La automatización verifica. Las personas definen la intención, los límites y la responsabilidad. Y cada vez más, el ingeniero diseña el sistema que conecta esas tres partes.
+
+**El futuro de la ingeniería de software quizá implique que escribamos menos código nosotros mismos. Pero exigirá que seamos mucho mejores al definir qué hay que construir, qué significa que algo sea correcto y quién, o qué, puede tomar cada decisión.**
+
+---
+
+## Lecturas adicionales
+
+- [GitHub Copilot on GitHub.com](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github), GitHub Docs
+- [Risks and mitigations for GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/risks-and-mitigations), GitHub Docs
+- [GitHub Agentic Workflows](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/about-github-agentic-workflows), GitHub Docs (public preview)
+- [GitHub previews Agentic Workflows as part of continuous AI concept](https://theregister.com/2026/02/17/github_previews_agentic_workflows), The Register, Feb 2026
+- [Claude Code GitHub Actions](https://code.claude.com/docs/en/github-actions), Anthropic
+- [Humans and Agents in Software Engineering Loops](https://www.martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html), Kief Morris, Mar 2026
+- [Harness engineering for coding agent users](https://martinfowler.com/articles/harness-engineering.html), Birgitta Böckeler, Apr 2026
+- [Are Harnesses Worth the Cost?](https://www.martinfowler.com/articles/are-harnesses-worth-the-cost.html), Naresh Jain, Oct 2026
+- [The lethal trifecta for AI agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), Simon Willison, Jun 2025
+- [2025 DORA State of AI-assisted Software Development](https://dora.dev/dora-report-2025/), DORA / Google Cloud
+- [Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), METR, Jul 2025

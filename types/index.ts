@@ -60,7 +60,9 @@ export interface LabArea {
 
 export interface PostFrontmatter {
   title: string;
+  seoTitle?: string;
   description: string;
+  cardSummary?: string;
   date: string;
   locale: Locale;
   translationKey: string;
