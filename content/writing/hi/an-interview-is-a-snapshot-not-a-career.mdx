@@ -1,0 +1,151 @@
+---
+title: "एक इंटरव्यू एक झलक है, पूरा करियर नहीं"
+description: "एक technical interview ने engineering experience, hiring decisions और लगातार सीखते रहने की अहमियत के बारे में मुझे क्या सिखाया।"
+date: "2026-11-06"
+locale: hi
+translationKey: an-interview-is-a-snapshot-not-a-career
+translationSourceHash: 7023c1381e7c515cc5aae20cc00dc1269778083bb097e303939733ddda6c6d6d
+tags:
+  - Engineering
+  - Career
+published: true
+featured: false
+---
+*एक technical interview ने engineering experience, hiring decisions और लगातार सीखते रहने की अहमियत के बारे में मुझे क्या सिखाया।*
+
+Feedback सिर्फ़ दो वाक्यों का था। मेरे करियर को लगभग तेरह साल हो गए हैं। कुछ दिनों तक वे दो वाक्य मुझे बहुत भारी लगे।
+
+मैं लगभग 13 साल से software लिख रहा हूँ। इस दौरान, एक अवसर से दूसरे अवसर पर जाने के बजाय, मैंने clients और teams के साथ लंबे समय के रिश्ते बनाने को प्राथमिकता दी है। मुझे किसी business को समझना, उसकी समस्याएँ जानना, solutions बनाना और उन solutions को समय के साथ विकसित होते देखना पसंद है।
+
+मैंने जो सबसे संतोषजनक काम किए हैं, उनमें ऐसे systems को maintain और modernize करना शामिल है जिन पर लोग हर दिन निर्भर करते हैं। अगर आपने enterprise applications पर काफ़ी समय काम किया है, तो आप जानते होंगे कि code लिखना अक्सर सबसे आसान हिस्सा होता है। कोई चीज़ एक खास तरीके से क्यों बनाई गई थी, उसे बदलने पर क्या टूट सकता है, और business में रुकावट डाले बिना उसे कैसे बेहतर बनाया जाए—असल engineering का बड़ा हिस्सा इन्हीं बातों में है।
+
+इसके साथ ही, मैंने कभी नहीं माना कि सिर्फ़ सालों का experience काफ़ी है। Technology लगातार बदलती रहती है, इसलिए मैं नई developments पर नज़र रखता हूँ, नई architectures का अध्ययन करता हूँ और उभरते tools के साथ काम करता हूँ। हाल के समय में मेरा बहुत-सा ध्यान AI, cloud architecture, intelligent agents और software बनाने के हमारे तरीक़े को वे कैसे बदल रहे हैं, इस पर रहा है।
+
+एक और बात मैंने खासकर LinkedIn पर देखी है: ज़्यादा से ज़्यादा engineers इस बारे में बात कर रहे हैं कि technical interviews कितने मुश्किल हो गए हैं। लंबे समय तक मैंने इस पर ज़्यादा ध्यान नहीं दिया। फिर हाल के एक अनुभव ने मुझे सोचने पर मजबूर किया कि software engineers के interview में हम असल में किस चीज़ को माप रहे हैं।
+
+## एक ऐसा इंटरव्यू जो मेरे साथ रह गया
+हाल ही में, मैंने एक engineering position के लिए technical interview दिया। मैं company या interviewer का नाम नहीं बताऊँगा। यह किसी व्यक्ति की आलोचना करने के बारे में नहीं है; यह उस बात के बारे में है जिस पर मुझे लगता है कि हमारे industry को ज़्यादा खुलकर चर्चा करनी चाहिए।
+
+जब technical interviews बातचीत जैसे लगते हैं, तो मुझे आम तौर पर वे पसंद आते हैं। मैं समझना चाहता हूँ कि team किन समस्याओं को हल कर रही है। Architecture पर चर्चा करना, अनुभव साझा करना, धारणाओं को चुनौती देना और कभी-कभी किसी approach पर असहमत होना भी मुझे अच्छा लगता है। असल ज़िंदगी में engineering इसी तरह होती है।
+
+यह interview अलग लगा। मेरे experience और जिन technologies के साथ मैं काम कर रहा था, उनका छोटा-सा परिचय देने के तुरंत बाद हम screen-sharing exercise पर चले गए: folder और document management system के लिए domain model बनाना।
+
+यह एक जाना-पहचाना problem था। इससे पहले मैं storage, processing और organization सहित एक पूरा document management solution खुद बना चुका था—और उन चुनौतियों से भी गुज़रा था जो किसी system के साधारण prototype से आगे बढ़ने पर आती हैं।
+
+मैंने model बनाना शुरू किया। और यहीं से बात दिलचस्प हो गई।
+
+## एक problem, कई सही designs
+Folder और document management system पहली नज़र में सरल लगता है: folders, documents, उनके बीच के relationships और शायद कोई storage location। जिसने भी ऐसा system बनाया है, वह जानता है कि सवाल पूछना शुरू करते ही design दिलचस्प होने लगता है:
+
+- Nested folders को कैसे दर्शाएँगे?
+- पूरे folder tree को कुशलता से कैसे retrieve करेंगे?
+- किसी folder का नाम बदला जाए या उसे दूसरी जगह ले जाया जाए, तो क्या होगा?
+- क्या कोई document एक से ज़्यादा folders का हिस्सा हो सकता है?
+- Permissions tree में नीचे तक कैसे लागू होंगी?
+- लाखों records होने पर क्या बदलेगा?
+Exercise के दौरान, मैंने hierarchy को सिर्फ़ parent-child references पर निर्भर रखने के बजाय paths के ज़रिए दर्शाने की तरफ़ रुझान दिखाया। यह पसंद hierarchical data और असली users के retrieval patterns के साथ मेरे व्यावहारिक अनुभव से आई थी।
+
+पीछे मुड़कर देखें, तो कोई अनुभवी architect जायज़ सवाल पूछ सकता है: अगर exercise domain modeling के बारे में थी, तो मैं पहले से hierarchy को store करने के तरीके को optimize क्यों कर रहा था? Domain model पहले आता है: entities, उनके relationships और business rules। Folders में folders और documents होते हैं; access उन rules के अनुसार मिलता है जो business तय करता है। इस hierarchy को कैसे persist करना है—parent references, paths या किसी और तरीके से—यह एक अलग निर्णय है, जो उन rules और access patterns के आधार पर होना चाहिए। मेरे experience ने मुझे domain को स्पष्ट करने से पहले storage के सवाल की तरफ़ खींच लिया।
+
+Storage के दोनों विकल्प जायज़ हैं। Materialized path से subtree queries आसान हो सकती हैं, लेकिन folder को move करने पर—या paths में folder के नाम होने पर उसका नाम बदलने पर—उसके descendant paths भी update करने पड़ सकते हैं। Parent reference में move करने के लिए सिर्फ़ एक row बदलनी पड़ती है और foreign keys relationships की सुरक्षा करती हैं, लेकिन गहरे tree को पढ़ने के लिए recursive query चाहिए। Microsoft की [SQL Server में hierarchical data पर documentation](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server) parent-child relationships और उसके विशेष hierarchyid representation के बीच के trade-offs समझाती है। Closure tables और hybrid models जैसे दूसरे तरीके भी requirements के अनुसार सही हो सकते हैं।
+
+किसी असली system में storage model ही पूरी लागत तय नहीं करता। Folder को move करने का मतलब inherited permissions को दोबारा calculate करना, search indexes refresh करना और audit history दर्ज करना भी हो सकता है—चाहे आपने कोई भी representation चुना हो। यही वजह है कि storage optimization से पहले domain rules पर ध्यान देना चाहिए।
+
+Document relationships में भी यही बात लागू होती है। अगर हर document ठीक एक folder का हिस्सा है, तो document पर `FolderId` foreign key अक्सर सबसे सरल design होता है। अगर कोई document कई folders में दिख सकता है, तो अलग mapping table का होना उचित है।
+
+सही design requirements पर निर्भर करता है। और इसीलिए requirements पर बात करना ज़रूरी है।
+
+## जहाँ मुझसे कमी रह गई
+Exercise के दौरान, मैंने इस reasoning के कुछ हिस्से समझाए और अलग-अलग संभावनाओं पर विचार करते हुए अपना approach बदला। लेकिन मुझसे एक गलती भी हुई: **मैंने अपनी reasoning का पर्याप्त हिस्सा actual model में स्पष्ट नहीं दिखाया।**
+
+पिछले अनुभव से जो entities, relationships और fields मुझे स्पष्ट लगते थे, वे screen पर नहीं आए। मैं पूरी application और उसे store करने के तरीके के बारे में सोच रहा था, जबकि exercise में एक साफ़, ठोस domain model माँगा गया था। Interviewer सिर्फ़ उसी का आकलन कर सकता है जिसे candidate सामने रखता है। मैंने अपनी reasoning के कुछ हिस्से ज़ुबानी समझाए, लेकिन model में पर्याप्त बातें स्पष्ट नहीं कीं।
+
+अगर मुझे वह exercise फिर से करने का मौका मिले, तो मैं एक भी box बनाने से पहले शुरुआती कुछ मिनट structure पर लगाऊँगा:
+
+1. **Assumptions बताऊँगा।** “मैं मान रहा हूँ कि document एक folder में रहता है, folders किसी भी गहराई तक nested हो सकते हैं और moves की तुलना में reads बहुत ज़्यादा होते हैं।”
+2. **Storage से पहले domain model करूँगा।** Folder, Document, उनके बीच के relationships और rules: किसमें क्या हो सकता है, किसका मालिक कौन है, और access कैसे दिया जाता है।
+3. **निर्णय के अहम बिंदु दिखाऊँगा।** बताऊँगा कि design कहाँ बदल सकता है: कई folders में documents, permission inheritance और उसके बाद ही hierarchy को persist करने का तरीका।
+4. **एक trade-off सिर्फ़ बोलकर नहीं, screen पर भी समझाऊँगा।** Paths क्यों, उनकी क्या कीमत है और किन परिस्थितियों में मैं दूसरा तरीका चुनूँगा।
+5. **बताऊँगा कि production से पहले किन बातों पर फिर से विचार करूँगा।** Indexing, एक ही समय में होने वाले moves, permission inheritance और scale।
+इंटरव्यू से मैंने यही सबक लिया, और यह अच्छा सबक है।
+
+लेकिन इसका एक दूसरा पहलू भी है। मुझे इस बारे में गहरी बातचीत अच्छी लगती कि मैं कोई खास design क्यों चुन रहा था, किन trade-offs पर विचार कर रहा था और production में इन समस्याओं से कैसे निपटता। मुझे लगा कि हमारी चर्चा में इन सवालों को सचमुच नहीं टटोला गया।
+
+## इंटरव्यू क्या माप सकता है और क्या नहीं
+बाद में मुझे मिले feedback में कहा गया कि मेरा domain-modeling ज्ञान और technical proficiency अपेक्षाओं पर खरे नहीं उतरे।
+
+मुझे सचमुच हैरानी हुई। इसलिए नहीं कि मैं ऐसा engineer हूँ जो गलतियाँ नहीं कर सकता। इसके ठीक उलट: मुझे पता है कि कुछ नया सीखने, किसी सीमा से टकराने या दूसरे engineer से बेहतर सुझाव सुनने के बाद मैंने कितनी बार architectural decision बदले हैं। मुझे जिस बात ने चौंकाया, वह मेरे feedback और उन systems के बीच का अंतर था जिन्हें मैं वास्तव में बना चुका था।
+
+इससे मेरे मन में एक सवाल आया: **क्या कोई technically capable engineer interview में खराब प्रदर्शन करके भी अपने काम में बहुत अच्छा हो सकता है?**
+
+मेरा मानना है कि हाँ। इसका उलटा भी हो सकता है। कोई व्यक्ति interview के सवालों के लिए बहुत अच्छी तैयारी कर सकता है, लेकिन उसके पास किसी जटिल production system को maintain करने का judgment न हो।
+
+Interface और abstract class के बीच का अंतर जानना ज़रूरी है। Relational modeling, C#, database fundamentals और design principles समझना भी ज़रूरी है। लेकिन ये पूरी engineering profession नहीं हैं। एक अनुभवी engineer को यह भी जानना होता है कि एक abstraction को दूसरे पर कब चुनना है, failures की जाँच कैसे करनी है, trade-offs कैसे लेने हैं, चीज़ों को कब सरल बनाना है और बिना technical background वाले लोगों को technical decisions कैसे समझाने हैं।
+
+एक छोटी-सी exercise में ये skills हमेशा दिख नहीं पातीं। सालों का experience अपने-आप competence साबित नहीं करता। लेकिन shared screen पर बना एक अधूरा model भी उन सालों की अहमियत अपने-आप मिटा नहीं देना चाहिए।
+
+## अच्छा evaluation कैसा होता है
+मुझे नहीं लगता कि हमें technical interviews खत्म कर देने चाहिए या उन्हें आसान बना देना चाहिए। Companies को अपने यहाँ नियुक्त किए जाने वाले लोगों का मूल्यांकन करने का पूरा अधिकार है, खासकर senior engineering और architecture positions के लिए। लेकिन interview इस तरह बनाया जाना चाहिए कि पता चले candidate क्या जानता है—सिर्फ़ यह पुष्टि करने के लिए नहीं कि interviewer वही सुन रहा है जिसकी उसे उम्मीद थी।
+
+स्पष्ट कर दूँ: समस्या यह नहीं है कि interviewer किसी खास design के लिए कहता है या उसे अस्वीकार करता है। Requirements पूरी न करने वाले design को अस्वीकार करना चाहिए। समस्या यह है कि reasoning को समझे बिना ही फैसला कर लिया जाए। Candidate को अपनी assumptions स्पष्ट करने, decisions के पक्ष में तर्क देने और trade-offs की समझ दिखाने का मौका मिलना चाहिए। किसी answer का मूल्यांकन करने और किसी engineer का मूल्यांकन करने में यही अंतर है।
+
+दिलचस्प बात यह है कि research कम नहीं, बल्कि ज़्यादा structure की वकालत करती है। Google की [guide to structured interviewing](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices) role से जुड़े सवाल, मानकीकृत scoring, interviewer training और उपयोगी follow-up questions की सलाह देती है। Hiring research के दशकों पर 2022 में किए गए एक re-analysis, जिसकी चर्चा [Society for Industrial and Organizational Psychology](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/) ने की, ने structured interviews को job performance के सबसे मज़बूत predictors में रखा।
+
+मेरे लिए structure और बातचीत एक-दूसरे के विरोधी नहीं हैं। अच्छा interviewer हर candidate से वही मुख्य सवाल पूछ सकता है, वही evaluation criteria लागू कर सकता है और फिर भी किसी अप्रत्याशित approach के बारे में जानने को उत्सुक रह सकता है। Domain-modeling exercise में ऐसे सवाल पूछने की कल्पना कीजिए:
+
+- “आपने path-based hierarchy क्यों चुनी?”
+- “हज़ारों documents वाले folder को move करने पर क्या होगा?”
+- “अगर documents कई folders में हो सकते हों, तो क्या आपका design बदलेगा?”
+- “Production में डालने से पहले आप किस बात पर दोबारा विचार करेंगे?”
+ये सवाल यह पता लगाने से कहीं ज़्यादा बताते हैं कि candidate ने कोई खास diagram बनाया या नहीं। ये engineering judgment को परखते हैं—और अनुभवी developer को hire करते समय मैं ठीक इसी चीज़ का मूल्यांकन करना चाहूँगा।
+
+ये सवाल दोनों पक्षों के लिए फ़ायदेमंद हैं। जो candidate अपनी reasoning स्पष्ट नहीं कर पाया, उसे ऐसा करने का उचित मौका मिलता है। और जिसने कोई pattern सिर्फ़ याद किया है, उसे यह दिखाना पड़ता है कि वह समझता भी है कि वह काम क्यों करता है।
+
+**एक अच्छा technical interview सिर्फ़ यह नहीं जानना चाहिए कि engineer क्या जानता है। उसे यह भी समझना चाहिए कि जब जवाब स्पष्ट न हो, तब वह engineer कैसे सोचता है।**
+
+## इसके बाद क्या हुआ
+यह अनुभव मेरी अपेक्षा से ज़्यादा समय तक मेरे साथ रहा। मैं सोचने लगा कि कहीं मैं लंबे projects पर काम करते हुए बहुत सहज तो नहीं हो गया हूँ। क्या मैं पीछे छूट गया था? क्या मैं किसी बुनियादी चीज़ को नज़रअंदाज़ कर रहा था?
+
+इसलिए मैंने खुद को चुनौती दी। पढ़ाई जारी रखी, अपने fundamentals मज़बूत किए, certifications पर काम किया और दूसरी engineering teams से बातचीत शुरू की। इनमें से कुछ बातचीत lead engineering और solution architecture positions के लिए थीं, और कई सकारात्मक रूप से आगे बढ़ीं।
+
+मुझे यह बात ध्यान खींचने वाली लगी कि interviewers एक जैसे experience का मूल्यांकन कितने अलग तरीक़ों से करते हैं। कुछ चर्चाओं में हमने मेरे बनाए systems, उनके पीछे के architectural decisions और उनकी teams जिन समस्याओं का सामना कर रही थीं, उनसे निपटने के मेरे तरीक़े पर बात की। कुछ अन्य में ध्यान खास technical exercises पर रहा।
+
+इसका मतलब यह नहीं कि एक interviewer सही था और दूसरा गलत। लेकिन इसने मुझे याद दिलाया कि interview का नतीजा सिर्फ़ candidate की वास्तविक क्षमता पर निर्भर नहीं करता। सवाल, expectations, दोनों पक्षों के बीच communication, evaluation criteria और interview लेने वाले लोगों का judgment—ये सब भी मायने रखते हैं।
+
+एक interview सबूत है। पूरी कहानी नहीं।
+
+## AI के दौर में यह बात और भी अहम क्यों है
+इसके साथ एक बड़ी चर्चा भी चल रही है: क्या AI software engineers की जगह ले लेगा? मेरा मानना है कि software engineering खत्म नहीं हो रही, बल्कि बदल रही है। AI हमारे काम के कुछ हिस्सों को automate करेगा और employers जिन skills को अहमियत देते हैं, उन्हें बदलेगा। फिर भी किसी को business की ज़रूरतें समझनी होंगी, नतीजे को validate करना होगा, customer data की सुरक्षा करनी होगी और कुछ गड़बड़ होने पर ज़िम्मेदारी लेनी होगी। Google की [2025 DORA research](https://dora.dev/research/2025/dora-report/) के अनुसार AI किसी organization की मौजूदा खूबियों और कमज़ोरियों को बढ़ा देता है। बेहतर tools अपने-आप बेहतर engineering decisions नहीं बनाते।
+
+इसका hiring पर सीधा असर पड़ता है। ऐसी दुनिया में जहाँ AI कुछ ही seconds में domain model बना सकता है, code लिख सकता है या architecture सुझा सकता है, हमारे interviews को उन बातों पर और ज़्यादा ध्यान देना चाहिए जिन्हें ये tools भरोसेमंद तरीके से साबित नहीं कर सकते: क्या engineer problem समझता है, assumptions पर सवाल उठाता है, trade-offs पहचानता है और production में solution की ज़िम्मेदारी ले सकता है। हर साल screen पर बना diagram कम साबित करता है। उसके पीछे की reasoning ज़्यादा साबित करती है।
+
+और माँग अब भी बनी हुई है। U.S. Bureau of Labor Statistics का [अनुमान है कि software developers, quality assurance analysts और testers के संयुक्त समूह में employment 2025 से 2035 के बीच 10% बढ़ेगा](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm), और World Economic Forum की [Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook) में software और applications developers को 2030 तक सबसे तेज़ी से बढ़ने वाली भूमिकाओं में रखा गया है। ये अनुमान हैं, वादे नहीं। लेकिन अगर industry engineers को hire करती रहेगी, तो उनका अच्छा मूल्यांकन करना सीखना भी ज़रूरी है।
+
+## Chaplin की वह कहानी जो सच नहीं थी
+जब भी किसी के साथ अन्यायपूर्ण फ़ैसला होता, तो मैं एक पुरानी कहानी सुनाया करता था: Charlie Chaplin एक बार Charlie Chaplin जैसे दिखने वालों की प्रतियोगिता में शामिल हुए और तीसरे स्थान पर आए। इस लेख के लिए research करते समय मुझे पता चला कि यह लगभग निश्चित रूप से एक मनगढ़ंत कहानी है। [आधिकारिक Charlie Chaplin archive](https://www.charliechaplin.com/en/articles/334) बताता है कि यह कहानी कैसे फैली और इसमें Chaplin का अपना बयान भी शामिल है, जिसमें वे इसका खंडन करते हैं।
+
+दिलचस्प बात वह प्रतियोगिता नहीं है। दिलचस्प यह है कि मैंने सालों तक उस कहानी को इसलिए दोहराया क्योंकि वह मेरी पहले से बनी धारणा की पुष्टि करती थी। Interviewers भी first impression के साथ ऐसा कर सकते हैं, और candidates rejection के साथ। कोई कहानी सुनने में विश्वसनीय हो, तो ज़रूरी नहीं कि वह सही भी हो; और कोई evaluation आत्मविश्वास से दिया गया हो, तो ज़रूरी नहीं कि वह पूरी तस्वीर दिखाए।
+
+## मेज़ के दोनों ओर के लोगों से
+हर उस engineer से जिसने interview में सफलता नहीं पाई: उससे सीखें, लेकिन उसे अपनी पहचान न बनने दें। सवालों की समीक्षा करें, पता लगाएँ कि आप क्या साफ़ तौर पर नहीं समझा पाए, fundamentals पर फिर से काम करें और सिर्फ़ जवाब तक पहुँचने के बजाय अपनी reasoning बताने का अभ्यास करें। हो सकता है कि कुछ वास्तविक कमियाँ हों जिन पर आपको काम करना है। यह भी हो सकता है कि interview का format आपको अपनी खूबियाँ दिखाने का मौका न दे पाया हो। दोनों बातें एक साथ सच हो सकती हैं। बनाते रहें और सीखते रहें।
+
+Interview लेने वाले हर engineer से: याद रखें कि आप screen पर दिए गए जवाब से ज़्यादा का मूल्यांकन कर रहे हैं। आप यह समझना चाहते हैं कि कोई व्यक्ति कैसे सोचता, सीखता और समस्याएँ हल करता है। उसकी सोच को चुनौती दें, मुश्किल सवाल पूछें और स्पष्टता व गहराई की अपेक्षा रखें। लेकिन अपने से अलग approach को समझने के लिए उत्सुक भी रहें।
+
+और दोनों पक्षों से: जिज्ञासु बने रहें। जिस पल हमें यक़ीन हो जाता है कि हमारा तरीक़ा ही एकमात्र सही तरीक़ा है, अक्सर उसी पल हम सीखना बंद कर देते हैं।
+
+इस profession में लगभग 13 साल बिताने के बाद भी मुझे एक बात पर पूरा यक़ीन है: सबसे अच्छे engineers वे नहीं होते जिन्हें हर जवाब पता हो। वे होते हैं जो सीखते रहते हैं, गलत होने पर अपना तरीका बदलते हैं और सामने की समस्याओं को हल करने की ज़िम्मेदारी लेते हैं।
+
+**एक interview आपको बता सकता है कि किसी ने उस दिन कैसा प्रदर्शन किया। लेकिन सिर्फ़ उसी से यह पूरी कहानी नहीं पता चलती कि वह क्या बना सकता है।**
+
+---
+*ये software engineering, architecture और enterprise application development में मेरे काम के निजी अनुभवों पर आधारित विचार हैं। मेरा उद्देश्य technical interviews से हतोत्साहित करना नहीं, बल्कि engineers और उनका मूल्यांकन करने वाले लोगों के बीच बेहतर बातचीत को बढ़ावा देना है।*
+
+## स्रोत
+
+- Microsoft Learn, [Hierarchical data (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server)
+- Google re:Work, [A guide to structured interviewing](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices)
+- SIOP, [Is cognitive ability the best predictor of job performance?](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/)
+- DORA, [2025 State of AI-assisted Software Development](https://dora.dev/research/2025/dora-report/)
+- U.S. Bureau of Labor Statistics, [Occupational Outlook Handbook: Software Developers](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm)
+- World Economic Forum, [Future of Jobs Report 2025: Jobs outlook](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook)
+- Charlie Chaplin official site, [Did Charlie Chaplin once lose his own lookalike contest?](https://www.charliechaplin.com/en/articles/334)

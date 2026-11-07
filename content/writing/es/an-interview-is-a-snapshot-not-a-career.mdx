@@ -1,0 +1,152 @@
+---
+title: "Una entrevista es una instantánea, no una carrera"
+description: "Lo que una entrevista técnica me enseñó sobre la experiencia en ingeniería, las decisiones de contratación y por qué nunca quiero dejar de aprender."
+date: "2026-11-06"
+locale: es
+translationKey: an-interview-is-a-snapshot-not-a-career
+translationSourceHash: 7023c1381e7c515cc5aae20cc00dc1269778083bb097e303939733ddda6c6d6d
+tags:
+  - Engineering
+  - Career
+published: true
+featured: false
+---
+*Lo que una entrevista técnica me enseñó sobre la experiencia en ingeniería, las decisiones de contratación y por qué nunca quiero dejar de aprender.*
+
+La retroalimentación cabía en dos oraciones. Mi carrera ha durado casi trece años. Durante unos días, esas dos oraciones pesaron más de lo que deberían.
+
+Llevo casi 13 años escribiendo software. Durante todo ese tiempo, he preferido construir relaciones a largo plazo con clientes y equipos en lugar de pasar de una oportunidad a otra. Disfruto entender un negocio, aprender sobre sus problemas, crear soluciones y ver cómo esas soluciones evolucionan.
+
+Algunos de los trabajos más gratificantes que he hecho han consistido en mantener y modernizar sistemas de los que la gente depende todos los días. Si has trabajado bastante tiempo en aplicaciones empresariales, sabes que escribir el código suele ser la parte fácil. Entender por qué algo se construyó de cierta manera, qué podría fallar al cambiarlo y cómo mejorarlo sin interrumpir el negocio es donde ocurre gran parte del verdadero trabajo de ingeniería.
+
+Al mismo tiempo, nunca he creído que los años de experiencia por sí solos sean suficientes. La tecnología cambia constantemente, así que procuro seguir las novedades, estudiar arquitecturas nuevas y trabajar con herramientas emergentes. Últimamente, gran parte de mi atención se ha centrado en la IA, la arquitectura en la nube, los agentes inteligentes y la manera en que están cambiando nuestra forma de crear software.
+
+Hay algo más que he estado observando, sobre todo en LinkedIn: cada vez más ingenieros hablan de lo difíciles que se han vuelto las entrevistas técnicas. Durante mucho tiempo no le di mayor importancia. Luego, una experiencia reciente me hizo reconsiderar qué estamos midiendo realmente cuando entrevistamos a ingenieros de software.
+
+## Una entrevista que no he olvidado
+Hace poco participé en una entrevista técnica para un puesto de ingeniería. No voy a mencionar la empresa ni a la persona que me entrevistó. Esto no se trata de criticar a alguien en particular, sino de algo que creo que nuestra industria debería conversar con más apertura.
+
+Por lo general, disfruto las entrevistas técnicas cuando se sienten como conversaciones. Quiero entender qué problemas está resolviendo un equipo. Me gusta hablar de arquitectura, compartir experiencias, cuestionar supuestos y, a veces, incluso discrepar sobre un enfoque. Así funciona la ingeniería en la vida real.
+
+Esta entrevista fue diferente. Después de una breve presentación sobre mi experiencia y las tecnologías que había estado usando, pasamos casi de inmediato a un ejercicio compartiendo la pantalla: diseñar un modelo de dominio para un sistema de administración de carpetas y documentos.
+
+Era un problema conocido. Antes había construido, con trabajo práctico, una solución completa para administrar documentos, incluyendo almacenamiento, procesamiento, organización y los desafíos que aparecen cuando un sistema supera la etapa de un simple prototipo.
+
+Empecé a crear el modelo. Y ahí fue cuando la cosa se puso interesante.
+
+## Un problema, muchos diseños válidos
+Al principio, un sistema para administrar carpetas y documentos parece sencillo: carpetas, documentos, las relaciones entre ellos y quizá una ubicación de almacenamiento. Quien haya construido uno sabe que el diseño se pone interesante en cuanto empiezas a hacer preguntas:
+
+- ¿Cómo representas las carpetas anidadas?
+- ¿Cómo recuperas eficientemente el árbol completo de carpetas?
+- ¿Qué ocurre cuando se cambia el nombre de una carpeta o se mueve?
+- ¿Puede un documento pertenecer a más de una carpeta?
+- ¿Cómo se propagan los permisos a lo largo del árbol?
+- ¿Qué cambia cuando trabajas con millones de registros?
+Durante el ejercicio, me incliné por representar la jerarquía con rutas en lugar de depender únicamente de referencias entre padres e hijos. Esa preferencia surgió de mi experiencia práctica con datos jerárquicos y con los patrones de consulta que generan los usuarios reales.
+
+Al verlo en retrospectiva, un arquitecto con experiencia podría preguntar con razón: si el ejercicio era sobre modelado de dominio, ¿por qué ya estaba optimizando cómo se almacena la jerarquía? El modelo de dominio va primero: las entidades, sus relaciones y las reglas de negocio. Las carpetas contienen carpetas y documentos; el acceso sigue las reglas que establece el negocio. La manera de persistir esa jerarquía —ya sea con referencias a padres, rutas o algún otro mecanismo— es una decisión aparte que debería derivarse de esas reglas y de los patrones de acceso. Mi experiencia me llevó a pensar en el almacenamiento antes de hacer visible el dominio.
+
+
+Ambas opciones de almacenamiento son válidas. Una ruta materializada puede simplificar las consultas a subárboles, pero mover una carpeta, o cambiarle el nombre cuando las rutas incluyen nombres de carpetas, puede requerir actualizar las rutas de sus descendientes. Con una referencia al padre, mover una carpeta implica cambiar una sola fila y las claves foráneas protegen las relaciones, pero leer un árbol profundo requiere una consulta recursiva. La [documentación de Microsoft sobre datos jerárquicos en SQL Server](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server) analiza las ventajas y desventajas de las relaciones entre padres e hijos y de la representación especializada hierarchyid. Otros enfoques, como las tablas de cierre (`closure tables`) y los modelos híbridos, también pueden ser apropiados según los requisitos.
+
+En un sistema real, el modelo de almacenamiento representa solo una parte del costo. Mover una carpeta también puede implicar recalcular los permisos heredados, actualizar los índices de búsqueda y registrar el historial de auditoría, independientemente de la representación que elijas. Precisamente por eso hay que prestar atención a las reglas de dominio antes de optimizar el almacenamiento.
+
+Las relaciones entre documentos siguen la misma lógica. Si cada documento pertenece exactamente a una carpeta, una clave foránea `FolderId` en el documento suele ser el diseño más sencillo. Si un documento puede aparecer en varias carpetas, se justifica una tabla de asociación aparte.
+
+El diseño correcto depende de los requisitos. Por eso mismo vale la pena hablar de ellos.
+
+## En qué me quedé corto
+Durante el ejercicio, expliqué parte de este razonamiento y ajusté mi enfoque al considerar distintas posibilidades. Pero también cometí un error: **no dejé suficientemente claro mi razonamiento en el modelo.**
+
+Las entidades, relaciones y campos que me parecían obvios por mi experiencia previa nunca llegaron a la pantalla. Estaba pensando en la aplicación completa, incluido cómo se almacenaría, mientras que el ejercicio pedía un modelo de dominio claro y concreto. Quien entrevista solo puede evaluar lo que comunica una persona candidata y, aunque expliqué verbalmente parte de mi razonamiento, no dejé suficiente de ese razonamiento explícito en el modelo.
+
+Si pudiera repetir ese ejercicio, dedicaría los primeros minutos a definir la estructura antes de dibujar una sola caja:
+
+1. **Explicaría los supuestos.** «Supongo que un documento vive en una carpeta, que las carpetas pueden anidarse a cualquier profundidad y que las lecturas son mucho más frecuentes que los movimientos».
+2. **Modelaría el dominio antes que el almacenamiento.** Carpeta, Documento, las relaciones entre ellos y las reglas: qué puede contener qué, quién es propietario de qué y cómo se otorga el acceso.
+3. **Señalaría los puntos de decisión.** Mostraría dónde se ramifica el diseño: documentos en varias carpetas, herencia de permisos y solo después cómo se persiste la jerarquía.
+4. **Explicaría una ventaja y una desventaja en pantalla, no solo en voz alta.** Por qué usar rutas, qué costo tienen y qué me haría cambiar de enfoque.
+5. **Terminaría con lo que revisaría antes de producción.** Indexación, movimientos simultáneos, herencia de permisos y escala.
+Esa es la lección que me llevé de la entrevista, y es una buena lección.
+
+Pero hay otra cara. Me habría gustado tener una conversación más profunda sobre por qué elegía un diseño determinado, qué ventajas y desventajas estaba sopesando y cómo abordaría esos problemas en producción. Me fui con la sensación de que nuestra conversación no había explorado realmente esas preguntas.
+
+## Qué puede y qué no puede medir una entrevista
+La retroalimentación que recibí después decía que mis conocimientos sobre modelado de dominio y mi competencia técnica no habían cumplido las expectativas.
+
+Me sorprendió de verdad. No porque crea que soy un ingeniero incapaz de equivocarse. Todo lo contrario: sé cuántas veces he cambiado una decisión de arquitectura después de aprender algo nuevo, toparme con una limitación o escuchar una idea mejor de otro ingeniero. Lo que me sorprendió fue la distancia entre esa retroalimentación y los sistemas que realmente había construido.
+
+Me dejó una pregunta: **¿puede un ingeniero técnicamente competente tener un mal desempeño en una entrevista y aun así ser muy bueno en su trabajo?**
+
+Creo que sí. Y también puede ocurrir lo contrario. Alguien puede prepararse muy bien para las preguntas de una entrevista sin tener el criterio necesario para mantener un sistema complejo en producción.
+
+Es importante saber distinguir una interfaz de una clase abstracta. También importa entender el modelado relacional, C#, los fundamentos de las bases de datos y los principios de diseño. Pero estas cosas no abarcan toda la profesión. Un ingeniero con experiencia también necesita saber cuándo elegir una abstracción sobre otra, cómo investigar fallas, cómo sopesar alternativas, cuándo simplificar y cómo explicar decisiones técnicas a personas sin formación técnica.
+
+Esas habilidades no siempre se ven en un ejercicio breve. Los años de experiencia no demuestran competencia de forma automática. Pero un modelo incompleto en una pantalla compartida tampoco debería borrar automáticamente el valor de esos años.
+
+## Cómo debería ser una buena evaluación
+No creo que debamos eliminar las entrevistas técnicas ni hacerlas más fáciles. Las empresas tienen todo el derecho de evaluar a las personas que contratan, sobre todo para puestos sénior de ingeniería y arquitectura. Pero una entrevista debería servir para descubrir lo que sabe una persona candidata, no solo para confirmar lo que quien entrevista espera escuchar.
+
+Para ser claro, el problema no es que quien entrevista pida un diseño específico, ni siquiera que lo rechace. Si un diseño no cumple los requisitos, hay que rechazarlo. El problema es llegar a una conclusión sin explorar el razonamiento detrás de ese diseño. Una persona candidata debería tener la oportunidad de aclarar sus supuestos, defender sus decisiones y demostrar si entiende las ventajas y desventajas. Esa es la diferencia entre evaluar una respuesta y evaluar a un ingeniero.
+
+Curiosamente, las investigaciones recomiendan más estructura, no menos. La [guía de Google sobre entrevistas estructuradas](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices) recomienda preguntas pertinentes para el puesto, criterios de evaluación estandarizados, capacitación para quienes entrevistan y preguntas de seguimiento significativas. Un nuevo análisis de 2022 sobre décadas de investigación de contratación, comentado por la [Society for Industrial and Organizational Psychology](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/), situó las entrevistas estructuradas entre los indicadores más sólidos del desempeño laboral.
+
+Para mí, la estructura y la conversación no son opuestas. Una buena persona entrevistadora puede hacerle a cada candidato las mismas preguntas centrales, aplicar los mismos criterios de evaluación y, aun así, mostrar curiosidad ante un enfoque inesperado. Imagina escuchar estas preguntas durante un ejercicio de modelado de dominio:
+
+- «¿Qué te llevó a elegir una jerarquía basada en rutas?»
+- «¿Qué ocurre cuando movemos una carpeta que contiene miles de documentos?»
+- «¿Cambiaría tu diseño si los documentos pudieran pertenecer a varias carpetas?»
+- «¿Qué revisarías antes de llevar esto a producción?»
+Esas preguntas revelan mucho más que si una persona candidata produjo un diagrama determinado. Ponen a prueba el criterio de ingeniería, que es precisamente lo que me gustaría evaluar al contratar a un desarrollador con experiencia.
+
+Y también benefician a ambas partes. Una persona candidata que no hizo visible su razonamiento tiene una oportunidad justa para explicarlo. Una persona candidata que memorizó un patrón tiene que demostrar que entiende por qué funciona.
+
+**Una buena entrevista técnica no debería limitarse a descubrir lo que sabe un ingeniero. También debería descubrir cómo piensa cuando la respuesta no es obvia.**
+
+## Qué pasó después
+Esa experiencia se quedó conmigo más tiempo del que esperaba. Empecé a preguntarme si me había acomodado demasiado trabajando en proyectos a largo plazo. ¿Me había quedado atrás? ¿Estaba pasando por alto algo fundamental?
+
+Así que me puse a prueba. Seguí estudiando, reforcé mis fundamentos, trabajé en certificaciones y empecé a conversar con otros equipos de ingeniería. Algunas de esas conversaciones eran para puestos de liderazgo en ingeniería y arquitectura de soluciones, y varias avanzaron favorablemente.
+
+Lo que más me llamó la atención fue lo distinto que era el modo en que las personas entrevistadoras evaluaban experiencias parecidas. En algunas conversaciones, exploramos los sistemas que había construido, las decisiones de arquitectura detrás de ellos y cómo abordaría los problemas que enfrentaban sus equipos. En otras, el enfoque estaba en ejercicios técnicos específicos.
+
+Eso no significa que una persona entrevistadora tuviera razón y otra estuviera equivocada. Pero me recordó que los resultados de una entrevista dependen de más que la capacidad real de una persona candidata. También dependen de las preguntas, las expectativas, la comunicación de ambas partes, los criterios de evaluación y el criterio de quienes realizan la entrevista.
+
+Una entrevista aporta evidencia. No cuenta toda la historia.
+
+## Por qué esto importa más en la era de la IA
+Junto a todo esto hay una conversación más amplia: ¿la IA reemplazará a los ingenieros de software? En mi opinión, la ingeniería de software no está desapareciendo, pero sí está cambiando. La IA automatizará algunas partes de nuestro trabajo y transformará las habilidades que valoran los empleadores. Aun así, alguien tiene que averiguar qué necesita el negocio, validar el resultado, proteger los datos de los clientes y asumir la responsabilidad cuando algo falla. La [investigación DORA de 2025 de Google](https://dora.dev/research/2025/dora-report/) describe la IA como un amplificador de las fortalezas y debilidades que una organización ya tiene. Las mejores herramientas no se traducen automáticamente en mejores decisiones de ingeniería.
+
+Eso tiene una consecuencia directa para la contratación. En un mundo donde la IA puede generar un modelo de dominio, escribir código o proponer una arquitectura en segundos, nuestras entrevistas deberían centrarse aún más en lo que esas herramientas no pueden determinar de forma confiable: si un ingeniero entiende el problema, cuestiona los supuestos, reconoce las ventajas y desventajas y puede asumir la responsabilidad de una solución en producción. Cada año, un diagrama en una pantalla demuestra menos. El razonamiento que hay detrás demuestra más.
+
+Y la demanda sigue ahí. La Oficina de Estadísticas Laborales de Estados Unidos [proyecta que el empleo del grupo de desarrolladores de software, analistas de aseguramiento de calidad y testers crecerá un 10% entre 2025 y 2035](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm), y el [Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook) del Foro Económico Mundial incluye a los desarrolladores de software y aplicaciones entre los puestos de más rápido crecimiento hasta 2030. Son proyecciones, no promesas. Pero si la industria sigue contratando ingenieros, vale la pena aprender a evaluarlos bien.
+
+## La historia de Chaplin que no era cierta
+Hay una vieja historia que solía contar cuando alguien se enfrentaba a un juicio injusto: Charlie Chaplin participó una vez en un concurso de imitadores de Charlie Chaplin y quedó en tercer lugar. Mientras investigaba para este artículo, descubrí que casi con toda seguridad es una leyenda. El [archivo oficial de Charlie Chaplin](https://www.charliechaplin.com/en/articles/334) explica cómo se difundió la historia e incluye el propio relato de Chaplin, en el que la desmiente.
+
+El concurso no es lo interesante. Lo interesante es que repetí esa historia durante años porque confirmaba lo que ya creía. Quienes entrevistan pueden hacer lo mismo con una primera impresión, y las personas candidatas pueden hacer lo mismo con un rechazo. Una historia convincente no necesariamente es precisa, y una evaluación hecha con seguridad no necesariamente es completa.
+
+## A ambos lados de la mesa
+A cada ingeniero que no ha pasado una entrevista: aprende de la experiencia, pero no dejes que te defina. Repasa las preguntas, identifica qué no pudiste explicar con claridad, vuelve a los fundamentos y practica cómo comunicar tu razonamiento, no solo cómo llegar a una respuesta. Puede que tengas brechas reales que debas atender. También es posible que te hayas encontrado con un formato que no te permitió mostrar tus fortalezas. Ambas cosas pueden ser ciertas. Sigue construyendo y sigue aprendiendo.
+
+A cada ingeniero que realiza entrevistas: recuerda que estás evaluando más que una respuesta en una pantalla. Intentas entender cómo piensa, aprende y resuelve problemas una persona. Cuestiona su razonamiento, haz preguntas difíciles y espera claridad y profundidad. Pero conserva la curiosidad necesaria para entender un enfoque distinto del tuyo.
+
+Y a ambas partes: mantengan la curiosidad. El momento en que nos convencemos de que nuestra manera es la única correcta suele ser también el momento en que dejamos de aprender.
+
+Después de casi 13 años en esta profesión, hay algo de lo que sigo convencido: los mejores ingenieros no son quienes conocen todas las respuestas. Son quienes siguen aprendiendo, se adaptan cuando se equivocan y se hacen responsables de resolver los problemas que tienen enfrente.
+
+**Una sola entrevista puede decirte cómo se desempeñó alguien ese día. Por sí sola, no puede contarte toda la historia de lo que esa persona es capaz de construir.**
+
+---
+*Estas son reflexiones personales sobre mi experiencia en ingeniería de software, arquitectura y desarrollo de aplicaciones empresariales. Mi objetivo no es desalentar las entrevistas técnicas, sino fomentar mejores conversaciones entre los ingenieros y las personas que los evalúan.*
+
+## Fuentes
+
+- Microsoft Learn, [Hierarchical data (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server)
+- Google re:Work, [A guide to structured interviewing](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices)
+- SIOP, [Is cognitive ability the best predictor of job performance?](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/)
+- DORA, [2025 State of AI-assisted Software Development](https://dora.dev/research/2025/dora-report/)
+- U.S. Bureau of Labor Statistics, [Occupational Outlook Handbook: Software Developers](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm)
+- World Economic Forum, [Future of Jobs Report 2025: Jobs outlook](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook)
+- Charlie Chaplin official site, [Did Charlie Chaplin once lose his own lookalike contest?](https://www.charliechaplin.com/en/articles/334)

@@ -15,6 +15,11 @@ export const localeContentTargets = {
     "complex-product-configuration-platform": { en: "complex-product-configuration-platform", es: "complex-product-configuration-platform", hi: "complex-product-configuration-platform" },
   },
   writing: {
+    "an-interview-is-a-snapshot-not-a-career": {
+      en: "an-interview-is-a-snapshot-not-a-career",
+      es: "an-interview-is-a-snapshot-not-a-career",
+      hi: "an-interview-is-a-snapshot-not-a-career",
+    },
     "guarded-ai-software-factory": {
       en: "guarded-ai-software-factory",
       es: "guarded-ai-software-factory",

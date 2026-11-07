@@ -1,0 +1,151 @@
+---
+title: "An Interview Is a Snapshot, Not a Career"
+description: "What one technical interview taught me about engineering experience, hiring decisions, and why I never want to stop learning."
+date: "2026-11-06"
+locale: en
+translationKey: an-interview-is-a-snapshot-not-a-career
+tags:
+  - Engineering
+  - Career
+published: true
+featured: false
+---
+*What one technical interview taught me about engineering experience, hiring decisions, and why I never want to stop learning.*
+
+The feedback fit in two sentences. My career has taken almost thirteen years. For a few days, the two sentences felt heavier.
+
+I've been writing software for almost 13 years. Throughout that time, I've preferred building long-term relationships with clients and teams over moving from one opportunity to the next. I enjoy understanding a business, learning its problems, building solutions, and watching those solutions evolve.
+
+Some of the most rewarding work I've done has been maintaining and modernizing systems that people depend on every day. If you've worked on enterprise applications long enough, you know that writing the code is often the easy part. Understanding why something was built a certain way, what might break when you change it, and how to improve it without disrupting the business is where much of the real engineering happens.
+
+At the same time, I've never believed that years of experience alone are enough. Technology changes constantly, so I make a habit of following new developments, studying new architectures, and working with emerging tools. Lately, much of that attention has gone to AI, cloud architecture, intelligent agents, and how they are changing the way we build software.
+
+There's something else I've been noticing, especially on LinkedIn: more engineers talking about how difficult technical interviews have become. For a long time, I didn't think much about it. Then a recent experience made me reconsider what we are actually measuring when we interview software engineers.
+
+## An interview that stayed with me
+Recently, I took part in a technical interview for an engineering position. I won't name the company or the interviewer. This isn't about criticizing an individual; it's about something I think our industry should discuss more openly.
+
+I generally enjoy technical interviews when they feel like conversations. I want to understand the problems a team is solving. I enjoy discussing architecture, sharing experiences, challenging assumptions, and sometimes even disagreeing about an approach. That's how engineering works in real life.
+
+This interview felt different. After a brief introduction about my experience and the technologies I'd been using, we moved almost immediately into a screen-sharing exercise: design a domain model for a folder and document management system.
+
+It was a familiar problem. I had previously built a complete document management solution hands-on, including storage, processing, organization, and the challenges that appear once a system grows beyond a simple prototype.
+
+I started creating the model. And that's where things became interesting.
+
+## One problem, many valid designs
+A folder and document management system looks simple at first: folders, documents, the relationships between them, and perhaps a storage location. Anyone who has built one knows the design gets interesting the moment you start asking questions:
+
+- How do you represent nested folders?
+- How do you retrieve an entire folder tree efficiently?
+- What happens when a folder is renamed or moved?
+- Can a document belong to more than one folder?
+- How do permissions propagate down the tree?
+- What changes when you're dealing with millions of records?
+During the exercise, I leaned toward representing the hierarchy with paths rather than relying only on parent-child references. That preference came from practical experience with hierarchical data and the retrieval patterns real users create.
+
+Looking back, an experienced architect could fairly ask: if the exercise was about domain modeling, why was I already optimizing how the hierarchy is stored? A domain model comes first: the entities, their relationships, and the business rules. Folders contain folders and documents; access follows rules the business sets. How that hierarchy is persisted, whether as parent references, paths, or something else, is a separate decision that should follow from those rules and from the access patterns. My experience pulled me toward the storage question before I had made the domain visible.
+
+
+Both storage choices are legitimate. A materialized path can simplify subtree queries, but moving a folder, or renaming one when paths contain folder names, may require updating descendant paths. A parent reference makes the move itself a one-row change and lets foreign keys protect the relationships, but reading a deep tree requires a recursive query. Microsoft's [SQL Server hierarchical data documentation](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server) explores the trade-offs between parent-child relationships and its specialized hierarchyid representation. Other approaches, such as closure tables and hybrid models, may also be appropriate depending on requirements.
+
+In a real system, the storage model is only part of the cost. Moving a folder can also mean recalculating inherited permissions, refreshing search indexes, and recording audit history, whichever representation you choose. That's precisely why the domain rules deserve attention before the storage optimization.
+
+Document relationships follow the same logic. If every document belongs to exactly one folder, a `FolderId` foreign key on the document is often the simplest design. If a document can appear in several folders, a separate mapping table earns its place.
+
+The correct design depends on the requirements. Which is exactly why the requirements are worth talking about.
+
+## Where I fell short
+During the exercise, I talked through parts of this reasoning and adjusted my approach as I considered different possibilities. But I also made a mistake: **I didn't make enough of my reasoning visible in the actual model.**
+
+Entities, relationships, and fields that felt obvious from previous experience never made it onto the screen. I was thinking about the whole application, including how it would be stored, while the exercise asked for a clear, concrete domain model. An interviewer can only evaluate what a candidate communicates, and while I explained some of my reasoning verbally, I didn't make enough of it explicit in the model itself.
+
+If I could take that exercise again, I'd spend the first few minutes on structure before drawing a single box:
+
+1. **State the assumptions.** "I'm assuming a document lives in one folder, folders nest to any depth, and reads far outnumber moves."
+2. **Model the domain before the storage.** Folder, Document, the relationships between them, and the rules: what can contain what, who owns what, how access is granted.
+3. **Mark the decision points.** Show where the design branches: multi-folder documents, permission inheritance, and only then how the hierarchy is persisted.
+4. **Explain one trade-off on screen, not just out loud.** Why paths, what they cost, and what would make me switch.
+5. **Close with what I'd revisit before production.** Indexing, concurrent moves, permission inheritance, scale.
+That's the lesson I took from the interview, and it's a good one.
+
+But there's another side to it. I would have enjoyed a deeper conversation about why I was choosing a particular design, what trade-offs I was weighing, and how I'd approach those problems in production. I left feeling that our discussion hadn't really explored those questions.
+
+## What an interview can and can't measure
+The feedback I received afterward said my domain-modeling knowledge and technical proficiency had not met expectations.
+
+I was genuinely surprised. Not because I think I'm an engineer who can't make mistakes. Quite the opposite: I know how often I've changed an architectural decision after learning something new, hitting a limitation, or hearing a better idea from another engineer. What surprised me was the distance between the feedback and the systems I had actually built.
+
+It left me with a question: **can a technically capable engineer perform poorly in an interview and still be very good at the job?**
+
+I believe the answer is yes. And the reverse can also be true. Someone can be extremely well prepared for interview questions without having the judgment to maintain a complex production system.
+
+Knowing the difference between an interface and an abstract class matters. Understanding relational modeling, C#, database fundamentals, and design principles matters. But these things are not the entire profession. An experienced engineer also needs to know when to choose one abstraction over another, how to investigate failures, how to make trade-offs, when to simplify, and how to explain technical decisions to people without a technical background.
+
+Those skills aren't always visible in a short exercise. Years of experience don't automatically prove competence. But one incomplete model on a shared screen shouldn't automatically erase the value of those years either.
+
+## What good evaluation looks like
+I don't think we should eliminate technical interviews or make them easier. Companies have every right to evaluate the people they hire, especially for senior engineering and architecture positions. But an interview should be designed to discover what a candidate knows, not simply confirm what the interviewer expects to hear.
+
+To be clear, the problem isn't an interviewer asking for a particular design, or even rejecting one. A design that fails the requirements should be rejected. The problem is reaching a verdict without exploring the reasoning behind it. A candidate should have the chance to clarify assumptions, defend decisions, and show whether they understand the trade-offs. That's the difference between evaluating an answer and evaluating an engineer.
+
+Interestingly, the research argues for more structure, not less. Google's [guide to structured interviewing](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices) recommends role-relevant questions, standardized scoring, interviewer training, and meaningful follow-up questions. A 2022 re-analysis of decades of hiring research, discussed by the [Society for Industrial and Organizational Psychology](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/), placed structured interviews among the strongest predictors of job performance.
+
+To me, structure and conversation aren't opposites. A good interviewer can ask every candidate the same core questions, apply the same evaluation criteria, and still be curious about an unexpected approach. Imagine hearing these during a domain-modeling exercise:
+
+- "What made you choose a path-based hierarchy?"
+- "What happens when we move a folder containing thousands of documents?"
+- "Would your design change if documents could belong to multiple folders?"
+- "What would you revisit before putting this into production?"
+Those questions reveal much more than whether a candidate produced a particular diagram. They test engineering judgment, which is exactly what I'd want to evaluate when hiring an experienced developer.
+
+They also cut both ways. A candidate who hasn't made their reasoning visible gets a fair chance to do so. A candidate who memorized a pattern has to show they understand why it works.
+
+**A good technical interview shouldn't just discover what an engineer knows. It should discover how that engineer thinks when the answer isn't obvious.**
+
+## What happened afterward
+That experience stayed with me longer than I expected. I began questioning whether I had become too comfortable working on long-term projects. Had I fallen behind? Was I overlooking something fundamental?
+
+So I challenged myself. I kept studying, strengthened my fundamentals, worked on certifications, and started conversations with other engineering teams. Some of those conversations involved lead engineering and solution architecture positions, and several progressed positively.
+
+What stood out was how differently interviewers evaluated similar experience. In some discussions, we explored the systems I'd built, the architectural decisions behind them, and how I'd approach the problems their teams were facing. In others, the focus was on specific technical exercises.
+
+That doesn't mean one interviewer was right and another was wrong. But it reminded me that interview outcomes depend on more than a candidate's actual ability. They also depend on the questions, the expectations, the communication on both sides, the evaluation criteria, and the judgment of the people conducting them.
+
+An interview is evidence. It isn't the complete story.
+
+## Why this matters more in the age of AI
+There's a bigger conversation running alongside all of this: will AI replace software engineers? My view is that software engineering isn't disappearing, but it is changing. AI will automate parts of our work and shift the skills employers value. Yet someone still has to work out what the business needs, validate the result, protect customer data, and take responsibility when something fails. Google's [2025 DORA research](https://dora.dev/research/2025/dora-report/) describes AI as an amplifier of an organization's existing strengths and weaknesses. Better tools don't automatically create better engineering decisions.
+
+That has a direct consequence for hiring. In a world where AI can generate a domain model, write code, or suggest an architecture in seconds, our interviews should focus even more on what those tools can't reliably establish: whether an engineer understands the problem, questions assumptions, recognizes trade-offs, and can take responsibility for a solution in production. A diagram on a screen proves less every year. The reasoning behind it proves more.
+
+And the demand is still there. The U.S. Bureau of Labor Statistics [projects employment of software developers, quality assurance analysts, and testers to grow 10% from 2025 to 2035](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm), and the World Economic Forum's [Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook) lists software and applications developers among the fastest-growing roles through 2030. These are forecasts, not promises. But if the industry keeps hiring engineers, it's worth learning to evaluate them well.
+
+## The Chaplin story that wasn't
+There's an old story I used to tell whenever someone faced an unfair judgment: Charlie Chaplin once entered a Charlie Chaplin lookalike contest and finished third. While researching this article, I learned it's almost certainly a legend. The [official Charlie Chaplin archive](https://www.charliechaplin.com/en/articles/334) traces how the story spread and includes Chaplin's own account disputing it.
+
+The contest isn't the interesting part. What's interesting is that I repeated the story for years because it confirmed what I already believed. Interviewers can do the same with a first impression, and candidates can do the same with a rejection. A convincing story isn't necessarily an accurate one, and a confident evaluation isn't necessarily a complete one.
+
+## To both sides of the table
+To every engineer who has failed an interview: learn from it, but don't let it define you. Review the questions, identify what you couldn't explain clearly, revisit the fundamentals, and practice communicating your reasoning, not just arriving at an answer. You may have genuine gaps to address. You may also have met a format that didn't let you show your strengths. Both things can be true. Keep building, and keep learning.
+
+To every engineer conducting interviews: remember that you're evaluating more than an answer on a screen. You're trying to understand how someone thinks, learns, and solves problems. Challenge their thinking, ask difficult questions, and expect clarity and depth. But stay curious enough to understand an approach different from your own.
+
+And to both sides: stay curious. The moment we become convinced that our way is the only correct way is often the moment we stop learning.
+
+After almost 13 years in this profession, one thing I remain convinced of is that the best engineers are not those who know every answer. They're the ones who keep learning, adapt when they're wrong, and take responsibility for solving the problems in front of them.
+
+**One interview can tell you how someone performed that day. It cannot, by itself, tell the whole story of what they're capable of building.**
+
+---
+*These are my personal reflections from working in software engineering, architecture, and enterprise application development. My goal is not to discourage technical interviews, but to encourage better conversations between engineers and the people evaluating them.*
+
+## Sources
+
+- Microsoft Learn, [Hierarchical data (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/hierarchical-data-sql-server)
+- Google re:Work, [A guide to structured interviewing](https://rework.withgoogle.com/intl/en/guides/a-guide-to-structured-interviewing-for-better-hiring-practices)
+- SIOP, [Is cognitive ability the best predictor of job performance?](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/)
+- DORA, [2025 State of AI-assisted Software Development](https://dora.dev/research/2025/dora-report/)
+- U.S. Bureau of Labor Statistics, [Occupational Outlook Handbook: Software Developers](https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm)
+- World Economic Forum, [Future of Jobs Report 2025: Jobs outlook](https://www.weforum.org/publications/the-future-of-jobs-report-2025/2-jobs-outlook)
+- Charlie Chaplin official site, [Did Charlie Chaplin once lose his own lookalike contest?](https://www.charliechaplin.com/en/articles/334)
