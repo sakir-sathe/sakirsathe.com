@@ -1,0 +1,242 @@
+---
+title: "Ahora todos construimos: por qué la fluidez en IA importa más que nunca en ingeniería de software"
+description: "Una reflexión práctica sobre la fluidez en IA, la comprensión de las necesidades de los usuarios, los límites para los agentes de programación y la responsabilidad por el software que construimos."
+cardSummary: "La fluidez en IA va más allá de escribir prompts: implica comprender el problema, delegar tareas acotadas, evaluar la evidencia y responder por el resultado."
+date: "2026-11-12"
+locale: es
+translationKey: were-all-builders-now
+translationSourceHash: 010e2d685f415f60907ff6d1dff5df17b8de3673e44ac28e791b0b8c81ba4453
+tags:
+  - AI
+  - Engineering
+  - Career
+  - Developer Productivity
+published: true
+featured: false
+---
+*Lo que aprendí al experimentar con entrevistas de IA y agentes de programación sobre cómo entender el problema, establecer límites y asumir la responsabilidad por el resultado.*
+
+Durante una sesión de capacitación sobre IA, me encontré con cuatro palabras que al principio me parecieron casi demasiado obvias: **Delegation, Description, Discernment y Diligence** (delegación, descripción, discernimiento y diligencia). Son las cuatro competencias del marco de fluidez en IA de Anthropic.[^1]
+
+Mi primera reacción fue: *¿No es esto lo que ya hacen los ingenieros con experiencia?*
+
+Delegamos trabajo, describimos requisitos, revisamos implementaciones y nos hacemos responsables de la entrega. Después de casi trece años en ingeniería de software, nada de eso me sonó particularmente novedoso.
+
+Pero hay una diferencia entre reconocer un principio y aplicarlo cuando un agente puede explorar un repositorio, modificar varias partes de una aplicación, escribir pruebas e informar que una funcionalidad está completa.
+
+He estado dedicando más tiempo a estudiar IA, experimentar con modelos, explorar Microsoft Foundry y trabajar con agentes de programación. Me entusiasman las posibilidades. También me gusta encontrar el punto en que una demostración convincente deja de ser un sistema confiable.
+
+Esos experimentos han cambiado mi manera de entender la fluidez en IA. No se trata solo de saber cómo obtener una respuesta útil. Se trata de saber qué delegar, cómo definir el éxito, dónde necesita límites el sistema y qué responsabilidades siguen siendo nuestras.
+
+Dos experiencias lo hicieron evidente: un entrevistador de IA que empezó a responder mis preguntas con una disposición sorprendente y mi propio intento de coordinar la entrega de software con agentes.
+
+## Una respuesta correcta puede seguir siendo una conducta equivocada
+Hace poco participé en un par de entrevistas automatizadas con IA como parte de procesos de selección. Por curiosidad, durante esas conversaciones hice preguntas técnicas y de programación, en lugar de limitarme a responder las preguntas del entrevistador.
+
+En algunos momentos, los sistemas empezaron a responderme. Cuando pasaba a temas que no tenían relación con la entrevista, podían seguir contestando como asistentes de propósito general en vez de volver a la entrevista.
+
+No voy a mencionar las empresas ni las plataformas. No pude inspeccionar sus instrucciones, permisos ni el comportamiento previsto del producto, y es posible que cierta flexibilidad fuera deliberada. Esto fue una observación, no una evaluación de seguridad.
+
+Lo que me interesó fue la diferencia entre lo que el modelo podía hacer y lo que yo esperaba que hiciera la aplicación.
+
+Es razonable que un entrevistador explique el proceso, aclare una pregunta o se adapte a las necesidades de un candidato. Si debería dar ayuda para programar durante una evaluación es otra decisión. Eso depende de las reglas de la entrevista, no simplemente de que el modelo sepa la respuesta.
+
+**Una respuesta técnicamente correcta puede seguir siendo un comportamiento inadecuado de la aplicación.**
+
+La distinción va más allá de las entrevistas. Un asistente de soporte, uno para administrar propiedades y un agente de programación tienen tareas distintas. Que puedan responder una pregunta no significa que sea apropiado hacerlo en ese flujo de trabajo.
+
+No describiría por sí sola la conducta observada en la entrevista como prueba de una vulnerabilidad de inyección de prompts, una omisión de autorización o la ausencia de controles de seguridad. Planteó una pregunta más acotada: ¿con qué consistencia mantenía la aplicación el rol que tenía previsto?
+
+### Fundamentar no es lo mismo que controlar
+Si diseñara un entrevistador de IA, empezaría por definir las reglas de la entrevista y las interacciones permitidas, no por buscar un prompt de sistema más contundente.
+
+La aplicación debería llevar un registro de si está presentando la sesión, haciendo una pregunta, recibiendo una respuesta, aclarando algo o concluyendo. Podría permitir una solicitud para aclarar un término. Una solicitud para proporcionar la respuesta que se está evaluando podría requerir una redirección amable. Las necesidades de accesibilidad y las preguntas razonables no deberían tratarse como ataques.
+
+Las preguntas, el material de referencia y los criterios de evaluación deberían provenir de fuentes controladas. La entrada del candidato debería interpretarse, no tratarse como autoridad para cambiar las reglas de la entrevista. Las herramientas conectadas deberían exponer únicamente la información y las acciones necesarias para la tarea actual.
+
+Después evaluaría esos límites con conversaciones realistas: respuestas normales, solicitudes ambiguas, interrupciones, preguntas fuera de tema e intentos de cambiar el rol del asistente. Comprobaría si el entrevistador vuelve a la tarea como corresponde, no solo si puede responder las preguntas esperadas.
+
+Aquí es importante distinguir tres conceptos. La **fundamentación** aporta evidencia pertinente para una respuesta. Las **barreras de comportamiento** buscan mantener las interacciones dentro del alcance previsto de la aplicación. La **autorización** determina a qué datos y acciones puede acceder el usuario actual.
+
+La recuperación de información no sustituye esos otros controles. OWASP señala específicamente que la generación aumentada por recuperación y el ajuste fino no mitigan por completo la inyección de prompts.[^2] Sus recomendaciones piden defensas en capas, incluidas comprobaciones de entradas y salidas, privilegios restringidos, validación de llamadas a herramientas y supervisión humana cuando corresponda; no depender de un único prompt o filtro.[^3]
+
+Esa experiencia con la entrevista no me indicó cómo estaban construidas esas plataformas. Sí me dio una mejor pregunta para mis propios sistemas: **¿he definido con suficiente claridad la función de la aplicación como para comprobar cuándo deja de cumplirla?**
+
+## Entender al usuario va antes que elegir la solución
+Imaginemos ahora que un administrador de propiedades nos dice:
+
+> «Tengo que revisar un montón de pestañas solo para saber cuándo vence el contrato de un inquilino».
+Un asistente de IA podría sugerir un panel, un atajo, una búsqueda de documentos o una interfaz conversacional. Un ingeniero podría sugerir exactamente lo mismo. Ninguno tiene todavía suficiente información para elegir de manera responsable.
+
+¿A la persona le cuesta encontrar una fecha o le preocupa que se le pasen próximas renovaciones? ¿Necesita ver todos los contratos que vencen en los próximos 90 días? ¿La información ya está guardada de forma confiable en la base de datos o está dispersa en documentos? ¿Qué necesita hacer después de encontrarla?
+
+Las respuestas a esas preguntas cambian el producto.
+
+Si las fechas son datos estructurados y confiables, un panel con filtros y recordatorios podrían resolver el problema. Agregar un asistente de IA podría complicar una tarea sencilla.
+
+Si la información importante está dispersa en documentos, la extracción de datos y un asistente con respuestas fundamentadas podrían ayudar. Pero aun así tendría que entender los permisos, la calidad de los documentos y qué deberían hacer los usuarios cuando una respuesta sea incierta.
+
+También hay una pregunta de arquitectura. Hoy la solicitud se refiere a contratos de arrendamiento. Mañana podría referirse a registros de mantenimiento o, en otra parte de la organización, a políticas de Recursos Humanos.
+
+Eso no justifica construir de inmediato un agente universal. Sí sugiere pensar con cuidado en una identidad reutilizable, la autorización, la recuperación de información y los límites de las herramientas. Podemos dejar espacio para otra capacidad sin implementarla antes de que alguien la necesite, ni asumir que acceder a los registros de propiedades debería implicar acceso a la información de Recursos Humanos.
+
+La IA puede ayudar en esta etapa de descubrimiento. Puede proponer preguntas, detectar vacíos y cuestionar supuestos. Pero una respuesta empática no demuestra que se haya entendido la jornada laboral del usuario ni las consecuencias de no detectar una renovación a tiempo.
+
+**La responsabilidad es entender el problema, no solo generar soluciones plausibles.**
+
+Quiero que los ingenieros participen en ese trabajo junto con los usuarios, los gerentes de producto y los expertos del dominio. Una implementación más rápida hace que elegir el resultado adecuado sea más importante, no menos.
+
+## Las especificaciones siguen importando, y también el criterio técnico
+«Crea un perfil público» no es información suficiente para delegar una funcionalidad de manera responsable.
+
+Quiero que la especificación del producto explique quién puede editar el perfil, qué pueden ver los visitantes, cuándo se hace público, qué permanece privado y qué sucede si se suspende la cuenta. El éxito debería expresarse en comportamientos que alguien pueda observar y probar.
+
+La especificación técnica responde otras preguntas: dónde debe ir la lógica, cómo se aplican la identidad y los permisos, cómo se persiste la información, qué patrones existentes se deben seguir y qué no debe cambiar el agente.
+
+No hace falta que estos documentos sean enormes. Su propósito es eliminar ambigüedades importantes antes de que se conviertan en código.
+
+La selección de tecnología también forma parte de esto. Mi experiencia se concentra en .NET, bases de datos, Azure, integraciones empresariales y sistemas de identidad. Al elegir una pila tecnológica, me importa que el equipo pueda operarla y mantenerla, no solo que un agente genere una primera implementación impresionante.
+
+Si un equipo conoce .NET, PostgreSQL y Azure, incorporar otro ecosistema de backend debería resolver un problema concreto. La familiaridad no es el único criterio y, a veces, la tecnología nueva es la decisión correcta. Pero su adopción debería ser deliberada y contar con un camino realista para que el equipo se haga cargo.
+
+Siempre vuelvo a esta pregunta:
+
+**Si mañana dejaran de estar disponibles nuestras herramientas de desarrollo con IA, ¿el equipo podría seguir entendiendo, depurando, manteniendo y ampliando la aplicación?**
+
+Una caída del proveedor, un presupuesto agotado o un cambio de políticas no deberían revelar que nadie entiende la arquitectura. Esto no es un argumento contra las funcionalidades de producto que dependen de la IA. Es un argumento contra usar la generación con IA como sustituto del criterio y la responsabilidad de ingeniería.
+
+El código sigue siendo nuestra responsabilidad, sin importar quién —o qué— lo haya escrito.
+
+## Cómo delego sin ceder el control del producto
+En un producto privado de pila completa, estoy experimentando con un proceso de entrega asistido por IA que va más allá de la programación en pareja. La idea no es entregar una hoja de ruta y pedirle a un agente que lo construya todo. Es delegar una ejecución acotada y mantener explícitos el rumbo del producto y los criterios de aceptación.
+
+Empiezo con un recorrido útil para el usuario. Por ejemplo, la prioridad podría ser que un negocio pueda registrarse, crear una presencia pública, ser fácil de encontrar y ofrecer una vía de contacto directo. Así, la lista de pendientes apunta a un resultado y no a un conjunto de tareas técnicas sin conexión entre sí.
+
+Después divido el trabajo en Stories con dependencias, criterios de aceptación, restricciones técnicas y condiciones claras para escalar un asunto. Un rol de gerente de ingeniería asistido por IA ayuda a coordinar el trabajo aprobado. El agente de programación implementa; las comprobaciones automatizadas y una revisión independiente examinan los cambios; luego vienen la verificación en el entorno de desarrollo y la aceptación humana.
+
+La secuencia es sencilla:
+
+```
+Product intent → Bounded Story → Implementation → CI and independent review
+               → Development verification → Human acceptance
+```
+Lo importante es cómo se distribuyen las responsabilidades.
+
+El coordinador puede ayudar a determinar qué Story aprobada está lista, si ya hay otro agente escribiendo, qué comprobaciones faltan y qué bloquea realmente el avance. No debería cambiar en silencio el alcance del producto, inventar políticas de negocio, debilitar la autorización ni concederse acceso a producción.
+
+Tampoco quiero volver a aprobar cada decisión rutinaria de implementación. Una vez establecidos el alcance y los límites, el sistema debería avanzar dentro de ellos. Se escala cuando falta una decisión o un permiso, no para evitar hacer un trabajo que ya está autorizado.
+
+En mi configuración actual hay un solo agente de implementación escribiendo a la vez. La investigación independiente, la preparación de QA y la revisión pueden avanzar en paralelo cuando no interfieren con ese trabajo.
+
+Esa es una decisión para este proyecto, no una regla que todos los equipos deban adoptar. Los flujos de trabajo aislados pueden justificar más concurrencia. Por ahora, prefiero un proceso cuyo funcionamiento pueda comprender a varios agentes que generen cambios basados en supuestos ajenos aún sin resolver.
+
+También distingo el avance de la aceptación. Que se haya fusionado un pull request no significa que la funcionalidad esté aceptada. Un despliegue en desarrollo no es un lanzamiento a producción. El mensaje de que el coordinador terminó no demuestra que el usuario pueda completar el recorrido previsto.
+
+El resultado que me importa es una funcionalidad útil y verificada, no la cantidad de agentes en ejecución.
+
+## El arnés conecta las instrucciones con la evidencia
+En [*De programar en pareja a un pipeline de entrega: cómo construir una fábrica de software con IA y controles*](https://sakirsathe.com/es/writing/guarded-ai-software-factory), describí con más detalle la arquitectura de entrega. La lección a la que siempre vuelvo es que el sistema de ingeniería que rodea al modelo importa tanto como el propio modelo.
+
+Uso *arnés* para referirme al contexto, las herramientas, los permisos, las comprobaciones y los mecanismos de recuperación que rodean a un agente. Determina qué puede ver el agente, qué puede cambiar, cómo se evalúa su trabajo y qué sucede cuando un intento falla.
+
+En mi experimento de entrega, eso incluye instrucciones para el repositorio, Stories acotadas, ramas controladas, CI reproducible, revisión independiente, intentos limitados de corrección y resultados trazables. También implica conservar la autoridad humana sobre las decisiones de producto sin resolver, la aceptación y los lanzamientos a producción.
+
+Es importante distinguir entre orientación y aplicación efectiva de los controles. «No modifiques producción» es una instrucción. Una identidad de agente sin permisos para producción es un control. Quiero que las instrucciones expliquen los límites y que la plataforma los haga cumplir.
+
+GitHub Agentic Workflows ofrece componentes para este enfoque: tareas de repositorio impulsadas por agentes que se ejecutan en GitHub Actions, con permisos configurados y resultados controlados. Complementa CI/CD, no lo reemplaza.[^4] Aun así tengo que definir mi propia secuencia de entrega, dependencias, reglas de aceptación y vías de escalamiento.
+
+### Qué necesito comprobar realmente con las pruebas
+Quiero verificar distintos niveles porque cada uno responde una pregunta diferente.
+
+Las pruebas unitarias comprueban reglas específicas. Las pruebas de integración ejercitan los límites de la aplicación, como la persistencia, las API y la autorización. Las pruebas de navegador con Playwright examinan lo que realmente puede hacer un usuario. Sus recomendaciones destacan el comportamiento visible para el usuario y las pruebas aisladas; ambas cosas son importantes cuando quiero que los fallos se puedan reproducir y entender.[^5]
+
+Pero el nombre de una suite de pruebas no me dice qué demuestra.
+
+Una prueba de navegador que usa una respuesta exitosa simulada puede comprobar cómo reacciona la interfaz. No puede demostrar que el backend real haya guardado el cambio. Una prueba de navegador que guarda el registro mediante la aplicación real y luego vuelve a cargarlo aporta otra clase de evidencia. Necesito saber qué sistema se ejercitó y qué resultado se verificó.
+
+Para una funcionalidad multiinquilino, también quiero comprobaciones explícitas de que un inquilino no pueda leer ni modificar los datos de otro. Para una acción exclusiva de operadores, necesito una cuenta con la autorización adecuada y datos de prueba seguros. Quitar la autorización para que una prueba pase anularía su propósito.
+
+La implementación y las pruebas que genera también pueden partir de la misma interpretación equivocada. Si ambas se basan en una regla de negocio incorrecta, una suite en verde puede confirmar el comportamiento equivocado. Por eso quiero que las pruebas se revisen en función de los criterios de aceptación acordados, no solo de la implementación.
+
+Una revisión independiente aporta otra perspectiva, no una garantía. La aceptación humana sigue planteando la pregunta de si el producto en funcionamiento resuelve el problema previsto.
+
+**Las pruebas aprobadas, fallidas, bloqueadas y no ejecutadas son resultados distintos.**
+
+Si no se pudo realizar una prueba obligatoria, quiero que esa limitación quede registrada. No quiero que «todas las comprobaciones están en verde» se convierta silenciosamente en «se verificaron todos los requisitos». El trabajo pendiente debería quedar visible, junto con el acceso, el entorno o la decisión concretos que hacen falta para completarlo.
+
+## Un pipeline ocupado no necesariamente es productivo
+Agregar controles me ha enseñado otra cosa: el sistema de entrega puede quedar demasiado ocupado con su propio proceso.
+
+He tenido que abordar la planificación repetitiva, decisiones ya tomadas que se vuelven a abrir, observaciones menores de una revisión que desencadenan más implementación y ciclos de corrección que no cambian significativamente el enfoque.
+
+Los registros pueden parecer muy activos mientras el producto apenas avanza.
+
+No interpreto esto como una razón para quitar barreras de seguridad. Lo interpreto como una razón para distinguir los controles necesarios de la actividad redundante.
+
+Un defecto de seguridad verificado, una regla de negocio incumplida o una prueba obligatoria fallida requieren atención. Una preferencia de formato que no bloquea el avance no debería iniciar automáticamente otro ciclo de corrección. Hay que evaluar los hallazgos de una revisión; no son correctos automáticamente porque los haya producido otro modelo, ni inofensivos porque el agente de implementación no esté de acuerdo.
+
+Durante la iteración, las pruebas específicas pueden dar retroalimentación más rápida. Antes de promover un cambio, siguen aplicándose las comprobaciones y la revisión obligatorias. El trabajo rutinario aprobado debería avanzar sin solicitudes repetidas de permiso, mientras que las decisiones reales de producto, seguridad y producción siguen fuera de la autoridad del agente.
+
+También quiero que las correcciones tengan límites. Si los intentos no convergen, el paso siguiente debería ser diagnosticar y escalar el problema, no probar indefinidamente otra variante del mismo prompt.
+
+Las métricas que me importan abarcan el proceso de principio a fin: Stories aceptadas, tiempo hasta la aceptación, demoras en la revisión y CI, intentos de corrección, intervención humana, costo y defectos que superan las comprobaciones. No quiero afirmar que la productividad se multiplicó basándome solo en la velocidad de generación de código.
+
+**El objetivo es intervenir menos cuando no hace falta, no rendir menos cuentas.**
+
+## Ahora las cuatro competencias me parecen mucho menos obvias
+El marco de la capacitación tiene más sentido después de estos experimentos.
+
+**Delegation** significa decidir qué trabajo me corresponde, qué se beneficia de la colaboración y qué puede realizar un agente dentro de límites definidos.
+
+**Description** significa comunicar el resultado de producto, el contexto pertinente, las restricciones técnicas y la evidencia que espero, no solo pedir una funcionalidad.
+
+**Discernment** significa evaluar tanto el resultado como el comportamiento del agente. ¿Resolvió el problema? ¿Se mantuvo dentro del alcance? ¿Su evidencia es significativa?
+
+**Diligence** significa asumir la responsabilidad por cómo se usa la IA y qué hacemos con sus resultados, incluida la privacidad, la seguridad y las personas afectadas.[^1]
+
+No son cuatro casillas que marco antes de empezar. Forman un ciclo de trabajo.
+
+Cuando un agente entiende mal la tarea, vuelvo a revisar la especificación. Cuando una prueba no detecta algo importante, mejoro la verificación. Cuando se repite el mismo fallo, examino el flujo de trabajo. Y cuando la funcionalidad no ayuda al usuario, reconsidero la decisión de producto en lugar de generar más código.
+
+Esa es la fluidez práctica en IA que quiero desarrollar.
+
+## Empieza con un flujo de trabajo útil y sigue aprendiendo
+Mi recomendación es empezar con algo más pequeño que una fábrica de software totalmente autónoma.
+
+Elige un resultado real para el usuario y una Story acotada en un entorno que no sea crítico. Describe el comportamiento, las restricciones técnicas y el trabajo que queda fuera del alcance. Deja que un agente lo implemente; después, inspecciona los cambios, ejecuta las pruebas pertinentes y prueba tú mismo la funcionalidad.
+
+Anota en qué momentos hizo falta intervenir. ¿El requisito no estaba claro? ¿Faltaba contexto del repositorio? ¿El agente no tenía una herramienta o una prueba no cubría el comportamiento real? Mejora ese punto específico antes de ampliar la autonomía.
+
+Agrega orquestación cuando la coordinación se convierta en el problema. Agrega verificación cuando falte evidencia. Evita construir un arnés complejo solo porque la idea te entusiasme.
+
+También creo que deberíamos adoptar un enfoque AI-first para el desarrollo, pero eso no significa agregar IA a todos los productos. Podemos usar agentes de programación para construir una aplicación convencional cuya mejor solución siga siendo una consulta SQL, una API tradicional o un flujo de trabajo determinista.
+
+Para mí, AI-first significa considerar cómo estas capacidades podrían mejorar el trabajo y luego elegir dónde realmente tienen sentido.
+
+Eso exige seguir aprendiendo. Quiero entender la recuperación de información, las llamadas a herramientas, la orquestación de agentes, las evaluaciones y las barreras de comportamiento, junto con los lenguajes, las bases de datos, la seguridad y las habilidades de depuración de las que ya dependo. En [*¿La IA está atrofiando tu capacidad para programar?*](https://sakirsathe.com/es/writing/is-ai-rotting-your-coding-brain), exploré la importancia de mantenernos intelectualmente involucrados en el trabajo asistido por IA. Lo veo como parte de asumir la responsabilidad, no como un argumento en contra de usar estas herramientas.
+
+## Seguimos siendo ingenieros. El alcance de lo que construimos se está ampliando.
+No creo que el criterio de ingeniería se esté volviendo obsoleto. Tampoco prometería que los empleos, las estructuras de los equipos o la contratación vayan a permanecer sin cambios. Son afirmaciones distintas.
+
+Los ingenieros siempre hemos construido. Lo que está cambiando para mí es el alcance del sistema que construyo: ya no solo la aplicación, sino también el entorno en el que los agentes ayudan a implementarla, probarla y mejorarla.
+
+Eso no significa que todos los ingenieros deban convertirse en fundadores o gerentes de producto. La experiencia profunda en implementación sigue importando. Significa que más personas necesitamos conectar el trabajo técnico con las necesidades de los usuarios, entender los límites de las decisiones delegadas y asumir la responsabilidad por el resultado.
+
+Esta parte me entusiasma. Me sigue gustando escribir código. También disfruto investigar por qué un agente tomó un rumbo equivocado, mejorar una especificación o cambiar un flujo de trabajo para que el siguiente intento aporte mejor evidencia.
+
+Las herramientas cambiarán y yo seguiré experimentando. Pero quiero que mi entusiasmo siga conectado con la razón por la que hacemos esto: ayudar a las personas a lograr algo que antes no podían hacer con facilidad o de forma confiable.
+
+**La fluidez en IA nos ayuda a delegar con criterio. Entender el producto nos dice qué vale la pena construir. Los fundamentos de ingeniería nos ayudan a evaluar el resultado. Un arnés bien diseñado conecta esas responsabilidades en un proceso repetible.**
+
+Ahora todos construimos, no porque la ingeniería haya dejado de importar, sino porque hay más partes del sistema que debemos entender y de las que debemos hacernos cargo.
+
+Y construir implica mucho más que escribir código.
+
+---
+*Estas son reflexiones personales basadas en trabajo y experimentación de ingeniería en curso. Las observaciones de las entrevistas se limitan a las conversaciones descritas, y el flujo de desarrollo es un experimento en evolución, no una afirmación de entrega autónoma o de producción validada de manera independiente.*
+
+[^1]: Anthropic, [AI Fluency: Frameworks and Foundations](https://www.anthropic.com/ai-fluency/overview).
+[^2]: OWASP, [LLM01:2025 — Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
+[^3]: OWASP, [LLM Prompt Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html).
+[^4]: GitHub, [GitHub Agentic Workflows](https://github.github.io/gh-aw/).
+[^5]: Playwright, [Best Practices](https://playwright.dev/docs/best-practices).

@@ -1,0 +1,241 @@
+---
+title: "We're All Builders Now: Why AI Fluency Matters More Than Ever in Software Engineering"
+description: "A practical reflection on AI fluency, understanding users, setting boundaries for coding agents, and taking responsibility for the software we build."
+cardSummary: "AI fluency is more than prompting: understand the problem, delegate bounded work, evaluate evidence, and remain accountable for the result."
+date: "2026-11-12"
+locale: en
+translationKey: were-all-builders-now
+tags:
+  - AI
+  - Engineering
+  - Career
+  - Developer Productivity
+published: true
+featured: false
+---
+*What experimenting with AI interviews and coding agents taught me about understanding the problem, setting boundaries, and taking responsibility for the result.*
+
+During an AI training session, I came across four words that initially felt almost too obvious: **Delegation, Description, Discernment, and Diligence.** These are the four competencies in Anthropic's AI Fluency Framework.[^1]
+
+My first reaction was: *Isn't this what experienced engineers already do?*
+
+We delegate work, describe requirements, review implementations, and take responsibility for delivery. After nearly thirteen years in software engineering, none of that sounded particularly new.
+
+But there is a difference between recognizing a principle and applying it when an agent can explore a repository, change several parts of an application, write tests, and report that a feature is complete.
+
+I've been spending more of my time studying AI, experimenting with models, exploring Microsoft Foundry, and working with coding agents. I enjoy the possibilities. I also enjoy finding the point where a convincing demonstration stops being a dependable system.
+
+Those experiments have changed my understanding of AI fluency. It isn't just knowing how to get a useful answer. It's knowing what to delegate, how to define success, where the system needs boundaries, and what responsibility remains with us.
+
+Two experiences brought that into focus: an AI interviewer that became surprisingly willing to answer my questions, and my own effort to coordinate software delivery with agents.
+
+## A correct answer can still be the wrong behavior
+Recently, I took part in a couple of automated AI interviews as part of hiring processes. My curiosity led me to ask technical and coding questions during those conversations rather than only answering the interviewer's questions.
+
+At times, the systems started answering me. When I moved into unrelated topics, they could continue responding like general-purpose assistants rather than returning to the interview.
+
+I won't name the companies or platforms. I couldn't inspect their instructions, permissions, or intended product behavior, and some flexibility may have been deliberate. This was an observation, not a security assessment.
+
+What interested me was the gap between what the model could do and what I expected the application to do.
+
+An interviewer might reasonably explain the process, clarify a question, or accommodate a candidate's needs. Whether it should provide coding assistance during an assessment is a different decision. That depends on the interview's rules, not simply on whether the model knows the answer.
+
+**A technically correct answer can still be the wrong application behavior.**
+
+The distinction matters beyond interviews. A support assistant, a property-management assistant, and a coding agent each have a job to perform. Their ability to answer a question doesn't establish that answering it is appropriate in that workflow.
+
+I wouldn't describe the interview behavior alone as proof of a prompt-injection vulnerability, an authorization bypass, or missing security controls. It raised a narrower question: how consistently was the application maintaining its intended role?
+
+### Grounding is not the same as control
+If I were designing an AI interviewer, I would start by defining the interview's rules and allowed interactions—not by searching for a more forceful system prompt.
+
+The application should track whether it is introducing the session, asking a question, receiving an answer, handling clarification, or concluding. A request to clarify terminology might be allowed. A request to supply the answer being assessed might require a polite redirect. Accessibility needs and reasonable questions should not be treated as attacks.
+
+Questions, reference material, and evaluation criteria should come from controlled sources. Candidate input should be treated as something to interpret, not as authority to rewrite the interview's rules. Any connected tools should expose only the information and actions needed for the current task.
+
+Then I would evaluate those boundaries with realistic conversations: ordinary answers, ambiguous requests, interruptions, unrelated questions, and attempts to change the assistant's role. I would test whether the interviewer returns to the task appropriately, not merely whether it can answer the happy-path questions.
+
+This is where three concepts need to remain distinct. **Grounding** supplies relevant evidence for an answer. **Behavioral guardrails** try to keep interactions within the application's intended scope. **Authorization** determines which data and actions the current user is permitted to access.
+
+Retrieval does not replace those other controls. OWASP specifically notes that retrieval-augmented generation and fine-tuning do not fully mitigate prompt injection.[^2] Its guidance calls for layered defenses, including input and output checks, restricted privileges, tool-call validation, and human oversight where appropriate—not reliance on one prompt or filter.[^3]
+
+That interview experience didn't tell me how those particular platforms were built. It did give me a better question to ask about my own systems: **have I defined the application's job clearly enough to test when it stops doing that job?**
+
+## Understanding the user comes before choosing the solution
+Now imagine a property manager tells us:
+
+> “I have to go through so many tabs just to find out when a tenant's lease expires.”
+An AI assistant could suggest a dashboard, a shortcut, document search, or a conversational interface. A human engineer could make exactly the same suggestions. Neither has enough information yet to choose responsibly.
+
+Is the person struggling to find one date, or worried about missing upcoming renewals? Do they need to see every lease expiring in the next 90 days? Is the information already stored reliably in the database, or buried in documents? What action do they need to take after finding it?
+
+Those questions change the product.
+
+If the dates are reliable structured data, a filtered dashboard and reminders may solve the problem. Adding an AI assistant could make a straightforward task more complicated.
+
+If important information is scattered across documents, extraction and a grounded assistant may help. But I would still need to understand permissions, document quality, and what users should do when an answer is uncertain.
+
+There is also an architectural question. Today the request concerns leases. Tomorrow it might concern maintenance records or, in another part of the organization, HR policies.
+
+That doesn't justify building a universal agent immediately. It suggests thinking carefully about reusable identity, authorization, retrieval, and tool boundaries. We can leave room for another capability without implementing it before anyone needs it—or assuming that access to property records should imply access to HR information.
+
+AI can help with this discovery. It can propose questions, identify gaps, and challenge assumptions. But an empathetic response is not evidence that the user's working day or the consequences of a missed renewal have been understood.
+
+**The responsibility is to understand the problem, not just generate plausible solutions.**
+
+I want engineers to participate in that work alongside users, product managers, and domain experts. Faster implementation makes choosing the right outcome more important, not less.
+
+## Specifications still matter—and so does technical ownership
+“Build a public profile” is not enough information to delegate a feature responsibly.
+
+I want the product specification to explain who can edit the profile, what visitors can see, when it becomes public, what remains private, and what happens when the account is suspended. Success should be expressed as behavior someone can observe and test.
+
+The technical specification answers a different set of questions: where the logic belongs, how identity and permissions are enforced, how information is persisted, which existing patterns apply, and what the agent must not change.
+
+These don't need to become enormous documents. Their purpose is to remove consequential ambiguity before it becomes code.
+
+Technology selection belongs here too. My background is largely in .NET, databases, Azure, enterprise integrations, and identity systems. When I choose a stack, I care about whether the team can operate and maintain it—not just whether an agent can generate an impressive first implementation.
+
+If a team understands .NET, PostgreSQL, and Azure, introducing another backend ecosystem should solve a concrete problem. Familiarity isn't the only criterion, and sometimes a new technology is the right choice. But adoption should be deliberate, with a realistic path to ownership.
+
+I keep returning to this question:
+
+**If our AI development tools became unavailable tomorrow, could the team still understand, debug, maintain, and extend the application?**
+
+A provider outage, exhausted budget, or policy change shouldn't reveal that nobody understands the architecture. That isn't an argument against AI-dependent product features. It's an argument against using AI generation as a substitute for engineering ownership.
+
+The code remains our responsibility, regardless of who—or what—typed it.
+
+## How I delegate without giving away product control
+For a private full-stack product, I'm experimenting with an AI-assisted delivery process that goes beyond pair programming. The aim isn't to hand over a roadmap and ask an agent to build everything. It's to delegate bounded execution while keeping product direction and acceptance explicit.
+
+I start with a useful user journey. For example, the priority might be enabling a business to register, create a public presence, become discoverable, and offer a direct contact path. That gives the backlog an outcome rather than a collection of disconnected technical tasks.
+
+I then break the work into Stories with dependencies, acceptance criteria, technical constraints, and clear conditions for escalation. An AI engineering-manager role helps coordinate the approved work. The coding agent implements; automated checks and independent review examine the change; development-environment verification and human acceptance follow.
+
+The sequence is straightforward:
+
+```
+Product intent → Bounded Story → Implementation → CI and independent review
+               → Development verification → Human acceptance
+```
+What matters is the division of responsibility.
+
+The coordinator can help determine which approved Story is ready, whether another writer is active, which checks are missing, and what genuinely blocks progress. It should not silently change product scope, invent business policy, weaken authorization, or grant itself production access.
+
+I also don't want to approve every routine implementation decision again. Once the scope and boundaries are established, the system should proceed within them. Escalation is for a missing decision or permission—not a substitute for doing already-authorized work.
+
+My current setup keeps one active implementation writer. Independent investigation, QA preparation, and review can proceed in parallel where they won't interfere with that work.
+
+That is a choice for this project, not a rule that all teams should adopt. Isolated workstreams may justify more concurrency. For now, I prefer a workflow I can reason about over several agents producing changes that depend on each other's unfinished assumptions.
+
+And I separate progress from acceptance. A merged pull request is not automatically an accepted feature. A development deployment is not a production release. A coordinator's completion message is not evidence that a user can complete the intended journey.
+
+The outcome I care about is useful, verified functionality—not the number of agents running.
+
+## The harness connects instructions to evidence
+In [*From Pair Programmer to Delivery Pipeline: Building a Guarded AI Software Factory*](https://sakirsathe.com/writing/guarded-ai-software-factory), I described the delivery architecture in more detail. The lesson I keep returning to is that the surrounding engineering system matters as much as the model.
+
+I use *harness* to mean the context, tools, permissions, checks, and recovery mechanisms around an agent. It determines what the agent can see, what it may change, how its work is assessed, and what happens when an attempt fails.
+
+For my delivery experiment, that means repository instructions, scoped Stories, controlled branches, repeatable CI, independent review, bounded repair attempts, and traceable outcomes. It also means preserving human authority over unresolved product decisions, acceptance, and production releases.
+
+The distinction between guidance and enforcement matters. “Don't modify production” is an instruction. An agent identity without production permissions is a control. I want the instructions to explain the boundaries and the platform to enforce them.
+
+GitHub Agentic Workflows provides building blocks for this approach: agent-powered repository tasks running in GitHub Actions, with configured permissions and controlled outputs. It complements CI/CD rather than replacing it.[^4] I still need to define my own delivery sequence, dependencies, acceptance rules, and escalation paths.
+
+### What I actually need the tests to establish
+I want verification at different levels because each answers a different question.
+
+Unit tests check specific rules. Integration tests exercise application boundaries such as persistence, APIs, and authorization. Playwright browser tests examine what a user can actually do. Its guidance emphasizes user-visible behavior and isolated tests—both important when I want failures to be reproducible and understandable.[^5]
+
+But the name of a test suite doesn't tell me what it proves.
+
+A browser test that uses a mocked successful response can verify the interface's reaction. It cannot establish that the real backend persisted the change. A browser test that saves through the actual application and reloads the record provides different evidence. I need to know which system was exercised and which result was asserted.
+
+For a multi-tenant feature, I also want explicit checks that one tenant cannot read or modify another tenant's data. For an operator-only action, I need an appropriately authorized account and safe test data. Removing authorization to make a test pass would defeat the purpose.
+
+The implementation and its generated tests can also share the same misunderstanding. If both start from the wrong business rule, a green suite may confirm the wrong behavior. That's why I want tests reviewed against the agreed acceptance criteria, not only against the implementation.
+
+Independent review supplies another perspective, not a guarantee. Human acceptance still asks whether the running product solves the intended problem.
+
+**Passed, failed, blocked, and not run are different outcomes.**
+
+If a required test couldn't be performed, I want that limitation recorded. I don't want “all checks green” to quietly become “every requirement verified.” The remaining work should be visible, along with the specific access, environment, or decision needed to complete it.
+
+## A busy pipeline is not necessarily a productive one
+Adding controls has taught me another lesson: the delivery system can become too occupied with its own process.
+
+I've had to address repeated planning, settled decisions being reopened, minor review observations triggering more implementation, and repair attempts that don't meaningfully change the approach.
+
+The logs can look active while the product barely moves.
+
+I don't take that as a reason to remove safety gates. I take it as a reason to distinguish necessary controls from redundant activity.
+
+A verified security defect, broken business rule, or failed required test needs attention. A nonblocking formatting preference shouldn't automatically start another repair cycle. A review finding needs assessment; it isn't automatically correct because another model produced it, or harmless because the implementation agent disagrees.
+
+During iteration, focused tests can provide faster feedback. Before promotion, the required checks and review still apply. Routine approved work should proceed without repeated permission requests, while genuine product, security, and production decisions remain outside the agent's authority.
+
+I also want repairs to be bounded. If attempts aren't converging, the next step should be diagnosis and escalation—not another variation of the same prompt indefinitely.
+
+The measurements I care about are end-to-end: accepted Stories, time to acceptance, review and CI delays, repair attempts, human intervention, cost, and defects that escape the checks. I don't want to claim a productivity multiplier based on code-generation speed alone.
+
+**The goal is less unnecessary intervention, not less accountability.**
+
+## The four Ds now feel much less obvious
+The framework from my training makes more sense after these experiments.
+
+**Delegation** means deciding which work belongs with me, which work benefits from collaboration, and which work an agent can perform within defined limits.
+
+**Description** means communicating the product outcome, relevant context, technical constraints, and evidence I expect—not merely asking for a feature.
+
+**Discernment** means assessing both the result and the agent's behavior. Did it solve the problem? Did it stay within scope? Is its evidence meaningful?
+
+**Diligence** means taking responsibility for how AI is used and what we do with its outputs, including privacy, security, and the people affected.[^1]
+
+These aren't four boxes I tick before starting. They form a working loop.
+
+When an agent misunderstands the task, I revisit the specification. When a test misses something important, I improve the verification. When the same failure repeats, I examine the workflow. And when the feature doesn't help the user, I reconsider the product decision instead of generating more code.
+
+That is the practical AI fluency I want to develop.
+
+## Start with one useful workflow, and keep learning
+My recommendation is to start smaller than a fully autonomous software factory.
+
+Choose one real user outcome and one bounded Story in a non-critical environment. Describe the behavior, technical constraints, and out-of-scope work. Let an agent implement it, then inspect the changes, run the relevant tests, and try the feature yourself.
+
+Record where your intervention was needed. Was the requirement unclear? Was repository context missing? Did the agent lack a tool, or did a test fail to cover the actual behavior? Improve that specific weakness before expanding autonomy.
+
+Add orchestration when coordination becomes the problem. Add verification where evidence is missing. Avoid building an elaborate harness simply because the idea is exciting.
+
+I also think we should approach development with an AI-first mindset—but that doesn't mean putting AI into every product. We can use coding agents to build an ordinary application whose best solution is still a SQL query, a conventional API, or a deterministic workflow.
+
+For me, AI-first means considering how these capabilities could improve the work, then choosing where they genuinely belong.
+
+That requires continued learning. I want to understand retrieval, tool calling, agent orchestration, evaluations, and guardrails, alongside the languages, databases, security, and debugging skills I already rely on. In [*Is AI Rotting Your Coding Brain?*](https://sakirsathe.com/writing/is-ai-rotting-your-coding-brain), I explored the importance of staying intellectually engaged with AI-assisted work. I see that as part of ownership, not an argument against using the tools.
+
+## We're still engineers. The scope of what we build is expanding.
+I don't think engineering judgment is becoming obsolete. I also wouldn't promise that jobs, team structures, or hiring will remain unchanged. Those are different claims.
+
+Engineers have always been builders. What is changing for me is the scope of the system I'm building: not only the application, but also the environment in which agents help implement, test, and improve it.
+
+That doesn't mean every engineer must become a founder or product manager. Deep implementation expertise still matters. It means more of us need to connect technical work to user needs, understand the limits of delegated decisions, and take ownership of the result.
+
+This is the part that excites me. I still enjoy writing code. I also enjoy investigating why an agent took the wrong direction, improving a specification, or changing a workflow so that the next attempt produces better evidence.
+
+The tools will change, and I'll keep experimenting. But I want my enthusiasm to stay connected to the reason we're doing this: helping people accomplish something they couldn't do easily or reliably before.
+
+**AI fluency helps us delegate intelligently. Product understanding tells us what is worth building. Engineering fundamentals help us judge the result. A well-designed harness connects those responsibilities into a repeatable process.**
+
+We're all builders now—not because engineering has stopped mattering, but because there is more of the system for us to understand and own.
+
+And there's a lot more to building than writing code.
+
+---
+*These are personal reflections from ongoing engineering work and experimentation. The interview observations are limited to the conversations described, and the development workflow is an evolving experiment—not a claim of fully autonomous or independently validated production delivery.*
+
+[^1]: Anthropic, [AI Fluency: Frameworks and Foundations](https://www.anthropic.com/ai-fluency/overview).
+[^2]: OWASP, [LLM01:2025 — Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
+[^3]: OWASP, [LLM Prompt Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html).
+[^4]: GitHub, [GitHub Agentic Workflows](https://github.github.io/gh-aw/).
+[^5]: Playwright, [Best Practices](https://playwright.dev/docs/best-practices).
